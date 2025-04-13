@@ -1,11 +1,23 @@
 package src.ServiceLayer;
 
+import src.DomainLayer.Supplier;
+import src.DomainLayer.SupplierController;
+import src.DomainLayer.ContactPerson;
+import src.DomainLayer.Agreement;
+import src.DomainLayer.Product;
+import src.DomainLayer.SupplierNeedsPickup;
+import src.DomainLayer.SupplierWithDeliveryDays;
+import src.DomainLayer.Enums.DaysOfTheWeek;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class SupplierService {
     private static SupplierService instance;
-    private SupplierRepository supplierRepository;
+    private SupplierController supplierController;
 
     private SupplierService() {
-        supplierRepository = SupplierRepository.getInstance();
+        supplierController = SupplierController.getInstance();
     }
 
     public static synchronized SupplierService getInstance() {
@@ -15,54 +27,61 @@ public class SupplierService {
         return instance;
     }
 
-    public Supplier createSupplier(String name, int bankAccount) {
-        int companyId = supplierRepository.generateSupplierId();
-        Supplier supplier = new Supplier(name, companyId, bankAccount);
-        supplierRepository.addSupplier(supplier);
+    public Supplier createSupplier(String name, int supplierId, int bankAccount) {
+        Supplier supplier = new SupplierNeedsPickup(name, "", supplierId, bankAccount);
+        supplierController.addSupplier(supplierId, supplier);
         return supplier;
     }
 
-    public Supplier getSupplier(int companyId) {
-        return supplierRepository.getSupplier(companyId);
+    public Supplier createSupplierWithDelivery(String name, int supplierId, int bankAccount, List<DaysOfTheWeek> deliveryDays) {
+        Supplier supplier = new SupplierWithDeliveryDays(name, supplierId, bankAccount, deliveryDays);
+        supplierController.addSupplier(supplierId, supplier);
+        return supplier;
+    }
+
+    public Supplier createSupplierNeedsPickup(String name, String address, int supplierId, int bankAccount) {
+        Supplier supplier = new SupplierNeedsPickup(name, address, supplierId, bankAccount);
+        supplierController.addSupplier(supplierId, supplier);
+        return supplier;
+    }
+
+    public Supplier getSupplier(int supplierId) {
+        return supplierController.getSupplierById(supplierId);
     }
 
     public List<Supplier> getAllSuppliers() {
-        return supplierRepository.getAllSuppliers();
+        return supplierController.getAllSuppliers();
     }
 
-    public boolean removeSupplier(int companyId) {
-        return supplierRepository.removeSupplier(companyId);
+    public boolean removeSupplier(int supplierId) {
+        return supplierController.removeSupplier(supplierId);
     }
 
-    public List<Supplier> findSuppliersByName(String name) {
-        return supplierRepository.findSuppliersByName(name);
-    }
-
-    public void addContactPersonToSupplier(int companyId, String name, String email, int phoneNumber) {
-        Supplier supplier = supplierRepository.getSupplier(companyId);
+    public void addContactPersonToSupplier(int supplierId, String name, int phoneNumber) {
+        Supplier supplier = supplierController.getSupplierById(supplierId);
         if (supplier != null) {
-            ContactPerson contactPerson = new ContactPerson(name, email, phoneNumber);
+            ContactPerson contactPerson = new ContactPerson(name, phoneNumber);
             supplier.addContactPerson(contactPerson);
         }
     }
 
-    public void addAgreementToSupplier(int companyId, Agreement agreement) {
-        Supplier supplier = supplierRepository.getSupplier(companyId);
+    public void addAgreementToSupplier(int supplierId, Agreement agreement) {
+        Supplier supplier = supplierController.getSupplierById(supplierId);
         if (supplier != null) {
             supplier.addAgreement(agreement);
         }
     }
 
-    public List<Product> getSupplierProducts(int companyId) {
-        Supplier supplier = supplierRepository.getSupplier(companyId);
+    public List<Product> getSupplierProducts(int supplierId) {
+        Supplier supplier = supplierController.getSupplierById(supplierId);
         if (supplier != null) {
             return supplier.getAvailableProducts();
         }
         return new ArrayList<>();
     }
 
-    public List<Agreement> getValidAgreements(int companyId) {
-        Supplier supplier = supplierRepository.getSupplier(companyId);
+    public List<Agreement> getValidAgreements(int supplierId) {
+        Supplier supplier = supplierController.getSupplierById(supplierId);
         if (supplier != null) {
             return supplier.getValidAgreements();
         }
