@@ -1,0 +1,45 @@
+package PresentationLayer;
+
+import BussinessLayer.Item;
+import BussinessLayer.Order;
+import BussinessLayer.Transport;
+
+import java.time.LocalDate;
+import java.util.List;
+
+public class OrderController {
+    private OrderService orderService;
+
+    // Constructor
+    public OrderController(OrderService orderService){
+        this.orderService = orderService;
+    }
+
+    // Methods
+    public Order createOrder(LocalDate date, String siteId, List<Item> items){
+        return orderService.createOrder(date, siteId, items); 
+    }
+
+    public List<Order> getAllOrders(){
+        return orderService.getAllOrders();
+    }
+    public Order getOrderById(int id){
+        return orderService.getOrderById(id);
+    }
+    public List<Order> getOrdersByDate(LocalDate date){
+        return orderService.getOrdersByDate(date);
+    }
+    public List<Order> getOrdersByStatus(OrderStatus status){
+        return orderService.getOrdersByStatus(status);
+    }
+    public boolean updateOrderStatus(int id, OrderStatus newStatus){
+        return orderService.updateOrderStatus(id, newStatus);
+    }
+    public boolean assignTransportToOrder(int orderId, int transportId){
+        return orderService.assignTransportToOrder(orderId, transportId);
+    }
+    public boolean cancelOrder(int id){
+        return orderService.cancelOrder(id);
+    }
+
+}
