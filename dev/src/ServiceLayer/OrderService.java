@@ -1,13 +1,19 @@
 package src.ServiceLayer;
 
+import src.DomainLayer.OrderController;
+import src.DomainLayer.SupplierController;
+import src.DomainLayer.*;
+
+import java.util.List;
+
 public class OrderService {
     private static OrderService instance;
-    private OrderRepository orderRepository;
-    private SupplierRepository supplierRepository;
+    private OrderController orderRepository;
+    private SupplierController supplierRepository;
 
     private OrderService() {
-        orderRepository = OrderRepository.getInstance();
-        supplierRepository = SupplierRepository.getInstance();
+        orderRepository = OrderController.getInstance();
+        supplierRepository = SupplierController.getInstance();
     }
 
     public static synchronized OrderService getInstance() {
