@@ -24,7 +24,7 @@ public class OrderController {
         this.nextOrderId = 1; // Start with order ID 1
     }
 
-    public Order createOrder(int supplierId, LocalDate supplyDate, Map<Integer, Integer> items) {
+    public Order createOrder(String supplierId, LocalDate supplyDate, Map<Integer, Integer> items) {
         Order order = new Order(nextOrderId, supplierId, LocalDate.now(), supplyDate, items, STATUS.IN_PROCESS);
         orders.put(nextOrderId, order);
         nextOrderId++;
@@ -35,7 +35,7 @@ public class OrderController {
         return orders.get(orderId);
     }
 
-    public List<Order> getOrdersBySupplier(int supplierId) {
+    public List<Order> getOrdersBySupplier(String supplierId) {
         List<Order> supplierOrders = new ArrayList<>();
         for (Order order : orders.values()) {
             if (order.getSupplierId() == supplierId) {

@@ -8,14 +8,14 @@ import java.util.Map;
 
 public class Product {
     private String ProductName;
-    private int supplierId;
+    private String supplierId;
     private int catalogNumber;
     private int quantityPerPackage;
     private Map<Integer, Double> discountPerPackage; // <amount, discount>
     private double price;   // price per package
     private Units units;
 
-    public Product(int supplierId, int catalogNumber, int quantityPerPackage,
+    public Product(String supplierId, int catalogNumber, int quantityPerPackage,
                    Map<Integer, Double> discountPerPackage, double price) {
         this.supplierId = supplierId;
         this.catalogNumber = catalogNumber;
@@ -31,7 +31,7 @@ public class Product {
         return supplierId;
     }
 
-    public void setSupplierId(int supplierId) {
+    public void setSupplierId(String supplierId) {
         this.supplierId = supplierId;
     }
 

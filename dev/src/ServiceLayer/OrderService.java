@@ -29,7 +29,7 @@ public class OrderService {
         return instance;
     }
 
-    public Order createOrder(int supplierId, LocalDate supplyDate, Map<Integer, Integer> items) {
+    public Order createOrder(String supplierId, LocalDate supplyDate, Map<Integer, Integer> items) {
         // Verify supplier exists
         Supplier supplier = supplierController.getSupplierById(supplierId);
         if (supplier == null) {
@@ -48,7 +48,7 @@ public class OrderService {
         return orderController.getAllOrders();
     }
 
-    public List<Order> getOrdersBySupplier(int supplierId) {
+    public List<Order> getOrdersBySupplier(String supplierId) {
         return orderController.getOrdersBySupplier(supplierId);
     }
 

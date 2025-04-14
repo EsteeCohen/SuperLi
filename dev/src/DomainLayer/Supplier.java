@@ -5,12 +5,12 @@ import java.util.List;
 
 public abstract class Supplier {
     private String name;
-    private int supplierId;
-    private int bankAccount;
+    private String supplierId;
+    private String bankAccount;
     private List<Agreement> agreements;
     private List<ContactPerson> contactPersons;
 
-    public Supplier(String name, int supplierId, int bankAccount) {
+    public Supplier(String name, String supplierId, String bankAccount) {
         this.name = name;
         this.supplierId = supplierId;
         this.bankAccount = bankAccount;
@@ -27,19 +27,19 @@ public abstract class Supplier {
         this.name = name;
     }
 
-    public int getSupplierId() {
+    public String getSupplierId() {
         return supplierId;
     }
 
-    public void setSupplierId(int supplierId) {
+    public void setSupplierId(String supplierId) {
         this.supplierId = supplierId;
     }
 
-    public int getBankAccount() {
+    public String getBankAccount() {
         return bankAccount;
     }
 
-    public void setBankAccount(int bankAccount) {
+    public void setBankAccount(String bankAccount) {
         this.bankAccount = bankAccount;
     }
 

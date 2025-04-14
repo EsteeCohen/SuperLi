@@ -7,7 +7,7 @@ import java.util.List;
 public class SupplierWithDeliveryDays extends  Supplier{
     private List<DaysOfTheWeek> deliveryDays;
 
-    public SupplierWithDeliveryDays(String name, int supplierId, int bankAccount, List<DaysOfTheWeek> deliveryDays) {
+    public SupplierWithDeliveryDays(String name, String supplierId, String bankAccount, List<DaysOfTheWeek> deliveryDays) {
         super(name, supplierId, bankAccount);
         deliveryDays = deliveryDays;
         if(this.deliveryDays == null)

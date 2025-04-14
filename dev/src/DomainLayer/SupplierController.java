@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class SupplierController {
     private static SupplierController instance;
-    private Map<Integer, Supplier> suppliers;
+    private Map<String, Supplier> suppliers;
 
     private SupplierController() {
         this.suppliers = new HashMap<>();
@@ -26,25 +26,11 @@ public class SupplierController {
     }
 
     /**
-     * Add a new supplier
-     * @param supplierId ID of the supplier
-     * @param supplier Supplier object
-     * @return true if added, false if already exists
-     */
-    public boolean addSupplier(int supplierId, Supplier supplier) {
-        if (suppliers.containsKey(supplierId)) {
-            return false;
-        }
-        suppliers.put(supplierId, supplier);
-        return true;
-    }
-
-    /**
      * Get supplier by ID
      * @param supplierId ID of the supplier
      * @return Supplier object if exists, null otherwise
      */
-    public Supplier getSupplierById(int supplierId) {
+    public Supplier getSupplierById(String supplierId) {
         return suppliers.get(supplierId);
     }
 
@@ -67,7 +53,7 @@ public class SupplierController {
      * @param supplierId ID of the supplier to remove
      * @return true if removed, false if not found
      */
-    public boolean removeSupplier(int supplierId) {
+    public boolean removeSupplier(String supplierId) {
         return suppliers.remove(supplierId) != null;
     }
 
@@ -77,5 +63,38 @@ public class SupplierController {
      */
     public List<Supplier> getAllSuppliers() {
         return new ArrayList<>(suppliers.values());
+    }
+
+    public boolean addSupplierWithDelivery(String name, String id, String bankAccount, String deliveryDays) {
+        if(suppliers.containsKey(id)) {
+            return false;
+        }
+        List<DaysOfTheWeek> days = parseDeliveryDays(deliveryDays);
+        SupplierWithDeliveryDays supplier = new SupplierWithDeliveryDays(name, id, bankAccount, days);
+        suppliers.put(id, supplier);
+        return true;
+    }
+
+    public List<DaysOfTheWeek> parseDeliveryDays(String deliveryDays) {
+        List<DaysOfTheWeek> days = new ArrayList<>();
+        String[] daysArray = deliveryDays.split(",");
+        for (String day : daysArray) {
+            try {
+                days.add(DaysOfTheWeek.values()[Integer.parseInt(day.trim())-1]);
+            } catch (IllegalArgumentException e) {
+                // Handle invalid day
+            }
+        }
+        return days;
+    }
+
+    public boolean addSupplierNeedsPickup(String name, String id, String bankAccount, String address) {
+        if(suppliers.containsKey(id)) {
+            return false;
+        }
+
+        SupplierNeedsPickup supplier = new SupplierNeedsPickup(name, id, bankAccount, address);
+        suppliers.put(id, supplier);
+        return true;
     }
 }

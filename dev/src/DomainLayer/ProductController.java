@@ -8,7 +8,7 @@ import java.util.Map;
 
 public class ProductController {
     private static ProductController instance;
-    private Map<Integer, Map<Integer, Product>> products; //<supplier, <catalogNumber, product>>
+    private Map<String, Map<Integer, Product>> products; //<supplier ID, <catalogNumber, product>>
 
     public static ProductController getInstance() {
         if (instance == null)
@@ -28,7 +28,7 @@ public class ProductController {
      * @param price Price per package
      * @return The created Product object
      */
-    public Product createProduct(int supplierId, int catalogNumber, int quantityPerPackage, double price) {
+    public Product createProduct(String supplierId, int catalogNumber, int quantityPerPackage, double price) {
         Product product = new Product(supplierId, catalogNumber, quantityPerPackage, new HashMap<>(), price);
 
         // Initialize supplier map if it doesn't exist
@@ -48,7 +48,7 @@ public class ProductController {
      * @param catalogNumber Catalog number of the product
      * @return Product object if found, null otherwise
      */
-    public Product getProduct(int supplierId, int catalogNumber) {
+    public Product getProduct(String supplierId, int catalogNumber) {
         if (products.containsKey(supplierId)) {
             Map<Integer, Product> supplierProducts = products.get(supplierId);
             return supplierProducts.get(catalogNumber);
@@ -61,7 +61,7 @@ public class ProductController {
      * @param supplierId ID of the supplier
      * @return List of products for the supplier
      */
-    public List<Product> getProductsBySupplier(int supplierId) {
+    public List<Product> getProductsBySupplier(String supplierId) {
         List<Product> supplierProducts = new ArrayList<>();
 
         if (products.containsKey(supplierId)) {
@@ -78,7 +78,7 @@ public class ProductController {
      * @param newPrice New price for the product
      * @return true if update successful, false if product not found
      */
-    public boolean updateProductPrice(int supplierId, int catalogNumber, double newPrice) {
+    public boolean updateProductPrice(String supplierId, int catalogNumber, double newPrice) {
         Product product = getProduct(supplierId, catalogNumber);
         if (product != null) {
             product.setPrice(newPrice);
@@ -95,7 +95,7 @@ public class ProductController {
      * @param discount Discount percentage (0.0 to 1.0)
      * @return true if discount added successfully, false if product not found
      */
-    public boolean addProductDiscount(int supplierId, int catalogNumber, int amount, double discount) {
+    public boolean addProductDiscount(String supplierId, int catalogNumber, int amount, double discount) {
         Product product = getProduct(supplierId, catalogNumber);
         if (product != null) {
             product.addDiscountPerPackage(amount, discount);
@@ -111,7 +111,7 @@ public class ProductController {
      * @param newQuantity New quantity per package
      * @return true if update successful, false if product not found
      */
-    public boolean updateQuantityPerPackage(int supplierId, int catalogNumber, int newQuantity) {
+    public boolean updateQuantityPerPackage(String supplierId, int catalogNumber, int newQuantity) {
         Product product = getProduct(supplierId, catalogNumber);
         if (product != null) {
             product.setQuantityPerPackage(newQuantity);
@@ -127,7 +127,7 @@ public class ProductController {
      * @param quantity Quantity to calculate price for
      * @return Calculated price or -1 if product not found
      */
-    public double calculateProductPrice(int supplierId, int catalogNumber, int quantity) {
+    public double calculateProductPrice(String supplierId, int catalogNumber, int quantity) {
         Product product = getProduct(supplierId, catalogNumber);
         if (product != null) {
             return product.calculatePriceWithDiscount(quantity);

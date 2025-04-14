@@ -87,7 +87,7 @@ public class ReportService {
         Map<Integer, Double> supplierTotals = new HashMap<>();
 
         for (Order order : ordersInRange) {
-            int supplierId = order.getSupplierId();
+            String supplierId = order.getSupplierId();
             double orderTotal = order.getTotalPrice();
 
             supplierTotals.put(supplierId, supplierTotals.getOrDefault(supplierId, 0.0) + orderTotal);

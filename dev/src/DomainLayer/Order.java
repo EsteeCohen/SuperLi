@@ -9,14 +9,14 @@ import java.util.Map;
 
 public class Order {
     private int orderId;
-    private int supplierId;
+    private String supplierId;
     private LocalDate orderDate;
     private LocalDate supplyDate;
     private Map<Integer, Integer> items;  // <catalogNumber, amount>
     private STATUS status;
 
 
-    public Order(int orderId, int supplierId, LocalDate orderDate, LocalDate supplyDate, Map<Integer, Integer> items, STATUS status) {
+    public Order(int orderId, String supplierId, LocalDate orderDate, LocalDate supplyDate, Map<Integer, Integer> items, STATUS status) {
         this.orderId = orderId;
         this.supplierId = supplierId;
         this.orderDate = orderDate;
@@ -38,11 +38,11 @@ public class Order {
         this.orderId = orderId;
     }
 
-    public int getSupplierId() {
+    public String getSupplierId() {
         return supplierId;
     }
 
-    public void setSupplierId(int supplierId) {
+    public void setSupplierId(String supplierId) {
         this.supplierId = supplierId;
     }
 

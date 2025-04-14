@@ -3,14 +3,25 @@ package src;
 import java.io.File;
 import java.io.IOException;
 import java.util.Scanner;
+import src.ServiceLayer.*;
 
 public class Main {
     private static SupplierSystem supplierSystem;
     private static Scanner scanner;
 
+
+
+    private static Scanner scanner = new Scanner(System.in);
+
+    public static void main(String[] args) {
+        UserRole role = chooseUserRole();
+        showMenuForRole(role);
+    }
+
+
     public static void main(String[] args) {
         scanner = new Scanner(System.in);
-        supplierSystem = new SupplierSystem(); // System initialized without initial data
+        supplierSystem = SupplierSystemש.getInstance(); // System initialized without initial data
 
         System.out.println("Welcome to the Supplier Management System!");
 
@@ -85,13 +96,7 @@ public class Main {
         System.out.print("Choose an option: ");
     }
 
-    private static int getUserChoice() {
-        try {
-            return Integer.parseInt(scanner.nextLine());
-        } catch (NumberFormatException e) {
-            return -1; // Invalid value will cause an error message in the main menu
-        }
-    }
+
 
     private static void loadDataFromFiles() {
         System.out.println("Loading data from files...");
@@ -137,8 +142,7 @@ public class Main {
         System.out.print("Enter phone: ");
         String phone = scanner.nextLine();
 
-        Supplier newSupplier = new Supplier(id, name, address, phone);
-        boolean success = supplierSystem.addSupplier(newSupplier);
+        boolean success = supplierSystem.addSupplier(id, name, address, phone);
 
         if (success) {
             System.out.println("Supplier added successfully!");
@@ -167,8 +171,7 @@ public class Main {
         System.out.print("Enter supplier ID: ");
         String supplierId = scanner.nextLine();
 
-        Product newProduct = new Product(id, name, price, supplierId);
-        boolean success = supplierSystem.addProduct(newProduct);
+        boolean success = supplierSystem.addProduct(id, name, price, supplierId);
 
         if (success) {
             System.out.println("Product added successfully!");

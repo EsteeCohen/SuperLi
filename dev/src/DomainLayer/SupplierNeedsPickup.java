@@ -5,7 +5,7 @@ package src.DomainLayer;
 public class SupplierNeedsPickup extends Supplier {
     public String address;
 
-    public SupplierNeedsPickup(String name, String address, int supplierId, int bankAccount) {
+    public SupplierNeedsPickup(String name, String supplierId, String bankAccount, String address) {
         super(name, supplierId, bankAccount);
         this.address = address;
     }

@@ -27,10 +27,10 @@ public class SupplierService {
         return instance;
     }
 
-    public Supplier createSupplier(String name, int supplierId, int bankAccount) {
+    public void createSupplier(String name, String supplierId, int bankAccount) {
         Supplier supplier = new SupplierNeedsPickup(name, "", supplierId, bankAccount);
         supplierController.addSupplier(supplierId, supplier);
-        return supplier;
+        //return supplier;
     }
 
     public Supplier createSupplierWithDelivery(String name, int supplierId, int bankAccount, List<DaysOfTheWeek> deliveryDays) {
@@ -45,7 +45,7 @@ public class SupplierService {
         return supplier;
     }
 
-    public Supplier getSupplier(int supplierId) {
+    public Supplier getSupplier(String supplierId) {
         return supplierController.getSupplierById(supplierId);
     }
 
@@ -86,5 +86,21 @@ public class SupplierService {
             return supplier.getValidAgreements();
         }
         return new ArrayList<>();
+    }
+
+    public boolean addSupplierWithDelivery(String name, String id, String bankAccount, String deliveryDays) {
+        try{
+            return supplierController.addSupplierWithDelivery(name, id, bankAccount, deliveryDays);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean addSupplierNeedsPickup(String name, String id, String bankAccount, String address) {
+        try{
+            return supplierController.addSupplierNeedsPickup(name, id, bankAccount, address);
+        } catch (Exception e) {
+            return false;
+        }
     }
 }
