@@ -1,10 +1,7 @@
 package BusinessLayer;
 
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 class Product {
     private final String productName;
@@ -18,6 +15,10 @@ class Product {
 
     private double sellPrice;
     private Discount discount;
+    private final TreeMap<LocalDate,Sale> salesReports=new TreeMap<>();
+    int brokenQuantity;
+    
+
 
     private final Map<Integer,Supply> supplies=new HashMap<>();//a map of all the supplies
 
@@ -60,11 +61,11 @@ class Product {
     }
 
 
-    void updateBrokenItems(int supplyId, int storeQuantity, int storageQuantity) throws  Exception
+    void updateFoundBrokenItems(int supplyId, int storeQuantity, int storageQuantity) throws  Exception
     {
         int totalLost=updateQuantities(supplyId,storeQuantity,storageQuantity);
 
-        //dovument loss?
+
     }
 
 
