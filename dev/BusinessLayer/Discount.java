@@ -6,13 +6,13 @@ import java.time.LocalDate;
 public class Discount {
     private final LocalDate startDate;
     private final LocalDate endDate;
-    private final double precentage;
+    private final double percentage;
 
     Discount(LocalDate startDate, LocalDate endDate, double precentage)
     {
         this.startDate=startDate;
         this.endDate=endDate;
-        this.precentage=precentage;
+        this.percentage=precentage;
     }
 
     LocalDate getStartDate()
@@ -25,7 +25,7 @@ public class Discount {
     }
     double getPrecentage()
     {
-        return precentage;
+        return percentage;
     }
 
 }

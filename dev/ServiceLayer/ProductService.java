@@ -2,26 +2,42 @@ package ServiceLayer;
 
 import BusinessLayer.ProductFacade;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Locale;
 
 public class ProductService
 {
     protected ProductFacade pf;
 
-    public void AddProduct(String name, List<String> subCategories, String manufacturer, int shelfQuantity, int storageQuantity, int minQuantity, double costPrice, double salePrice, int supplyID)
+    public void AddProduct(String productName, String category, List<String> subCategories, String manufacturer, int sellPrice)
     {
-
+        try
+        {
+            pf.AddProduct(productName, category, subCategories, manufacturer, sellPrice);
+        }
+        catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
-    public void SetDiscountForProduct(String productName)
+    public void SetDiscountForProduct(String productName, LocalDate startDate, LocalDate endDate, double percentage)
     {
-
+        try
+        {
+            pf.SetDiscountForCategory(productName, startDate, endDate, percentage);
+        }
+        catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
-    public void SetDiscount(String productCategory)
+    public void SetDiscount(String productName, LocalDate startDate, LocalDate endDate, double percentage)
     {
-
-    }
-    public int GetQuantity(String productName)
-    {
-        return 0;
+        try
+        {
+            pf.SetDiscount(productName, startDate, endDate, percentage);
+        }
+        catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
     }
 }

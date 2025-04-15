@@ -23,17 +23,31 @@ class Product {
 
     Product(String productName, List<String> subCategories, String manufacturer, int sellPrice)
     {
-        this.productName=productName;
-        this.subCategories=subCategories;
-        this.manufacturer=manufacturer;
+        this.productName = productName;
+        this.subCategories = subCategories;
+        this.manufacturer = manufacturer;
 
         //quantities=0 by default, you add to it by adding batches
-        this.shelfQuantity=0;
-        this.storageQuantity=0;
-        this.minQuantity=0;
+        this.shelfQuantity = 0;
+        this.storageQuantity = 0;
+        this.minQuantity = 0;
 
-        this.sellPrice=sellPrice;
-        this.discount=null;
+        this.sellPrice = sellPrice;
+        this.discount = null;
+    }
+    public void SetDiscount(Discount discount)
+    {
+        this.discount = discount;
+    }
+
+    public int GetShelfQuantity()
+    {
+        return this.shelfQuantity;
+    }
+
+    public int GetStorageQuantity()
+    {
+        return this.storageQuantity;
     }
 
 
