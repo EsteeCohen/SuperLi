@@ -26,7 +26,14 @@ public class OrderService {
         if (site == null)
             return null;
 
-        Order order = new Order(date, site, items);
+        List<Item> itemsInOrder = new ArrayList<>();
+        for (Item item : items) {
+            if (item.getQuantity() in site && ((itemQuantity - item.getQuantity()) > 0)){ //אפשר לעשות MAP לכל אתר עם המוצרים שיש בו וכמות
+                itemsInOrder.add(item);
+                site.updateItemQuantity(---);
+            }
+        }
+        Order order = new Order(date, site, itemsInOrder);
         orders.add(order);
         return order;
     }
@@ -43,6 +50,7 @@ public class OrderService {
         }
         return null;
     }
+
     public List<Order> getOrdersByDate(LocalDate date){
         List<Order> result = new ArrayList<>();
         for (Order order : orders) {
@@ -51,8 +59,8 @@ public class OrderService {
             }
         }
         return result;
-
     }
+
     public List<Order> getOrdersByStatus(OrderStatus status){
         List<Order> result = new ArrayList<>();
         for (Order order : orders) {
@@ -69,6 +77,7 @@ public class OrderService {
         order.setStatus(newStatus);
         return true;
     }
+
     public boolean assignTransportToOrder(int orderId, int transportId){
         Order order = getOrderById(orderId);
         Transport transport = transportService.getTransportById(transportId);
@@ -77,14 +86,51 @@ public class OrderService {
             return false;
         }
 
+        double newWeight = order.OrderWeight() + transport.getCurrentWeight();
+        if (newWeight > transport.getTruck().getMaxWeight()) {
+            return false;//1/2/3יש חריגה במשקל צריך לפתןר אותה
+        }
         order.setTransport(transport);
+        transport.setCurrentWeight(newWeight);
         return true;
     }
+
+    public boolean removeItems (int orderId, int transportId, List<Item> itemsToRemove){//וגם לעדכן בMAP של האתר את הפריטים
+        Order order = getOrderById(orderId);
+        Transport transport = transportService.getTransportById(transportId);
+
+        if (order == null || transport == null || !order.getTransport().equals(transport)) {\
+            return false;
+        }
+
+        List<Item> orderItems = order.getItems();
+        double removedWeight = 0;
+
+        for (Item itemToRemove : itemsToRemove) {
+            if (orderItems.contains(itemToRemove)) {
+                orderItems.remove(itemToRemove);
+                removedWeight += itemToRemove.getWeight();
+            }
+        }
+        order.setItems(orderItems);
+        transport.setCurrentWeight(transport.getCurrentWeight() - removedWeight);
+        return true;
+
+
+
+
+
+    }
+
     public boolean cancelOrder(int id){
         Order order = getOrderById(id);
         if (order == null) return false;
 
         if(order.canBeCancelled()){
+            if (order.getTransport()!=null){
+                order.setTransport(null);
+                transport.setCurrentWeight(transport.getCurrentWeight() - order.OrderWeight());
+            }
             order.setStatus(OrderStatus.CANCELLED);
             return true;
         }

@@ -1,5 +1,7 @@
 package BussinessLayer;
 
+import java.util.List;
+
 public class Item {
     private int id;
     private String name;
@@ -34,6 +36,7 @@ public class Item {
         this.weight = weight;
     }
 
+ //    METHODS
     public double getTotalWeight(){
         return weight * quantity;
     }

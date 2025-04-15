@@ -15,15 +15,15 @@ public class Transport {
     private double currentWeight;
     private TransportStatus status;
 
-    public Transport(LocalDate date, LocalTime time, Truck truck, Driver driver, Site sourceSite, List<Site> destinations, double currentWeight) {
+    public Transport(LocalDate date, LocalTime time, Truck truck, Driver driver, Site sourceSite, List<Site> destinations) {
         this.id = idCounter++;
         setDate(date);
         setTime(time);
-        this.truck = truck;
+        setTruck(truck);
         setDriver(driver);
         this.sourceSite = sourceSite;
         setDestinations(destinations);
-        this.currentWeight = currentWeight;
+        this.currentWeight = 0;
         this.status = TransportStatus.PLANNING;
     }
 
@@ -67,26 +67,45 @@ public class Transport {
         if (time.isBefore(LocalTime.now())) {
             throw new IllegalArgumentException("Time cannot be in the past");
         }
+        this.time = time;
     }
-    public void setTruck(Truck truck){ // With license validation להוסיף
+    public void setTruck(Truck truck){
+        if(driver!=null) {
+            if (!driver.driverCanDrive(truck.getTypeOfLicence())){
+                throw new IllegalArgumentException("Driver :" + driver.getName() + " that assign to this transport has no valid license");
+            }
+        }
+        if (this.truck != null) {
+            this.truck.available();
+        }
         this.truck = truck;
+        truck.istaken();
     }
     public void setDriver(Driver driver){
-        if(isDriverLicenseValid()) {
-            this.driver = driver;
+        if (truck != null) {
+            if (!driver.driverCanDrive(truck.getTypeOfLicence())) {
+                throw new IllegalArgumentException("Driver :" + driver.getName() + " that assign to this transport has no valid license");
+            }
         }
-    }
-    public void setSourceSite(Site sourceSite){
-        this.sourceSite = sourceSite;
+        if(!driver.checkIfTheDriverIsAvailable(date)) {
+            throw new IllegalArgumentException("Driver " + driver.getName() + " is not available in : " + date);
+        }
+        if (this.driver != null) {
+            this.driver.available();
+        }
+        this.driver = driver;
+        driver.istaken();
+
     }
     public void setDestinations(List<Site> destinations) {// With zone validation
-        if(areDestinationsValid()){
-            this.destinations = destinations;
+        if(!areDestinationsValid()){
+            throw new IllegalArgumentException("not all sites in the same shipping zone");
         }
+        this.destinations = destinations;
     }
-    public void setCurrentWeight(double currentWeight) {// With weight validation
+    public void setCurrentWeight(double currentWeight) {
         if (isWeightValid()){
-            currentWeight = currentWeight;
+            this.currentWeight = currentWeight;
         }
     }
     public void setStatus(TransportStatus status){
@@ -95,21 +114,17 @@ public class Transport {
 
 //    METHODS
     public boolean isWeightValid() {
-        if (currentWeight < 0 || currentWeight > truck.getMaxWeight()){
-            return false;
-        }
-        return true;
+        return (currentWeight > 0) && (currentWeight < truck.getMaxWeight());
     }
-    public boolean isDriverLicenseValid() {
 
-    } // Checks if driver has valid license for truck
     public boolean areDestinationsValid() {
         zone = destinations[0].getShippingZone();
         for (Site destination : destinations) {
             if (destination.getShippingZone() != zone){
-                throw new IllegalArgumentException("not all sites in the same shipping zone");
+                return false;
             }
         }
+        return true;
     }
 
     public boolean canBeCancelled(){

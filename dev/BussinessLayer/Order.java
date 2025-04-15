@@ -2,6 +2,7 @@ package BussinessLayer;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 public class Order {
     private int id;
@@ -14,7 +15,7 @@ public class Order {
 
     public Order(LocalDate date, Site site, List<Item> items){
         this.id = idCounter++;
-        this.date = date;
+        setDate(date);
         this.site = site;
         this.items = items;
         this.transport = null; //ברירת מחדל שלא צריך משלוח
@@ -61,6 +62,7 @@ public class Order {
         this.status = status;
     }
 
+//    METHODS
     public double OrderWeight() {
         double totalWeight = 0;
         for (Item item : items) {

@@ -38,6 +38,9 @@ public class OrderController {
     public boolean assignTransportToOrder(int orderId, int transportId){
         return orderService.assignTransportToOrder(orderId, transportId);
     }
+    public boolean removeItems (int orderId, int transportId, List<Item> itemsToRemove){
+        return orderService.removeItems (orderId,transportId,itemsToRemove);
+    }
     public boolean cancelOrder(int id){
         return orderService.cancelOrder(id);
     }

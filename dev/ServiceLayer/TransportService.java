@@ -1,5 +1,6 @@
 package ServiceLayer;
 
+import BussinessLayer.Item;
 import BussinessLayer.Transport;
 
 import java.time.LocalDate;
@@ -20,7 +21,7 @@ public class TransportService {
         this.siteService = siteService;
     }
     // Methods
-    public Transport createTransport(LocalDate date, LocalTime time, String truckId, String driverId, String sourceId, List<String> destinationIds, double weight){
+    public Transport createTransport(LocalDate date, LocalTime time, String truckId, String driverId, String sourceId, List<String> destinationIds){
         Truck truck = truckService.getTruckByRegNumber(truckId);
         Driver driver = driverService.getDriverById(driverId);
         Site source = siteService.getSiteById(sourceId);
@@ -34,13 +35,14 @@ public class TransportService {
             return null;
         }
 
-        Transport transport = new Transport(date, time, truck, driver, source, destinations, weight);
+        Transport transport = new Transport(date, time, truck, driver, source, destinations);
         transports.add(transport);
         return transport;
     }
     public List<Transport> getAllTransports(){
         return new ArrayList<>(transports);
     }
+
     public Transport getTransportById(int id){
         for (Transport t : transports) {
             if (t.getId() == id) return t;
@@ -103,7 +105,7 @@ public class TransportService {
         return true;
     }
 
-    public boolean removeDestination(int transportId, String siteId) {
+    public boolean removeDestination(int transportId, String siteId) {//removes items to this destination?
         Transport transport = getTransportById(transportId);
         if (transport == null) return false;
 

@@ -1,5 +1,6 @@
 package PresentationLayer;
 
+import BussinessLayer.Item;
 import BussinessLayer.Transport;
 import ServiceLayer.TransportService;
 
