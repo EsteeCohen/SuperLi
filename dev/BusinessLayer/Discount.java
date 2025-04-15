@@ -1,29 +1,31 @@
 package BusinessLayer;
 import java.time.LocalDate;
 
+//holds an info of a discount
+//just a subclass that allows us to calc the sell price of a product
 class Discount {
-    private final LocalDate _startDate;
-    private final LocalDate _endDate;
-    private final double _precentage;
+    private final LocalDate startDate;
+    private final LocalDate endDate;
+    private final double precentage;
 
     Discount(LocalDate startDate, LocalDate endDate, double precentage)
     {
-        _startDate=startDate;
-        _endDate=endDate;
-        _precentage=precentage;
+        this.startDate=startDate;
+        this.endDate=endDate;
+        this.precentage=precentage;
     }
 
     LocalDate getStartDate()
     {
-        return _startDate;
+        return startDate;
     }
     LocalDate getEndDate()
     {
-        return _endDate;
+        return endDate;
     }
     double getPrecentage()
     {
-        return _precentage;
+        return precentage;
     }
 
 }
