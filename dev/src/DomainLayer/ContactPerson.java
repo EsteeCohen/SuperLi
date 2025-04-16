@@ -3,9 +3,9 @@ package src.DomainLayer;
 
 public class ContactPerson {
     private String contactName;
-    private int phoneNumber;
+    private String phoneNumber;
 
-    public ContactPerson(String contactName, int phoneNumber) {
+    public ContactPerson(String contactName, String phoneNumber) {
         this.contactName = contactName;
         this.phoneNumber = phoneNumber;
     }
@@ -19,11 +19,11 @@ public class ContactPerson {
         this.contactName = contactName;
     }
 
-    public int getPhoneNumber() {
+    public String getPhoneNumber() {
         return phoneNumber;
     }
 
-    public void setPhoneNumber(int phoneNumber) {
+    public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
 

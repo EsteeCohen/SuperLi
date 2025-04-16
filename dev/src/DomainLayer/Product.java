@@ -9,14 +9,14 @@ import java.util.Map;
 public class Product {
     private String ProductName;
     private String supplierId;
-    private int catalogNumber;
+    private String catalogNumber;
     private int quantityPerPackage;
     private Map<Integer, Double> discountPerPackage; // <amount, discount>
     private double price;   // price per package
     private Units units;
 
-    public Product(String supplierId, int catalogNumber, int quantityPerPackage,
-                   Map<Integer, Double> discountPerPackage, double price) {
+    public Product(String supplierId, String catalogNumber, int quantityPerPackage,
+                   Map<Integer, Double> discountPerPackage, double price, Units units) {
         this.supplierId = supplierId;
         this.catalogNumber = catalogNumber;
         this.quantityPerPackage = quantityPerPackage;
@@ -24,10 +24,11 @@ public class Product {
         this.price = price;
         if(this.discountPerPackage == null)
             this.discountPerPackage = new HashMap<>();
+        this.units = units;
     }
 
     // Getters and setters
-    public int getSupplierId() {
+    public String getSupplierId() {
         return supplierId;
     }
 
@@ -35,11 +36,11 @@ public class Product {
         this.supplierId = supplierId;
     }
 
-    public int getCatalogNumber() {
+    public String getCatalogNumber() {
         return catalogNumber;
     }
 
-    public void setCatalogNumber(int catalogNumber) {
+    public void setCatalogNumber(String catalogNumber) {
         this.catalogNumber = catalogNumber;
     }
 
@@ -89,10 +90,14 @@ public class Product {
         return price * quantity * (1 - discount);
     }
 
+    public void setProductName(String value) {
+        this.ProductName = value;
+    }
 
     @Override
     public String toString() {
         return "Product{" +
+                "ProductName='" + ProductName + '\'' +
                 "supplierId=" + supplierId +
                 ", catalogNumber=" + catalogNumber +
                 ", quantityPerPackage=" + quantityPerPackage +
@@ -100,5 +105,10 @@ public class Product {
                 ", discountPerPackage=" +  discountPerPackage.toString() +
                 ", price=" + price +
                 '}';
+    }
+
+
+    public void setUnits(Units unit) {
+        this.units = unit;
     }
 }

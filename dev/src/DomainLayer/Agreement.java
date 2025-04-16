@@ -9,15 +9,17 @@ import java.util.List;
 
 public class Agreement {
     private String supplierId;
+    private int agreementId;
     private List<Product> productCatalog;
     private PaymentMethod paymentMethod;
     private PaymentTiming paymentTiming;
     private LocalDate validFrom;
     private LocalDate validTo;
 
-    public Agreement(String supplierId, PaymentMethod paymentMethod, PaymentTiming paymentTiming, LocalDate validFrom,
+    public Agreement(String supplierId,int agreementId, PaymentMethod paymentMethod, PaymentTiming paymentTiming, LocalDate validFrom,
                      LocalDate validTo) {
         this.supplierId = supplierId;
+        this.agreementId = agreementId;
         this.productCatalog = new ArrayList<>();
         this.paymentMethod = paymentMethod;
         this.paymentTiming = paymentTiming;
@@ -28,6 +30,10 @@ public class Agreement {
     // Getters and setters
     public String getSupplierId() {
         return supplierId;
+    }
+
+    public int getAgreementId() {
+        return agreementId;
     }
 
     public void setSupplierId(String supplierId) {

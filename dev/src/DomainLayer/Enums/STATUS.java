@@ -1,7 +1,7 @@
 package src.DomainLayer.Enums;
 
 public enum STATUS {
-    DONE,
+    DELIVERED,
     IN_PROCESS,
-    CANCEL
+    CANCELLED
 }

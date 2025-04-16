@@ -12,21 +12,27 @@ public class Order {
     private String supplierId;
     private LocalDate orderDate;
     private LocalDate supplyDate;
-    private Map<Integer, Integer> items;  // <catalogNumber, amount>
+    private ContactPerson contactPerson;
+    private Agreement agreement;
+    private Map<String, Integer> items;  // <catalogNumber, amount>
     private STATUS status;
+    private double totalPrice;
 
 
-    public Order(int orderId, String supplierId, LocalDate orderDate, LocalDate supplyDate, Map<Integer, Integer> items, STATUS status) {
+    public Order(int orderId, String supplierId, LocalDate orderDate,ContactPerson contactPerson, Agreement agreement, LocalDate supplyDate, Map<String, Integer> items, STATUS status, double totalPrice) {
         this.orderId = orderId;
         this.supplierId = supplierId;
         this.orderDate = orderDate;
         this.supplyDate = supplyDate;
+        this.contactPerson = contactPerson;
+        this.agreement = agreement;
         this.items = items;
         this.status = status;
 
         if(this.items == null)
-            this.items = new HashMap<Integer, Integer>();
+            this.items = new HashMap<String, Integer>();
 
+        this.totalPrice = totalPrice;
     }
 
     // Getters and setters
@@ -62,23 +68,23 @@ public class Order {
         this.supplyDate = deliveryDate;
     }
 
-    public Map<Integer, Integer> getItems() {
+    public Map<String, Integer> getItems() {
         return items;
     }
 
-    public void setItems(Map<Integer, Integer> items) {
+    public void setItems(Map<String, Integer> items) {
         this.items = items;
     }
 
-    public void addItem(int catalogNumber, int amount) {
+    public void addItem(String catalogNumber, int amount) {
         items.put(catalogNumber, amount);
     }
 
-    public int getAmount(int catalogNumber) {
+    public int getAmount(String catalogNumber) {
         return items.getOrDefault(catalogNumber, 0);
     }
 
-    public void removeItem(int catalogNumber) {
+    public void removeItem(String catalogNumber) {
         items.remove(catalogNumber);
     }
 
@@ -91,16 +97,11 @@ public class Order {
     }
 
     public double getTotalPrice() {
-        ProductController productController = ProductController.getInstance();
-        double totalPrice = 0;
-        for (Map.Entry<Integer, Integer> entry : items.entrySet()) {
-            Integer catalogNumber = entry.getKey();
-            Integer amount = entry.getValue();
-
-            totalPrice += productController.calculateProductPrice(supplierId, catalogNumber, amount);
-        }
-
+        return totalPrice;
     }
+
+
+
 
     @Override
     public String toString() {
@@ -109,7 +110,7 @@ public class Order {
                 ", supplierId=" + supplierId +
                 ", date=" + orderDate +
                 ", deliveryDate=" + supplyDate +
-                ", items=" + items.length +
+                ", items=" + items.size() +
                 ", status=" + status +
                 '}';
     }
