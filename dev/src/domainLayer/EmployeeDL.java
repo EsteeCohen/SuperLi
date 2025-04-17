@@ -35,4 +35,36 @@ public class EmployeeDL {
     public String getId() {
         return id;
     }
+
+    public boolean IsPassword(String password) {
+        return this.password.equals(password);
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public LocalDate getWordStartingDate() {
+        return wordStartingDate;
+    }
+
+    public int getWage() {
+        return wage;
+    }
+
+    public WageType getWageType() {
+        return wageType;
+    }
+    
+    public List<RoleDL> getRoles() {
+        return roles;
+    }
+
+    public int getYearlySickDays() {
+        return yearlySickDays;
+    }
+
+    public int getYearlyDaysOff() {
+        return yearlyDaysOff;
+    }
 }

@@ -1,12 +1,13 @@
 package src.serviceLayer;
 
+import domainLayer.EmployeeDL;
+import domainLayer.RoleDL;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 public class EmployeeSL {
     private final String id;
-    private final String password;
     private final String fullName;
     private final LocalDate wordStartingDate;
     private final int wage;
@@ -15,9 +16,8 @@ public class EmployeeSL {
     private final int yearlySickDays;
     private final int yearlyDaysOff;
 
-    public EmployeeSL(String id, String password, String fullName, LocalDate wordStartingDate, int wage, char wageTypeChar, int yearlySickDays, int yearlyDaysOff) {
+    public EmployeeSL(String id, String fullName, LocalDate wordStartingDate, int wage, char wageTypeChar, int yearlySickDays, int yearlyDaysOff) {
         this.id = id;
-        this.password = password;
         this.fullName = fullName;
         this.wordStartingDate = wordStartingDate;
         this.wage = wage;
@@ -27,13 +27,23 @@ public class EmployeeSL {
         this.yearlyDaysOff = yearlyDaysOff;
     }
 
+    public EmployeeSL(EmployeeDL edl){
+        this.id = edl.getId();
+        this.fullName = edl.getFullName();
+        this.wordStartingDate = edl.getWordStartingDate();
+        this.wage = edl.getWage();
+        this.wageType = WageTypeSL.fromChar(edl.getWageType().getChar());
+        this.roles = new ArrayList<>();
+        for (RoleDL role : edl.getRoles()) {
+            this.roles.add(new RoleSL(role));
+        }
+        this.yearlySickDays = edl.getYearlySickDays();
+        this.yearlyDaysOff = edl.getYearlyDaysOff();
+    }
+
     // Getters for the fields (optional, if needed)
     public String getId() {
         return id;
-    }
-
-    public String getPassword() {
-        return password;
     }
 
     public String getFullName() {
