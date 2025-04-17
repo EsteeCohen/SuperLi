@@ -15,7 +15,7 @@ public class HRSystemUIService {
         return instance;
     }
 
-    public static src.presentationLayer.EmployeePL login(String id, String password) {
+    public static EmployeeSL login(String id, String password) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'login'");
     }

@@ -46,15 +46,9 @@ public class HRSystemUI {
         System.out.print("Enter your password: ");
         String password = scanner.nextLine();
 
-        EmployeePL employee = HRSystemUIService.login(id, password);
-        if (employee != null) {
-            System.out.println("Login successful!");
-            return employee; // החזרת העובד המחובר
-            // ניתוב למסך הבא לפי תפקיד המשתמש
-        } else {
-            System.out.println("Login failed. Please try again.");
-            return login();
-        }
+        EmployeePL employee = new EmployeePL(hrService.login(id, password));
+        System.out.println("Login successful!");
+        return employee; // החזרת העובד המחובר
     }
 
     private void displayMenuForEmployee(EmployeePL employee) {
