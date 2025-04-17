@@ -12,15 +12,15 @@ import java.util.Map;
 public class Shift {
     private final LocalDate date;
     private final ShiftType shiftType;
-    private final Map<Role, List<EmployeeSL>> employeesAssignment;
+    private final Map<RolePL, List<EmployeeSL>> employeesAssignment;
 
     public Shift(LocalDate date, ShiftType shiftType) {
         this.date = date;
         this.shiftType = shiftType;
-        this.employeesAssignment = new HashMap<Role, List<EmployeeSL>>();
+        this.employeesAssignment = new HashMap<RolePL, List<EmployeeSL>>();
     }
 
-    public void assignEmployee(Role role, EmployeeSL employee) {
+    public void assignEmployee(RolePL role, EmployeeSL employee) {
         // needs to be checked if the employee is already assigned to this shift
         // needs to be checked if the employee can preforem this role
         if (!employeesAssignment.containsKey(role)) {
@@ -29,21 +29,21 @@ public class Shift {
         employeesAssignment.get(role).add(employee);
     }
 
-    public void unassignEmployee(Role role, EmployeeSL employee) {
+    public void unassignEmployee(RolePL role, EmployeeSL employee) {
         if (employeesAssignment.containsKey(role)) {
             employeesAssignment.get(role).remove(employee);
         }
     }
 
-    public Dictionary<Role, Integer> getRequirements(){
+    public Dictionary<RolePL, Integer> getRequirements(){
         return WeeklyShiftRequirements.getInstance().getRequirements(date.getDayOfWeek(), shiftType);
     }
 
     public boolean meetTheRequirements() {
         // gets the requirements for this shift
-        Dictionary<Role, Integer> requirements = getRequirements();
+        Dictionary<RolePL, Integer> requirements = getRequirements();
         // checks if the requirements are met
-        for (Role role : java.util.Collections.list(requirements.keys())) {
+        for (RolePL role : java.util.Collections.list(requirements.keys())) {
             if (employeesAssignment.get(role) == null || employeesAssignment.get(role).size() < requirements.get(role)) {
                 return false;
             }

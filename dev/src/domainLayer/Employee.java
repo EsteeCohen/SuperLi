@@ -12,8 +12,8 @@ public class Employee {
     private final  String fullName;
     private final LocalDate wordStartingDate;
     private final int wage;
-    private final WageType wageType;
-    private final List<Role> roles;
+    private final WageTypeSL wageType;
+    private final List<RolePL> roles;
     private final int yearlySickDays;
     private final int yearlyDaysOff;
 
@@ -23,13 +23,13 @@ public class Employee {
         this.fullName = fullName;
         this.wordStartingDate = wordStartingDate;
         this.wage = wage;
-        this.wageType = WageType.fromChar(wageTypeChar);
-        this.roles = new ArrayList<Role>();
+        this.wageType = WageTypeSL.fromChar(wageTypeChar);
+        this.roles = new ArrayList<RolePL>();
         this.yearlySickDays = yearlySickDays;
         this.yearlyDaysOff = yearlyDaysOff;
     }
 
-    public boolean hasRole(Role role) {
+    public boolean hasRole(RolePL role) {
         return roles.contains(role);
     }
 

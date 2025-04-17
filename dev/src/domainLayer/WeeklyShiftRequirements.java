@@ -6,7 +6,7 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 
 public class WeeklyShiftRequirements {
-    private Dictionary<String, Dictionary<Role, Integer>> weeklyRequirements;
+    private Dictionary<String, Dictionary<RolePL, Integer>> weeklyRequirements;
 
     // Singleton 
     private static WeeklyShiftRequirements instance = null;
@@ -18,14 +18,14 @@ public class WeeklyShiftRequirements {
     }
 
     private WeeklyShiftRequirements() {
-        this.weeklyRequirements = new Hashtable<String, Dictionary<Role, Integer>>();
+        this.weeklyRequirements = new Hashtable<String, Dictionary<RolePL, Integer>>();
     }
 
-    public void setRequirements(DayOfWeek day, ShiftType shift, Role role, int quantity) {
+    public void setRequirements(DayOfWeek day, ShiftType shift, RolePL role, int quantity) {
         String dayString = day.toString() + "_" + shift.toString();
         // Check if the day and shift combination already exists in the dictionary
         if(weeklyRequirements.get(dayString) == null) {
-            weeklyRequirements.put(dayString, new Hashtable<Role, Integer>());
+            weeklyRequirements.put(dayString, new Hashtable<RolePL, Integer>());
         }
         // Check if the role already exists for the given day and shift combination
         if(weeklyRequirements.get(dayString).get(role) == null) {
@@ -35,7 +35,7 @@ public class WeeklyShiftRequirements {
         weeklyRequirements.get(dayString).put(role, quantity);
     }
 
-    public Dictionary<Role, Integer> getRequirements(DayOfWeek day, ShiftType shift) {
+    public Dictionary<RolePL, Integer> getRequirements(DayOfWeek day, ShiftType shift) {
         String dayString = day.toString() + "_" + shift.toString();
         // Check if the day and shift combination exists in the dictionary
         if(weeklyRequirements.get(dayString) != null) {

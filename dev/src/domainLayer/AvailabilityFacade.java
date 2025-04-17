@@ -24,7 +24,7 @@ public class AvailabilityFacade {
         return availableEmployees;
     }
 
-    public List<EmployeeSL> getAvailabilitiesForShift(Shift shift, Role role) {
+    public List<EmployeeSL> getAvailabilitiesForShift(Shift shift, RolePL role) {
         List<EmployeeSL> availableEmployees = new ArrayList<>();
         for (Availability availability : availabilities) {
             if (availability.getShift().equals(shift) && availability.isAvailable() && availability.getEmployee().hasRole(role)) {

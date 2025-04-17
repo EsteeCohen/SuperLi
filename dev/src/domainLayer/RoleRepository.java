@@ -3,8 +3,8 @@ package domainLayer;
 import java.util.List;
 
 public interface RoleRepository {
-    public List<Role> getAllRoles();
-    public Role getRoleByName(String name);
-    public void add(Role role);
-    public void delete(Role role);
+    public List<RolePL> getAllRoles();
+    public RolePL getRoleByName(String name);
+    public void add(RolePL role);
+    public void delete(RolePL role);
 }
