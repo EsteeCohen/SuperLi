@@ -14,8 +14,8 @@ public class AvailabilityFacade {
         this.availabilities.add(availability);
     }
 
-    public List<Employee> getAvailabilitiesForShift(Shift shift) {
-        List<Employee> availableEmployees = new ArrayList<>();
+    public List<EmployeeSL> getAvailabilitiesForShift(Shift shift) {
+        List<EmployeeSL> availableEmployees = new ArrayList<>();
         for (Availability availability : availabilities) {
             if (availability.getShift().equals(shift) && availability.isAvailable()) {
                 availableEmployees.add(availability.getEmployee());
@@ -24,8 +24,8 @@ public class AvailabilityFacade {
         return availableEmployees;
     }
 
-    public List<Employee> getAvailabilitiesForShift(Shift shift, Role role) {
-        List<Employee> availableEmployees = new ArrayList<>();
+    public List<EmployeeSL> getAvailabilitiesForShift(Shift shift, Role role) {
+        List<EmployeeSL> availableEmployees = new ArrayList<>();
         for (Availability availability : availabilities) {
             if (availability.getShift().equals(shift) && availability.isAvailable() && availability.getEmployee().hasRole(role)) {
                 availableEmployees.add(availability.getEmployee());
@@ -34,7 +34,7 @@ public class AvailabilityFacade {
         return availableEmployees;
     }
 
-    public boolean  getAvailabilitiesForEmployee(Employee employee, Shift shift) {
+    public boolean  getAvailabilitiesForEmployee(EmployeeSL employee, Shift shift) {
         for (Availability availability : availabilities) {
             if (availability.getEmployee().equals(employee) && availability.getShift().equals(shift)) {
                 return availability.isAvailable();

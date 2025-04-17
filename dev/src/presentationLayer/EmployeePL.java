@@ -14,5 +14,9 @@ public class EmployeePL {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getRole'");
     }
+    public String getID() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getID'");
+    }
 
 }

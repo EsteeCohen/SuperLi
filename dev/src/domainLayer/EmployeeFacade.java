@@ -4,7 +4,7 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 
 public class EmployeeFacade {
-    private Dictionary<String, Employee> employees;
+    private Dictionary<String, EmployeeSL> employees;
 
     // Singleton
     private static EmployeeFacade instance = null;
@@ -16,21 +16,21 @@ public class EmployeeFacade {
     }
 
     private EmployeeFacade() {
-        this.employees = new Hashtable<String, Employee>();
+        this.employees = new Hashtable<String, EmployeeSL>();
     }
 
-    public void addEmployee(Employee e) {
+    public void addEmployee(EmployeeSL e) {
         if (e != null) {
             employees.put(e.getId(), e);
         }
     }
 
-    public Employee getEmployee(String id) {
+    public EmployeeSL getEmployee(String id) {
         return employees.get(id);
     }
 
     public boolean employeeHasRole(String id, String roleName) {
-        Employee employee = employees.get(id);
+        EmployeeSL employee = employees.get(id);
         if (employee != null) {
             return employee.hasRole(RoleFacade.getInstance().getRoleByName(roleName));
         }

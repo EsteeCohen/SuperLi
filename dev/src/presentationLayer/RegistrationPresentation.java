@@ -1,4 +1,8 @@
+package src.presentationLayer;
+
 import java.util.Scanner;
+
+import src.serviceLayer.HRSystemUIService;
 
 public class RegistrationPresentation {
     private HRSystemUIService employeeService;
@@ -9,7 +13,7 @@ public class RegistrationPresentation {
         this.scanner = scanner;
     }
 
-    public void showRegistrationForm() {
+    public void registerNewEmployee() {
         System.out.println("=== Add New Employee ===");
         System.out.print("Name: ");
         String name = scanner.nextLine();

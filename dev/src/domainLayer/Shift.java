@@ -12,24 +12,24 @@ import java.util.Map;
 public class Shift {
     private final LocalDate date;
     private final ShiftType shiftType;
-    private final Map<Role, List<Employee>> employeesAssignment;
+    private final Map<Role, List<EmployeeSL>> employeesAssignment;
 
     public Shift(LocalDate date, ShiftType shiftType) {
         this.date = date;
         this.shiftType = shiftType;
-        this.employeesAssignment = new HashMap<Role, List<Employee>>();
+        this.employeesAssignment = new HashMap<Role, List<EmployeeSL>>();
     }
 
-    public void assignEmployee(Role role, Employee employee) {
+    public void assignEmployee(Role role, EmployeeSL employee) {
         // needs to be checked if the employee is already assigned to this shift
         // needs to be checked if the employee can preforem this role
         if (!employeesAssignment.containsKey(role)) {
-            employeesAssignment.put(role, new ArrayList<Employee>());
+            employeesAssignment.put(role, new ArrayList<EmployeeSL>());
         }
         employeesAssignment.get(role).add(employee);
     }
 
-    public void unassignEmployee(Role role, Employee employee) {
+    public void unassignEmployee(Role role, EmployeeSL employee) {
         if (employeesAssignment.containsKey(role)) {
             employeesAssignment.get(role).remove(employee);
         }

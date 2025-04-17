@@ -2,10 +2,10 @@ package domainLayer;
 
 public class Availability {
     private final Shift shift;
-    private final Employee employee;
+    private final EmployeeSL employee;
     private boolean isAvailable;
 
-    public Availability(Shift shift, Employee employee, boolean isAvailable) {
+    public Availability(Shift shift, EmployeeSL employee, boolean isAvailable) {
         this.shift = shift;
         this.employee = employee;
         this.isAvailable = isAvailable;
@@ -23,7 +23,7 @@ public class Availability {
         return shift;
     }
 
-    public Employee getEmployee() {
+    public EmployeeSL getEmployee() {
         return employee;
     }
 }
