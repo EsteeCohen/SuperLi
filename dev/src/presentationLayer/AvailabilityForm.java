@@ -3,13 +3,16 @@ package src.presentationLayer;
 import java.util.List;
 import java.util.Scanner;
 
+import src.serviceLayer.EmployeeService;
 import src.serviceLayer.HRSystemUIService;
 
 public class AvailabilityForm {
+    private EmployeeService employeeService;
     private HRSystemUIService hrService;
     private Scanner scanner;
 
-    public AvailabilityForm(HRSystemUIService service, Scanner scanner) {
+    public AvailabilityForm(EmployeeService employeeService,HRSystemUIService service, Scanner scanner) {
+        this.employeeService = employeeService;
         this.hrService = service;
         this.scanner = scanner;
     }
@@ -18,7 +21,7 @@ public class AvailabilityForm {
         System.out.println("=== availabillity form ===");
 
         // Fetch and display the list of work times
-        List<String> workTimes = hrService.getWorkTimes();
+        List<String> workTimes = employeeService.getWorkTimes();
         System.out.println("shifts:");
         for (int i = 0; i < workTimes.size(); i++) {
             System.out.println((i + 1) + ". " + workTimes.get(i));

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
+import src.serviceLayer.EmployeeService;
 import src.serviceLayer.HRSystemUIService;
 import src.serviceLayer.RoleService;
 import src.serviceLayer.ShiftService;
@@ -16,6 +17,7 @@ public class HRSystemUI {
     private HRSystemUIService hrService;
     private RoleService roleService;
     private ShiftService shiftService;
+    private EmployeeService employeeService;
 
 
     private final Scanner scanner;
@@ -46,7 +48,7 @@ public class HRSystemUI {
         System.out.print("Enter your password: ");
         String password = scanner.nextLine();
 
-        EmployeePL employee = new EmployeePL(hrService.login(id, password));
+        EmployeePL employee = new EmployeePL(employeeService.login(id, password));
         System.out.println("Login successful!");
         return employee; // החזרת העובד המחובר
     }
@@ -107,7 +109,7 @@ public class HRSystemUI {
                 registration.registerNewEmployee();
                 break;
             case 2:
-                AvailabilityForm availabilityForm = new AvailabilityForm(hrService, scanner);
+                AvailabilityForm availabilityForm = new AvailabilityForm(employeeService,hrService, scanner);
                 availabilityForm.showAvailabilityForm(employee.getID());
                 break;
             case 3:
@@ -137,7 +139,7 @@ public class HRSystemUI {
     private boolean handleEmployeeChoice(int choice, EmployeePL employee) {
         switch (choice) {
             case 1:
-                AvailabilityForm availabilityForm = new AvailabilityForm(hrService, scanner);
+                AvailabilityForm availabilityForm = new AvailabilityForm(employeeService, hrService, scanner);
                 availabilityForm.showAvailabilityForm(employee.getID());
                 break;
             case 2:

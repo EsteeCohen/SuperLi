@@ -15,21 +15,12 @@ public class HRSystemUIService {
         return instance;
     }
 
-    public static EmployeeSL login(String id, String password) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'login'");
-    }
-
     public void registerEmployee(String name, String id, double salary, String wageType, int yearlySickDays,
             int yearlyDaysOff) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'registerEmployee'");
     }
 
-    public List<String> getWorkTimes() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getWorkTimes'");
-    }
 
     public void setAvailability(String employeeId, String selectedTime) {
         // TODO Auto-generated method stub
