@@ -6,7 +6,7 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 
 public class ShiftFacade {
-    private Dictionary<String, Shift> shifts;
+    private Dictionary<String, ShiftDL> shifts;
 
     // singleton
     private static ShiftFacade instance = null;
@@ -18,6 +18,6 @@ public class ShiftFacade {
     }
 
     private ShiftFacade() {
-        this.shifts = new Hashtable<String,Shift>();
+        this.shifts = new Hashtable<String,ShiftDL>();
     }
 }

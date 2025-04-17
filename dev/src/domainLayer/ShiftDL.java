@@ -9,41 +9,41 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Shift {
+public class ShiftDL {
     private final LocalDate date;
     private final ShiftType shiftType;
-    private final Map<RolePL, List<EmployeeSL>> employeesAssignment;
+    private final Map<RoleDL, List<EmployeeDL>> employeesAssignment;
 
-    public Shift(LocalDate date, ShiftType shiftType) {
+    public ShiftDL(LocalDate date, ShiftType shiftType) {
         this.date = date;
         this.shiftType = shiftType;
-        this.employeesAssignment = new HashMap<RolePL, List<EmployeeSL>>();
+        this.employeesAssignment = new HashMap<RoleDL, List<EmployeeDL>>();
     }
 
-    public void assignEmployee(RolePL role, EmployeeSL employee) {
+    public void assignEmployee(RoleDL role, EmployeeDL employee) {
         // needs to be checked if the employee is already assigned to this shift
         // needs to be checked if the employee can preforem this role
         if (!employeesAssignment.containsKey(role)) {
-            employeesAssignment.put(role, new ArrayList<EmployeeSL>());
+            employeesAssignment.put(role, new ArrayList<EmployeeDL>());
         }
         employeesAssignment.get(role).add(employee);
     }
 
-    public void unassignEmployee(RolePL role, EmployeeSL employee) {
+    public void unassignEmployee(RoleDL role, EmployeeDL employee) {
         if (employeesAssignment.containsKey(role)) {
             employeesAssignment.get(role).remove(employee);
         }
     }
 
-    public Dictionary<RolePL, Integer> getRequirements(){
+    public Dictionary<RoleDL, Integer> getRequirements(){
         return WeeklyShiftRequirements.getInstance().getRequirements(date.getDayOfWeek(), shiftType);
     }
 
     public boolean meetTheRequirements() {
         // gets the requirements for this shift
-        Dictionary<RolePL, Integer> requirements = getRequirements();
+        Dictionary<RoleDL, Integer> requirements = getRequirements();
         // checks if the requirements are met
-        for (RolePL role : java.util.Collections.list(requirements.keys())) {
+        for (RoleDL role : java.util.Collections.list(requirements.keys())) {
             if (employeesAssignment.get(role) == null || employeesAssignment.get(role).size() < requirements.get(role)) {
                 return false;
             }

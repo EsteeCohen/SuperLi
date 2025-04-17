@@ -4,19 +4,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AvailabilityFacade {
-    private final List<Availability> availabilities;
+    private final List<AvailabilityDL> availabilities;
 
     public AvailabilityFacade() {
         this.availabilities = new ArrayList<>();
     }
 
-    public void addAvailability(Availability availability) {
+    public void addAvailability(AvailabilityDL availability) {
         this.availabilities.add(availability);
     }
 
-    public List<EmployeeSL> getAvailabilitiesForShift(Shift shift) {
-        List<EmployeeSL> availableEmployees = new ArrayList<>();
-        for (Availability availability : availabilities) {
+    public List<EmployeeDL> getAvailabilitiesForShift(ShiftDL shift) {
+        List<EmployeeDL> availableEmployees = new ArrayList<>();
+        for (AvailabilityDL availability : availabilities) {
             if (availability.getShift().equals(shift) && availability.isAvailable()) {
                 availableEmployees.add(availability.getEmployee());
             }
@@ -24,9 +24,9 @@ public class AvailabilityFacade {
         return availableEmployees;
     }
 
-    public List<EmployeeSL> getAvailabilitiesForShift(Shift shift, RolePL role) {
-        List<EmployeeSL> availableEmployees = new ArrayList<>();
-        for (Availability availability : availabilities) {
+    public List<EmployeeDL> getAvailabilitiesForShift(ShiftDL shift, RoleDL role) {
+        List<EmployeeDL> availableEmployees = new ArrayList<>();
+        for (AvailabilityDL availability : availabilities) {
             if (availability.getShift().equals(shift) && availability.isAvailable() && availability.getEmployee().hasRole(role)) {
                 availableEmployees.add(availability.getEmployee());
             }
@@ -34,8 +34,8 @@ public class AvailabilityFacade {
         return availableEmployees;
     }
 
-    public boolean  getAvailabilitiesForEmployee(EmployeeSL employee, Shift shift) {
-        for (Availability availability : availabilities) {
+    public boolean  getAvailabilitiesForEmployee(EmployeeDL employee, ShiftDL shift) {
+        for (AvailabilityDL availability : availabilities) {
             if (availability.getEmployee().equals(employee) && availability.getShift().equals(shift)) {
                 return availability.isAvailable();
             }
