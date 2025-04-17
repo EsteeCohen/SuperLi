@@ -13,7 +13,7 @@ public class RoleService {
     }
 
     public void createRole(String roleName) {
-       roleFacade.add(new RoleSL(roleName));
+       roleFacade.add(roleName);
     }
 
     public void deleteRole(String name) {
