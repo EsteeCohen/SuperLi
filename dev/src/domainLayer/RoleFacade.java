@@ -6,15 +6,6 @@ import java.util.List;
 
 public class RoleFacade{
     private Hashtable<String, RoleDL> roles;
-    
-    // Singleton
-    private static RoleFacade instance = null;
-    public static RoleFacade getInstance() {
-        if (instance == null) {
-            instance = new RoleFacade();
-        }
-        return instance;
-    }
 
     private RoleFacade() {
         this.roles = new Hashtable<String, RoleDL>();

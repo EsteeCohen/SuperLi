@@ -1,8 +1,11 @@
 package src.serviceLayer;
 
+import domainLayer.EmployeeFacade;
 import java.util.List;
 
 public class EmployeeService {
+    private EmployeeFacade employeeFacade;
+
     public static EmployeeSL login(String id, String password) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'login'");

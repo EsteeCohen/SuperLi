@@ -1,7 +1,10 @@
 package src.serviceLayer;
 
+import domainLayer.ShiftFacade;
+
 
 public class ShiftService {
+    private ShiftFacade shiftFacade;
 
     public void printAllShifts() {
         // TODO Auto-generated method stub

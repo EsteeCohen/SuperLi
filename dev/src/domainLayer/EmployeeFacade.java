@@ -5,17 +5,10 @@ import java.util.Hashtable;
 
 public class EmployeeFacade {
     private Dictionary<String, EmployeeDL> employees;
+    private RoleFacade roleFacade;
 
-    // Singleton
-    private static EmployeeFacade instance = null;
-    public static EmployeeFacade getInstance() {
-        if (instance == null) {
-            instance = new EmployeeFacade();
-        }
-        return instance;
-    }
-
-    private EmployeeFacade() {
+    private EmployeeFacade(RoleFacade roleFacade) {
+        this.roleFacade = roleFacade;
         this.employees = new Hashtable<String, EmployeeDL>();
     }
 
@@ -32,7 +25,7 @@ public class EmployeeFacade {
     public boolean employeeHasRole(String id, String roleName) {
         EmployeeDL employee = employees.get(id);
         if (employee != null) {
-            return employee.hasRole(RoleFacade.getInstance().getRoleByName(roleName));
+            return employee.hasRole(roleFacade.getRoleByName(roleName));
         }
         return false;
     }

@@ -1,9 +1,9 @@
 package domainLayer;
 
-public class Role {
+public class RoleDL {
     private final String name;
 
-    public Role(String name) {
+    public RoleDL(String name) {
         this.name = name;
     }
     public String getName() {
