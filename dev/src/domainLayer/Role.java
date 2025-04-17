@@ -1,7 +1,7 @@
-package src.domainLayer;
+package domainLayer;
 
 public class Role {
-    private String name;
+    private final String name;
 
     public Role(String name) {
         this.name = name;

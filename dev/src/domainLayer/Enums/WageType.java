@@ -1,4 +1,4 @@
-package src.domainLayer.Enums;
+package domainLayer.Enums;
 
 public enum WageType {
     HOURLY('H'),
