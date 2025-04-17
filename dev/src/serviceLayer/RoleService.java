@@ -11,9 +11,14 @@ public class RoleService {
         throw new UnsupportedOperationException("Unimplemented method 'getAvailableRoles'");
     }
 
-    public void createRole(RoleSL role) {
+    public void createRole(String name) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'createRole'");
+    }
+
+    public void deleteRole(String name) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'deleteRole'");
     }
 
 }

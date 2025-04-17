@@ -50,4 +50,16 @@ public class EmployeeFacade {
         employees.put(id, newEmployee);
         return true;
     }
+
+    public boolean assignRoleToEmployee(String employeeId, String roleName) {
+        EmployeeDL employee = employees.get(employeeId);
+        if (employee != null) {
+            RoleDL role = roleFacade.getRoleByName(roleName);
+            if (role != null) {
+                employee.getRoles().add(role);
+                return true;
+            }
+        }
+        return false; // Employee or role not found
+    }
 }

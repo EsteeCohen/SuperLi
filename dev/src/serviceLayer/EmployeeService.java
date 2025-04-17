@@ -31,11 +31,10 @@ public class EmployeeService {
 
     public void setAvailabilityOfEmployee(String employeeId, LocalDate date, String ShiftType, boolean available) {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setAvailability'");
+        throw new UnsupportedOperationException("Unimplemented method 'setAvailabilityOfEmployee'");
     }
 
-    public void assignRoleToEmployee(String employeeId, RoleSL role) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'assignRoleToEmployee'");
+    public boolean assignRoleToEmployee(String employeeId, String roleName) {
+        return employeeFacade.assignRoleToEmployee(employeeId, roleName);
     }
 }
