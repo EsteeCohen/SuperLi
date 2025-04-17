@@ -1,5 +1,5 @@
 package src.serviceLayer;
 
-public class Employee {
+public class EmployeeSL {
 
 }

@@ -1,5 +1,9 @@
+package src.presentationLayer;
+
 import java.util.List;
 import java.util.Scanner;
+
+import src.serviceLayer.RoleService;
 
 public class RoleAssignmentPresentation {
     private RoleService roleService;

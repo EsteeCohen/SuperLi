@@ -8,21 +8,28 @@ import java.util.Map;
 import java.util.Scanner;
 
 import src.serviceLayer.HRSystemUIService;
+import src.serviceLayer.RoleService;
+import src.serviceLayer.ShiftService;
 
 public class HRSystemUI {
 
     private HRSystemUIService hrService;
+    private RoleService roleService;
+    private ShiftService shiftService;
+
+
     private final Scanner scanner;
 
     public HRSystemUI() {
         this.hrService = HRSystemUIService.getInstance();
+
         this.scanner = new Scanner(System.in);
     }
 
     public void start() {
         System.out.println("Welcome to the Human Resource System!");
         
-        Employee employee = login();
+        EmployeePL employee = login();
 
         boolean isRunning = true;
         while (isRunning) {
@@ -32,16 +39,17 @@ public class HRSystemUI {
         scanner.close();
     }
 
-    private Employee login() {
+    private EmployeePL login() {
 
         System.out.print("Enter your ID: ");
         String id = scanner.nextLine();
         System.out.print("Enter your password: ");
         String password = scanner.nextLine();
 
-        Employee employee = HRSystemUIService.login(id, password);
+        EmployeePL employee = HRSystemUIService.login(id, password);
         if (employee != null) {
             System.out.println("Login successful!");
+            return employee; // החזרת העובד המחובר
             // ניתוב למסך הבא לפי תפקיד המשתמש
         } else {
             System.out.println("Login failed. Please try again.");
@@ -49,7 +57,7 @@ public class HRSystemUI {
         }
     }
 
-    private void displayMenuForEmployee(Employee employee) {
+    private void displayMenuForEmployee(EmployeePL employee) {
         if (employee.getRole().contains("manager")) {
             displayHRManagerMenu();
         }
@@ -83,7 +91,7 @@ public class HRSystemUI {
         }
     }
 
-    private boolean handleChoice(Employee employee) {
+    private boolean handleChoice(EmployeePL employee) {
         displayMenuForEmployee(employee);
         int choice = getUserChoice();
         
@@ -92,31 +100,38 @@ public class HRSystemUI {
             return false;
         }
         if (employee.getRole().contains("manager")) {
-            return handleHRManagerChoice(choice);        }
+            return handleHRManagerChoice(choice, employee);        }
         else{
             return handleEmployeeChoice(choice, employee);
-        }return true;
+        }
     }
 
-    private boolean handleHRManagerChoice(int choice) {
+    private boolean handleHRManagerChoice(int choice,EmployeePL employee) {
         switch (choice) {
             case 1:
-                hrService.registerEmployeeUI(scanner);
+                RegistrationPresentation registration = new RegistrationPresentation(hrService, scanner);
+                registration.registerNewEmployee();
                 break;
             case 2:
-                hrService.enterAvailabilityUI(scanner);
+                AvailabilityForm availabilityForm = new AvailabilityForm(hrService, scanner);
+                availabilityForm.showAvailabilityForm(employee.getID());
                 break;
             case 3:
-                hrService.assignRoleUI(scanner);
+                RoleAssignmentPresentation roleAssignment = new RoleAssignmentPresentation(roleService, scanner);
+                roleAssignment.assignRoleToEmployee();
                 break;
             case 4:
-                hrService.createRoleUI(scanner);
+                RoleCreationPresentation roleCreation = new RoleCreationPresentation(roleService, scanner);
+                roleCreation.createNewRole();
                 break;
             case 5:
-                hrService.viewOrAssignShiftsUI(scanner);
+                ShiftsTablePresentation shiftsTable = new ShiftsTablePresentation(shiftService, scanner);
+                shiftsTable.showShiftTable();
+                shiftsTable.assignEmployeeToShift();
                 break;
             case 6:
-                hrService.searchEmployeeUI(scanner);
+                EmployeeSearchPresentation employeeSearch = new EmployeeSearchPresentation(hrService, scanner);
+                employeeSearch.searchEmployee();
                 break;
             default:
                 System.out.println("Invalid option. Please try again.");
@@ -125,13 +140,15 @@ public class HRSystemUI {
         return true;
     }
 
-    private boolean handleEmployeeChoice(int choice, Employee employee) {
+    private boolean handleEmployeeChoice(int choice, EmployeePL employee) {
         switch (choice) {
             case 1:
-                hrService.enterAvailabilityUI(scanner, employee);
+                AvailabilityForm availabilityForm = new AvailabilityForm(hrService, scanner);
+                availabilityForm.showAvailabilityForm(employee.getID());
                 break;
             case 2:
-                hrService.viewShiftsForEmployee(employee);
+                ShiftsTablePresentation shiftsTable = new ShiftsTablePresentation(shiftService, scanner);
+                shiftsTable.showShiftTable();                
                 break;
             default:
                 System.out.println("Invalid option. Please try again.");

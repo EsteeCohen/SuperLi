@@ -1,4 +1,8 @@
+package src.presentationLayer;
+
 import java.util.Scanner;
+
+import src.serviceLayer.ShiftService;
 
 public class ShiftsTablePresentation {
     private ShiftService shiftService;
