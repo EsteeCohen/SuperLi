@@ -1,18 +1,10 @@
 package presentationLayer;
 
 import java.util.Scanner;
-<<<<<<< HEAD
-import src.serviceLayer.EmployeeService;
-import src.serviceLayer.HRSystemUIService;
-import src.serviceLayer.RoleService;
-import src.serviceLayer.ShiftService;
-=======
-
 import serviceLayer.EmployeeService;
 import serviceLayer.HRSystemUIService;
 import serviceLayer.RoleService;
 import serviceLayer.ShiftService;
->>>>>>> 1872f48f7fb227804fb3cdd4f7d67930058e3c34
 
 public class HRSystemUI {
 
