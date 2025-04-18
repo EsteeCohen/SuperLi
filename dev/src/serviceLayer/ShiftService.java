@@ -1,4 +1,4 @@
-package src.serviceLayer;
+package serviceLayer;
 
 import domainLayer.AvailabilityDL;
 import domainLayer.ShiftDL;

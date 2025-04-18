@@ -1,10 +1,10 @@
-package src.presentationLayer;
+package presentationLayer;
 
 import java.util.List;
 import java.util.Scanner;
 
-import src.serviceLayer.EmployeeService;
-import src.serviceLayer.HRSystemUIService;
+import serviceLayer.EmployeeService;
+import serviceLayer.HRSystemUIService;
 
 public class AvailabilityForm {
     private EmployeeService employeeService;

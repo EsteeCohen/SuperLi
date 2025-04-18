@@ -1,5 +1,4 @@
-package src.serviceLayer;
-
+package serviceLayer;
 
 import domainLayer.EmployeeDL;
 import domainLayer.Enums.ShiftType;

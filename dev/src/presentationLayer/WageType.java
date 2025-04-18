@@ -1,4 +1,4 @@
-package src.presentationLayer;
+package presentationLayer;
 
 public enum WageType {
     HOURLY('H'),

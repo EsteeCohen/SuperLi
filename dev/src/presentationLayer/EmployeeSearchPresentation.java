@@ -1,8 +1,8 @@
-package src.presentationLayer;
+package presentationLayer;
 
 import java.util.Scanner;
 
-import src.serviceLayer.HRSystemUIService;
+import serviceLayer.HRSystemUIService;
 
 public class EmployeeSearchPresentation {
     private HRSystemUIService employeeService;

@@ -1,6 +1,6 @@
-package src.presentationLayer;
+package presentationLayer;
 
-import src.serviceLayer.RoleSL;
+import serviceLayer.RoleSL;
 
 public class RolePL {
     private final String name;

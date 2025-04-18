@@ -1,11 +1,11 @@
-package src.presentationLayer;
+package presentationLayer;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import src.serviceLayer.EmployeeSL;
-import src.serviceLayer.RoleSL;
+import serviceLayer.EmployeeSL;
+import serviceLayer.RoleSL;
 
 public class EmployeePL {
     private final String id;

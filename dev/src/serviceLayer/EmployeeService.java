@@ -1,4 +1,4 @@
-package src.serviceLayer;
+package serviceLayer;
 
 import domainLayer.EmployeeDL;
 import domainLayer.EmployeeFacade;
@@ -10,9 +10,8 @@ public class EmployeeService {
         EmployeeDL edl = employeeFacade.login(id, password);
         if (edl != null) {
             return new EmployeeSL(edl);
-        } else {
-            return null; // or throw an exception
         }
+        return null; // or throw an exception
     }
 
     public boolean registerEmployee(String fullName, String password, String id, int wage, String wageType, int yearlySickDays, int yearlyDaysOff) {
