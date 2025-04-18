@@ -103,14 +103,6 @@ public class SupplierSystemUI {
         System.out.println("0. Exit");
     }
 
-    /*private void displayGeneralManagerMenu() {
-        System.out.println("\n=== General Manager Menu ===");
-        System.out.println("1. Load data from files");
-        System.out.println("2. Save data to files");
-        System.out.println("3. Analyze reports");
-        System.out.println("4. View all system data");
-        System.out.println("0. Exit");
-    }*/
 
     private void displayRegularEmployeeMenu() {
         System.out.println("\n=== Regular Employee Menu ===");
@@ -123,7 +115,7 @@ public class SupplierSystemUI {
         try {
             return Integer.parseInt(scanner.nextLine());
         } catch (NumberFormatException e) {
-            return -1; // Invalid value will cause an error message in the main menu
+            return -1;
         }
     }
 
@@ -230,25 +222,6 @@ public class SupplierSystemUI {
         }
     }
 
-    /*private void handleGeneralManagerChoice(int choice) {
-        switch (choice) {
-            case 1:
-                loadDataFromFiles();
-                break;
-            case 2:
-                saveDataToFiles();
-                break;
-            case 3:
-                analyzeReports();
-                break;
-            case 4:
-                viewAllSystemData();
-                break;
-            default:
-                System.out.println("Invalid option. Please try again.");
-                break;
-        }
-    }*/
 
     private void handleRegularEmployeeChoice(int choice) {
         switch (choice) {
@@ -263,6 +236,7 @@ public class SupplierSystemUI {
                 break;
         }
     }
+
 
     private String getSupplierIdFromUser() {
         System.out.print("Enter supplier ID: ");
@@ -421,6 +395,7 @@ public class SupplierSystemUI {
                 break;
             case 4:
                 fieldToUpdate = "contactPersons";
+                System.out.print("Enter contact person details in the format: name, phone (e.g. Israel Israeli, 0501234567): ");
                 break;
             default:
                 System.out.println("Invalid choice. Operation cancelled.");
@@ -540,7 +515,7 @@ public class SupplierSystemUI {
         }
     }
 
-    // Add the new order-related methods:
+    // order-related methods:
 
     private void insertOrder() {
         System.out.println("\n--- Insert Existing Order ---");
@@ -635,7 +610,6 @@ public class SupplierSystemUI {
 
     private Map<Integer,Integer> selectProducts(int numProducts) {
         Map<Integer, Integer> IndexProducts = new HashMap<>();
-        //List<Integer> quantitiesList = new ArrayList<>();
         System.out.println("\nEnter product index and quantity (Enter -1 to finish):");
 
         int productIndex = 0;
@@ -877,106 +851,7 @@ public class SupplierSystemUI {
 
     }
 
-
-    // Delivery Manager Functions
-    private void viewSuppliersRequiringPickup() {
-        System.out.println("\n--- Suppliers Requiring Pickup ---");
-        String suppliers = supplierSystem.getSuppliersRequiringPickup();
-        System.out.println(suppliers);
-    }
-
-
-    /* General Manager Functions
-    private void loadDataFromFiles() {
-        System.out.println("\n--- Load Data From Files ---");
-
-        System.out.print("Enter file path for suppliers: ");
-        String suppliersPath = scanner.nextLine();
-
-        System.out.print("Enter file path for products: ");
-        String productsPath = scanner.nextLine();
-
-        boolean result = supplierSystem.loadDataFromFiles(suppliersPath, productsPath);
-
-        if (result) {
-            System.out.println("Data loaded successfully!");
-        } else {
-            System.out.println("Failed to load data. Check file paths and formats.");
-        }
-    }
-
-    private void saveDataToFiles() {
-        System.out.println("\n--- Save Data To Files ---");
-
-        System.out.print("Enter file path for suppliers: ");
-        String suppliersPath = scanner.nextLine();
-
-        System.out.print("Enter file path for products: ");
-        String productsPath = scanner.nextLine();
-
-        boolean result = supplierSystem.saveDataToFiles(suppliersPath, productsPath);
-
-        if (result) {
-            System.out.println("Data saved successfully!");
-        } else {
-            System.out.println("Failed to save data. Check file paths and permissions.");
-        }
-    }
-
-    private void analyzeReports() {
-        System.out.println("\n--- Analyze Reports ---");
-        System.out.println("1. Product Distribution by Category");
-        System.out.println("2. Supplier Distribution by Location");
-        System.out.println("3. Price Analysis");
-
-        int choice = getUserChoice();
-
-        switch (choice) {
-            case 1:
-                String categoryReport = supplierSystem.getProductDistributionByCategory();
-                System.out.println(categoryReport);
-                break;
-            case 2:
-                String locationReport = supplierSystem.getSupplierDistributionByLocation();
-                System.out.println(locationReport);
-                break;
-            case 3:
-                String priceReport = supplierSystem.getPriceAnalysis();
-                System.out.println(priceReport);
-                break;
-            default:
-                System.out.println("Invalid choice.");
-                break;
-        }
-    }
-
-    private void viewAllSystemData() {
-        System.out.println("\n--- All System Data ---");
-        System.out.println("=== Suppliers ===");
-        viewAllSuppliers();
-        System.out.println("\n=== Products ===");
-        viewAllProducts();
-    }*/
-
-    // Regular Employee Functions
-    private void searchProductById() {
-        System.out.println("\n--- Search Product by catalog number and supplier ID ---");
-        System.out.print("Enter catalog number: ");
-        String catalogNum = scanner.nextLine();
-
-        String supplierId = getSupplierIdFromUser();
-
-        String productInfo = supplierSystem.getProductBySupplierAndCatalog(supplierId, catalogNum);
-
-        if (productInfo != null && !productInfo.isEmpty()) {
-            System.out.println(productInfo);
-        } else {
-            System.out.println("Product not found.");
-        }
-    }
-
     //Agreement Functions
-
     private void createAgreement() {
         System.out.println("\n--- Create New Agreement ---");
 
@@ -1071,9 +946,9 @@ public class SupplierSystemUI {
         }
 
         if (success) {
-                System.out.println("Agreement updated successfully!");
+            System.out.println("Agreement updated successfully!");
         } else {
-                System.out.println("Failed to update agreement.");
+            System.out.println("Failed to update agreement.");
         }
 
     }
@@ -1094,6 +969,33 @@ public class SupplierSystemUI {
             System.out.println("Failed to remove agreement. Check if supplier ID and agreement ID are correct.");
         }
     }
+
+    // Delivery Manager Function
+    private void viewSuppliersRequiringPickup() {
+        System.out.println("\n--- Suppliers Requiring Pickup ---");
+        String suppliers = supplierSystem.getSuppliersRequiringPickup();
+        System.out.println(suppliers);
+    }
+
+
+    // Regular Employee Functions
+    private void searchProductById() {
+        System.out.println("\n--- Search Product by catalog number and supplier ID ---");
+        System.out.print("Enter catalog number: ");
+        String catalogNum = scanner.nextLine();
+
+        String supplierId = getSupplierIdFromUser();
+
+        String productInfo = supplierSystem.getProductBySupplierAndCatalog(supplierId, catalogNum);
+
+        if (productInfo != null && !productInfo.isEmpty()) {
+            System.out.println(productInfo);
+        } else {
+            System.out.println("Product not found.");
+        }
+    }
+
+    //helper Functions
 
     private LocalDate getValidTo() {
         System.out.print("Enter valid to date (YYYY-MM-DD): ");

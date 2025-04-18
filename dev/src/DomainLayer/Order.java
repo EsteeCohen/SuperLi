@@ -101,19 +101,20 @@ public class Order {
     }
 
 
-
-
     @Override
     public String toString() {
-        return "Order{" +
-                "orderId: " + orderId +
-                ", supplierId: " + supplierId +
-                ", agreementId: " + agreement.getAgreementId() +
-                ", date: " + orderDate +
-                ", deliveryDate=" + supplyDate +
-                ", items=" + items.size() +
-                ", status=" + status +
-                '}';
+        return String.format(
+                "Order #%d\n  Supplier ID: %s\n  Agreement ID: %d\n  Order Date: %s\n  Supply Date: %s\n  Status: %s\n  Total Price: %.2f\n  Items: %d products",
+                orderId,
+                supplierId,
+                agreement.getAgreementId(),
+                orderDate,
+                supplyDate,
+                status,
+                totalPrice,
+                items.size()
+        );
     }
+
 
 }

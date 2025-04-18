@@ -29,9 +29,7 @@ public class ContactPerson {
 
     @Override
     public String toString() {
-        return "ContactPerson{" +
-                "contactName: '" + contactName + '\'' +
-                ", phoneNumber: " + phoneNumber +
-                '}';
+        return String.format("%s (Phone: %s)", contactName, phoneNumber);
     }
+
 }

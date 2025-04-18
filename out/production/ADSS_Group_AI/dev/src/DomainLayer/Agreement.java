@@ -99,13 +99,20 @@ public class Agreement {
 
     @Override
     public String toString() {
-        return "Agreement{" +
-                "supplierId: " + supplierId +
-                ", productCatalog: " + productCatalog +
-                ", paymentMethod: " + paymentMethod +
-                ", paymentTiming: " + paymentTiming +
-                ", validFrom: " + validFrom +
-                ", validTo: " + validTo +
-                '}';
+        StringBuilder products = new StringBuilder();
+        for (Product p : productCatalog) {
+            products.append(String.format("    - %s (%s)\n", p.getCatalogNumber(), p.getPrice()));
+        }
+        return String.format(
+                "Agreement:\n  Supplier ID: %s\n  Agreement ID: %d\n  Payment Method: %s\n  Payment Timing: %s\n  Valid From: %s\n  Valid To: %s\n  Products:\n%s",
+                supplierId,
+                agreementId,
+                paymentMethod,
+                paymentTiming,
+                validFrom,
+                validTo,
+                products.toString().isEmpty() ? "    None\n" : products.toString()
+        );
     }
+
 }

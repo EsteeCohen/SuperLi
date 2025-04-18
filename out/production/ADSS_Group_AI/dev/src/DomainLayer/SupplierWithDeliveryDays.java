@@ -34,6 +34,7 @@ public class SupplierWithDeliveryDays extends  Supplier{
 
     @Override
     public String toString() {
-        return super.toString() + deliveryDays.toString();
+        return super.toString() + "  Delivery Days: " + deliveryDays + "\n";
     }
+
 }

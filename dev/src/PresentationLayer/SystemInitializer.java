@@ -33,13 +33,13 @@ public class SystemInitializer {
 
         /* ---------------- Supplier 2 agreement & order ---------------- */
         if (service.createAgreement("SUP002", 1, 3, LocalDate.now().minusDays(10), LocalDate.now().plusDays(60), List.of(0,1))) {
-            System.out.println("🔍 Supplier 2 agreement created with products [0,1]");
+            System.out.println("Supplier 2 agreement created with products [0,1]");
             Map<Integer,Integer> Supplier2Items = Map.of(0,5); // AM001 x5
             service.insertOrder("SUP002", LocalDate.now(), LocalDate.now().plusDays(5), Supplier2Items,
                     "Jane Smith", "0509876543", 0, 0); // agreement idx 0, DELIVERED
-            System.out.println("✅ Supplier 2 order initialized.");
+            System.out.println("Supplier 2 order initialized.");
         }
 
-        System.out.println("System initialization complete.");
+        //System.out.println("System initialization complete.");
     }
 }

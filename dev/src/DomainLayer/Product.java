@@ -100,15 +100,17 @@ public class Product {
 
     @Override
     public String toString() {
-        return "Product{" +
-                "ProductName: '" + ProductName + '\'' +
-                "supplierId:" + supplierId +
-                ", catalogNumber:" + catalogNumber +
-                ", quantityPerPackage:" + quantityPerPackage +
-                ", units:" + units +
-                ", discountPerPackage:" +  discountPerPackage.toString() +
-                ", price: " + price +
-                '}';
+        return String.format(
+                "Product:\n  Name: %s\n  Catalog Number: %s\n  Supplier ID: %s\n  Quantity Per Package: %d %s\n  Price per package: %.2f\n  Discounts: %s",
+                ProductName != null ? ProductName : "N/A",
+                catalogNumber,
+                supplierId,
+                quantityPerPackage,
+                units,
+                price,
+                discountPerPackage.isEmpty() ? "None" : discountPerPackage.toString()
+        );
     }
+
 
 }

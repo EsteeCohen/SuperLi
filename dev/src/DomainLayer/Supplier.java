@@ -103,12 +103,24 @@ public abstract class Supplier {
 
     @Override
     public String toString() {
-        return "Supplier{" +
-                "name: " + name + '\'' +
-                ", supplierId: " + supplierId +
-                ", bankAccount: " + bankAccount +
-                ", agreements: " + agreements.toString() +
-                ", contactPersons: " + contactPersons.toString() +
-                '}';
+        StringBuilder contacts = new StringBuilder();
+        for (ContactPerson cp : contactPersons) {
+            contacts.append(String.format("    - %s\n", cp.toString()));
+        }
+
+        StringBuilder ags = new StringBuilder();
+        for (Agreement ag : agreements) {
+            ags.append(String.format("    - Agreement ID: %d\n", ag.getAgreementId()));
+        }
+
+        return String.format(
+                "Supplier:\n  Name: %s\n  ID: %s\n  Bank Account: %s\n  Contacts:\n%s  Agreements:\n%s",
+                name,
+                supplierId,
+                bankAccount,
+                contacts.toString().isEmpty() ? "    None\n" : contacts.toString(),
+                ags.toString().isEmpty() ? "    None\n" : ags.toString()
+        );
     }
+
 }

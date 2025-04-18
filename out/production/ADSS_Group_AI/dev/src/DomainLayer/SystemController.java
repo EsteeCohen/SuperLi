@@ -94,8 +94,7 @@ public class SystemController {
                 supplier.setBankAccount(value);
                 return true;
             case "contactpersons":
-                supplier.addContactPerson(new ContactPerson(value, "0")); // ניתן לעדכן עם מספר טלפון בעתיד
-                return true;
+                return addContactPersonFromString(supplier, value);
             case "deliverydays":
                 if (supplier instanceof SupplierWithDeliveryDays) {
                     List<DaysOfTheWeek> days = parseDeliveryDays(value); // value = "1,3,5"
@@ -109,6 +108,12 @@ public class SystemController {
         }
     }
 
+    private boolean addContactPersonFromString(Supplier supplier, String value) {
+        String[] parts = value.split(",");
+        if (parts.length != 2) return false;
+        supplier.addContactPerson(new ContactPerson(parts[0].trim(), parts[1].trim()));
+        return true;
+    }
 
     public List<String> getAllSuppliers() {
         List<String> all = new ArrayList<>();
@@ -225,16 +230,6 @@ public class SystemController {
         return all;
     }
 
-
-    /*public String findProduct(String catalogNumber) {
-        int catalogKey = Integer.parseInt(catalogNumber);
-        for (Map<Integer, Product> supplierProducts : products.values()) {
-            if (supplierProducts.containsKey(catalogKey)) {
-                return supplierProducts.get(catalogKey).toString();
-            }
-        }
-        return null;
-    }*/
 
     public String findProductBySupplierAndCatalog(String supplierId, String catalogNumber) {
         if (!products.containsKey(supplierId)) return null;
@@ -516,12 +511,18 @@ public class SystemController {
         Agreement agreement = supplier.getAgreements().get(agreementIndex);
         if (agreement == null) return false;
 
-        List<Product> productsToUpdate = new ArrayList<>();
+        Map<String, Product> allSupplierProducts = products.get(supplierId);
+        if (allSupplierProducts == null) return false;
+
+        List<Product> supplierProductList = new ArrayList<>(allSupplierProducts.values());
+        List<Product> updatedCatalog = new ArrayList<>();
+
         for (int index : indexProducts) {
-            productsToUpdate.add(agreement.getProductCatalog().get(index));
+            if (index < 0 || index >= supplierProductList.size()) return false;
+            updatedCatalog.add(supplierProductList.get(index));
         }
 
-        agreement.setProductCatalog(productsToUpdate);
+        agreement.setProductCatalog(updatedCatalog);
         return true;
     }
 
