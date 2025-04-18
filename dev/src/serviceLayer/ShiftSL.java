@@ -1,4 +1,4 @@
-package src.serviceLayer;
+package serviceLayer;
 
 public class ShiftSL {
     private final LocalDate date;

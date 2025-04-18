@@ -1,4 +1,4 @@
-package src.serviceLayer;
+package serviceLayer;
 
 public class HRSystemUIService {
     private static HRSystemUIService instance = null;

@@ -1,8 +1,8 @@
-package src.presentationLayer;
+package presentationLayer;
 
 import java.util.Scanner;
 
-import src.serviceLayer.RoleService;
+import serviceLayer.RoleService;
 
 public class RoleCreationPresentation {
     private RoleService roleService;

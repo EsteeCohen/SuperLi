@@ -1,6 +1,6 @@
 {
     "java.project.sourcePaths": [
-        "dev"
+        "dev","DEV","src"
     ],
     "java.project.referencedLibraries": []
 }

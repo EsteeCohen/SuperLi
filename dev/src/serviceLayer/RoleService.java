@@ -1,4 +1,4 @@
-package src.serviceLayer;
+package serviceLayer;
 
 import domainLayer.RoleFacade;
 import java.util.List;

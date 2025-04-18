@@ -1,4 +1,4 @@
-package src.serviceLayer;
+package serviceLayer;
 
 import domainLayer.ShiftFacade;
 import java.time.LocalDate;
