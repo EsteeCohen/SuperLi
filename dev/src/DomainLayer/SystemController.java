@@ -47,6 +47,7 @@ public class SystemController {
     public boolean addSupplierWithDelivery(String name, String id, String bankAccount, String deliveryDays) {
         if (suppliers.containsKey(id)) return false;
         List<DaysOfTheWeek> days = parseDeliveryDays(deliveryDays);
+        if (days == null) return false;
         Supplier supplier = new SupplierWithDeliveryDays(name, id, bankAccount, days);
         suppliers.put(id, supplier);
         return true;
@@ -88,19 +89,21 @@ public class SystemController {
                     for(Product product: supplierProducts.values())
                         product.setSupplierId(value);
                 }
-
-
                 return true;
-
             case "bankaccount":
                 supplier.setBankAccount(value);
                 return true;
-
-            case "contactperson":
             case "contactpersons":
                 supplier.addContactPerson(new ContactPerson(value, "0")); // ניתן לעדכן עם מספר טלפון בעתיד
                 return true;
-
+            case "deliverydays":
+                if (supplier instanceof SupplierWithDeliveryDays) {
+                    List<DaysOfTheWeek> days = parseDeliveryDays(value); // value = "1,3,5"
+                    if (days == null) return false;
+                    ((SupplierWithDeliveryDays) supplier).setDeliveryDays(days);
+                    return true;
+                }
+                return false;
             default:
                 return false;
         }
@@ -131,6 +134,7 @@ public class SystemController {
         for (String token : input.split(",")) {
             try {
                 int dayIndex = Integer.parseInt(token.trim());
+                if(dayIndex < 1 || dayIndex > 7) return null;
                 days.add(DaysOfTheWeek.values()[dayIndex - 1]);
             } catch (Exception ignored) {}
         }
@@ -235,15 +239,10 @@ public class SystemController {
     public String findProductBySupplierAndCatalog(String supplierId, String catalogNumber) {
         if (!products.containsKey(supplierId)) return null;
 
-        try {
-            int catalogKey = Integer.parseInt(catalogNumber);
-            Product product = products.get(supplierId).get(catalogKey);
-            return (product != null) ? product.toString() : null;
-        } catch (NumberFormatException e) {
-            return null;
-        }
+        Map<String, Product> supplierProducts = products.get(supplierId);
+        Product product = supplierProducts.get(catalogNumber);
+        return (product != null) ? product.toString() : null;
     }
-
 
 
     public boolean removeProduct(String supplierID, String catalogNumber) {

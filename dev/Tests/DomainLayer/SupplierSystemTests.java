@@ -22,8 +22,6 @@ class SupplierSystemTests {
     public void setUp() {
         // Get a new instance for each test
         service = SupplierSystemService.getInstance();
-        // Clear existing data (you may want to add a method for this in your system)
-        // For now we'll just create new test data for each test
     }
 
     // Test 1: Add supplier with delivery days
@@ -57,14 +55,18 @@ class SupplierSystemTests {
     // Test 3: Update supplier information
     @Test
     public void testUpdateSupplier() {
-        // First, add a supplier
+        // Add a supplier with initial delivery days
         service.addSupplierWithDelivery("Original Name", "SUP003", "123456789", "1,3,5");
 
-        // Now update the name
-        boolean result = service.updateSupplier("SUP003", "name", "Updated Name");
-        assertTrue(result);
+        // Update the name
+        boolean nameUpdate = service.updateSupplier("SUP003", "name", "Updated Name");
+        assertTrue(nameUpdate, "Failed to update supplier name");
 
-        // Verify the update
+        // Update delivery days
+        boolean deliveryDaysUpdate = service.updateSupplier("SUP003", "deliveryDays", "2,4,6"); // Monday, Wednesday, Friday
+        assertTrue(deliveryDaysUpdate, "Failed to update delivery days");
+
+        // Verify supplier exists and name updated
         List<String> suppliers = service.getAllSuppliers();
         boolean found = false;
         for (String supplier : suppliers) {
@@ -73,7 +75,7 @@ class SupplierSystemTests {
                 break;
             }
         }
-        assertTrue(found, "Updated supplier name not found");
+        assertTrue(found, "Updated supplier not found");
     }
 
     // Test 4: Remove supplier
@@ -141,19 +143,21 @@ class SupplierSystemTests {
     // Test 7: Remove product
     @Test
     public void testRemoveProduct() {
-        // Add supplier and product first
         service.addSupplierWithDelivery("Product Remove Supplier", "SUP007", "123456789", "1,3,5");
         ArrayList<String> discounts = new ArrayList<>(Arrays.asList("10,5", "20,10"));
-        service.addProduct("SUP007", "PROD003", 10, discounts, 100.0, 0);
+        boolean added = service.addProduct("SUP007", "PROD003", 10, discounts, 100.0, 0);
+        assertTrue(added, "Product was not added successfully");
 
-        // Remove the product
-        boolean result = service.removeProduct("SUP007", "PROD003");
-        assertTrue(result);
+        String productBeforeRemoval = service.getProductBySupplierAndCatalog("SUP007", "PROD003");
+        assertNotNull(productBeforeRemoval, "Product should exist before removal");
 
-        // Verify it's gone
-        String product = service.getProductBySupplierAndCatalog("SUP007", "PROD003");
-        assertNull("Product should be removed but was found", product);
+        boolean removed = service.removeProduct("SUP007", "PROD003");
+        assertTrue(removed, "Product removal failed");
+
+        String productAfterRemoval = service.getProductBySupplierAndCatalog("SUP007", "PROD003");
+        assertNull(productAfterRemoval, "Product should be removed but was found");
     }
+
 
     // Test 8: Create agreement
     @Test
@@ -179,7 +183,7 @@ class SupplierSystemTests {
     // Test 9: Update agreement
     @Test
     public void testUpdateAgreement() {
-        // Add supplier, products, and agreement first
+        // Step 1: Add supplier, products, and initial agreement
         service.addSupplierWithDelivery("Agreement Update Supplier", "SUP009", "123456789", "1,3,5");
         ArrayList<String> discounts = new ArrayList<>(Arrays.asList("10,5", "20,10"));
         service.addProduct("SUP009", "PROD006", 10, discounts, 100.0, 0);
@@ -190,22 +194,44 @@ class SupplierSystemTests {
         List<Integer> productIndices = Arrays.asList(0, 1);
         service.createAgreement("SUP009", 0, 0, validFrom, validTo, productIndices);
 
-        // Update payment method
-        boolean result = service.updatePaymentMethods("SUP009", 0, 1);
-        assertTrue(result);
+        // Step 2: Update payment method
+        boolean methodUpdated = service.updatePaymentMethods("SUP009", 0, 1);
+        assertTrue(methodUpdated, "Failed to update payment method");
 
-        // Verify the update
+        // Step 3: Update payment timing
+        boolean timingUpdated = service.updatePaymentTiming("SUP009", 0, 2);
+        assertTrue(timingUpdated, "Failed to update payment timing");
+
+        // Step 4: Update validFrom date
+        LocalDate newValidFrom = validFrom.minusDays(3);
+        boolean fromUpdated = service.updateValidFrom("SUP009", 0, newValidFrom);
+        assertTrue(fromUpdated, "Failed to update validFrom");
+
+        // Step 5: Update validTo date
+        LocalDate newValidTo = validTo.plusMonths(3);
+        boolean toUpdated = service.updateValidTo("SUP009", 0, newValidTo);
+        assertTrue(toUpdated, "Failed to update validTo");
+
+        // Step 6: Update products - keep only the first one
+        List<Integer> newProducts = List.of(0);
+        boolean productsUpdated = service.updateAgreementProducts("SUP009", 0, newProducts);
+        assertTrue(productsUpdated, "Failed to update agreement products");
+
+        // Step 7: Retrieve and verify the updated agreement
         List<String> agreements = service.getAgreementsBySupplier("SUP009");
-        boolean found = false;
-        for (String agreement : agreements) {
-            // Check if it contains the updated payment method (index 1)
-            if (agreement.contains("paymentMethod: " + service.getPaymentMethods().get(1))) {
-                found = true;
-                break;
-            }
-        }
-        assertTrue(found, "Updated payment method not found in agreement");
+        assertFalse(agreements.isEmpty(), "No agreements found");
+
+        String agreement = agreements.get(0);
+        assertTrue(agreement.contains(service.getPaymentMethods().get(1)), "Payment method not updated correctly");
+        assertTrue(agreement.contains(service.getPaymentTimings().get(2)), "Payment timing not updated correctly");
+        assertTrue(agreement.contains("validFrom: " + newValidFrom), "validFrom not updated");
+        assertTrue(agreement.contains("validTo: " + newValidTo), "validTo not updated");
+
+        // Validate products were updated
+        assertTrue(agreement.contains("PROD006"), "Expected product not found");
+        assertFalse(agreement.contains("PROD007"), "Unexpected product still present after update");
     }
+
 
     // Test 10: Create order
     @Test
