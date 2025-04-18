@@ -94,21 +94,21 @@ public class Product {
         this.ProductName = value;
     }
 
-    @Override
-    public String toString() {
-        return "Product{" +
-                "ProductName='" + ProductName + '\'' +
-                "supplierId=" + supplierId +
-                ", catalogNumber=" + catalogNumber +
-                ", quantityPerPackage=" + quantityPerPackage +
-                ", units=" + units +
-                ", discountPerPackage=" +  discountPerPackage.toString() +
-                ", price=" + price +
-                '}';
-    }
-
-
     public void setUnits(Units unit) {
         this.units = unit;
     }
+
+    @Override
+    public String toString() {
+        return "Product{" +
+                "ProductName: '" + ProductName + '\'' +
+                "supplierId:" + supplierId +
+                ", catalogNumber:" + catalogNumber +
+                ", quantityPerPackage:" + quantityPerPackage +
+                ", units:" + units +
+                ", discountPerPackage:" +  discountPerPackage.toString() +
+                ", price: " + price +
+                '}';
+    }
+
 }

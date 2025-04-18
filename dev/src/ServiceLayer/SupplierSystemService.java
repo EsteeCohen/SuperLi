@@ -160,9 +160,13 @@ public class SupplierSystemService {
         return systemController.loadDataSafe(suppliersPath, productsPath, ordersPath);
     }*/
 
+    public boolean createAgreement(String supplierId, int paymentMethod, int paymentTiming, LocalDate validFrom, LocalDate validTo, List<Integer> IndexProducts) {
+        return systemController.createAgreement(supplierId, paymentMethod, paymentTiming, validFrom, validTo, IndexProducts);
+    }
 
-
-
+    public boolean removeAgreement(String supplierId, int agreementIndex) {
+        return systemController.removeAgreement(supplierId, agreementIndex);
+    }
     //help func
 
     public boolean checkIfSupplierExists(String supplierId){
@@ -173,7 +177,38 @@ public class SupplierSystemService {
         return systemController.getProductsByAgreement(supplierId, agreementIndex);
     }
 
+    public List<String> getProductsBySupplier(String supplierId) {
+        return systemController.getProductsBySupplier(supplierId);
+    }
 
+
+
+    public boolean updateAgreementProducts(String supplierId, int agreementIndex, List<Integer> indexProducts) {
+        return systemController.updateAgreementProducts(supplierId, agreementIndex, indexProducts);
+    }
+
+    public boolean updatePaymentMethods(String supplierId, int agreementIndex, int paymentMethodIndex) {
+        return systemController.updatePaymentMethods(supplierId, agreementIndex, paymentMethodIndex);
+    }
+
+    public boolean updatePaymentTiming(String supplierId, int agreementIndex, int paymentTimingIndex) {
+        return systemController.updatePaymentTiming(supplierId, agreementIndex, paymentTimingIndex);
+    }
+
+    public boolean updateValidFrom(String supplierId, int agreementIndex, LocalDate validFrom) {
+        return systemController.updateValidFrom(supplierId, agreementIndex, validFrom);
+    }
+
+    public boolean updateValidTo(String supplierId, int agreementIndex, LocalDate validTo) {
+        return systemController.updateValidTo(supplierId, agreementIndex, validTo);
+    }
+    public List<String> getPaymentMethods(){
+        return systemController.getPaymentMethods();
+    }
+
+    public List<String> getPaymentTimings(){
+        return systemController.getPaymentTimings();
+    }
     /*
     public int getAgreementIdByIndex(String supplierId, int index) {
         return systemController.getAgreementIdByIndex(supplierId, index);

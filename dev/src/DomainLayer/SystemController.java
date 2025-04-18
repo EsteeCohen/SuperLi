@@ -363,11 +363,14 @@ public class SystemController {
      * @param supplierId ID of the supplier
      * @return List of products for the supplier
      */
-    public List<Product> getProductsBySupplier(String supplierId) {
-        List<Product> supplierProducts = new ArrayList<>();
+    public List<String> getProductsBySupplier(String supplierId) {
+        List<String> supplierProducts = new ArrayList<>();
 
         if (products.containsKey(supplierId)) {
-            supplierProducts.addAll(products.get(supplierId).values());
+            List<Product> productsList = new ArrayList<>(products.get(supplierId).values());
+            for (Product product : productsList) {
+                supplierProducts.add(product.toString());
+            }
         }
 
         return supplierProducts;
@@ -489,16 +492,128 @@ public class SystemController {
         return result;
     }
 
-    //public String getCatalogNumber(String supplierId, int productIndex, String) {}
+    // Get all available payment methods as strings
+    public List<String> getPaymentMethods() {
+        List<String> methods = new ArrayList<>();
+        for (PaymentMethod method : PaymentMethod.values()) {
+            methods.add(method.toString());
+        }
+        return methods;
+    }
 
-    /*public int getAgreementIdByIndex(String supplierId, int index) {
+    // Get all available payment timings as strings
+    public List<String> getPaymentTimings() {
+        List<String> timings = new ArrayList<>();
+        for (PaymentTiming timing : PaymentTiming.values()) {
+            timings.add(timing.toString());
+        }
+        return timings;
+    }
+
+    public boolean updateAgreementProducts(String supplierId, int agreementIndex, List<Integer> indexProducts) {
         Supplier supplier = suppliers.get(supplierId);
-        if (supplier == null) return -1;
+        if (supplier == null) return false;
+
+        Agreement agreement = supplier.getAgreements().get(agreementIndex);
+        if (agreement == null) return false;
+
+        List<Product> productsToUpdate = new ArrayList<>();
+        for (int index : indexProducts) {
+            productsToUpdate.add(agreement.getProductCatalog().get(index));
+        }
+
+        agreement.setProductCatalog(productsToUpdate);
+        return true;
+    }
+
+    public boolean updatePaymentMethods(String supplierId, int agreementIndex, int paymentMethodIndex) {
+        Supplier supplier = suppliers.get(supplierId);
+        if (supplier == null) return false;
+
+        Agreement agreement = supplier.getAgreements().get(agreementIndex);
+        if (agreement == null) return false;
+
+        try {
+            PaymentMethod paymentMethod = PaymentMethod.values()[paymentMethodIndex];
+            agreement.setPaymentMethod(paymentMethod);
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+    }
+
+    public boolean updatePaymentTiming(String supplierId, int agreementIndex, int paymentTimingIndex) {
+        Supplier supplier = suppliers.get(supplierId);
+        if (supplier == null) return false;
+
+        Agreement agreement = supplier.getAgreements().get(agreementIndex);
+        if (agreement == null) return false;
+
+        try {
+            PaymentTiming paymentTiming = PaymentTiming.values()[paymentTimingIndex];
+            agreement.setPaymentTiming(paymentTiming);
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+    }
+
+    public boolean updateValidFrom(String supplierId, int agreementIndex, LocalDate validFrom) {
+        Supplier supplier = suppliers.get(supplierId);
+        if (supplier == null) return false;
+
+        Agreement agreement = supplier.getAgreements().get(agreementIndex);
+        if (agreement == null) return false;
+
+        agreement.setValidFrom(validFrom);
+        return true;
+    }
+
+    public boolean updateValidTo(String supplierId, int agreementIndex, LocalDate validTo) {
+        Supplier supplier = suppliers.get(supplierId);
+        if (supplier == null) return false;
+
+        Agreement agreement = supplier.getAgreements().get(agreementIndex);
+        if (agreement == null) return false;
+
+        agreement.setValidTo(validTo);
+        return true;
+    }
+
+    public boolean createAgreement(String supplierId, int paymentMethod, int paymentTiming, LocalDate validFrom, LocalDate validTo, List<Integer> IndexProducts) {
+        Supplier supplier = suppliers.get(supplierId);
+        if (supplier == null) return false;
+
+        try {
+            PaymentMethod method = PaymentMethod.values()[paymentMethod];
+            PaymentTiming timing = PaymentTiming.values()[paymentTiming];
+            Agreement agreement = new Agreement(supplierId, nextAgreementId, method, timing, validFrom, validTo);
+            supplier.addAgreement(agreement);
+            //updateAgreementProducts(supplierId, nextAgreementId, IndexProducts);
+            List<Product> catalog = new ArrayList<>();
+            Map<String, Product> map = products.get(supplierId);   // כל המוצרים של הספק
+            List<Product> supplierProducts = new ArrayList<>(map.values());
+
+            for (int idx : IndexProducts) {
+                if (idx < 0 || idx >= supplierProducts.size()) return false; // אינדקס לא חוקי
+                catalog.add(supplierProducts.get(idx));
+            }
+            agreement.setProductCatalog(catalog);
+            nextAgreementId++;
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+    }
+
+    public boolean removeAgreement(String supplierId, int agreementIndex) {
+        Supplier supplier = suppliers.get(supplierId);
+        if (supplier == null) return false;
 
         List<Agreement> agreements = supplier.getAgreements();
-        if (index < 0 || index >= agreements.size()) return -1;
+        if (agreementIndex < 0 || agreementIndex >= agreements.size()) return false;
 
-        return agreements.get(index).getAgreementId();
-    }*/
-
+        agreements.remove(agreementIndex);
+        return true;
+    }
 }

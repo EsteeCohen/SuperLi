@@ -104,11 +104,11 @@ public abstract class Supplier {
     @Override
     public String toString() {
         return "Supplier{" +
-                "name='" + name + '\'' +
-                ", supplierId=" + supplierId +
-                ", bankAccount=" + bankAccount +
-                ", agreements=" + agreements.size() +
-                ", contactPersons=" + contactPersons.size() +
+                "name: " + name + '\'' +
+                ", supplierId: " + supplierId +
+                ", bankAccount: " + bankAccount +
+                ", agreements: " + agreements.toString() +
+                ", contactPersons: " + contactPersons.toString() +
                 '}';
     }
 }

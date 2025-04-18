@@ -100,12 +100,12 @@ public class Agreement {
     @Override
     public String toString() {
         return "Agreement{" +
-                "supplierId=" + supplierId +
-                ", productCatalog=" + productCatalog +
-                ", paymentMethod=" + paymentMethod +
-                ", paymentTiming=" + paymentTiming +
-                ", validFrom=" + validFrom +
-                ", validTo=" + validTo +
+                "supplierId: " + supplierId +
+                ", productCatalog: " + productCatalog +
+                ", paymentMethod: " + paymentMethod +
+                ", paymentTiming: " + paymentTiming +
+                ", validFrom: " + validFrom +
+                ", validTo: " + validTo +
                 '}';
     }
 }

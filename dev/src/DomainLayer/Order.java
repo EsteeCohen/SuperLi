@@ -106,9 +106,10 @@ public class Order {
     @Override
     public String toString() {
         return "Order{" +
-                "orderId=" + orderId +
-                ", supplierId=" + supplierId +
-                ", date=" + orderDate +
+                "orderId: " + orderId +
+                ", supplierId: " + supplierId +
+                ", agreementId: " + agreement.getAgreementId() +
+                ", date: " + orderDate +
                 ", deliveryDate=" + supplyDate +
                 ", items=" + items.size() +
                 ", status=" + status +

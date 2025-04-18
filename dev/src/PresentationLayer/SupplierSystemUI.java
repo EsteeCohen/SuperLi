@@ -83,14 +83,17 @@ public class SupplierSystemUI {
         System.out.println("7. View all suppliers");
         System.out.println("8. View all products");
         System.out.println("9. Search product by catalog number and supplier ID");
-        System.out.println("10. Insert order");
-        System.out.println("11. Update order status");
-        System.out.println("12. View all orders");
-        System.out.println("13. View order by ID");
-        System.out.println("14. View orders by status");
-        System.out.println("15. View orders by supplier");
+        System.out.println("10. Add new agreement");
+        System.out.println("11. Update agreement");
+        System.out.println("12. Remove agreement");
+        System.out.println("13. View agreements by supplier");
+        System.out.println("14. Insert order");
+        System.out.println("15. Update order status");
+        System.out.println("16. View all orders");
+        System.out.println("17. View order by ID");
+        System.out.println("18. View orders by status");
+        System.out.println("19. View orders by supplier");
         System.out.println("0. Exit");
-        // Call appropriate functions here
     }
 
     private void displayDeliveryManagerMenu() {
@@ -181,24 +184,35 @@ public class SupplierSystemUI {
                 searchProductById();
                 break;
             case 10:
-                insertOrder();
+                createAgreement();
                 break;
             case 11:
-                updateOrderStatus();
+                updateAgreement();
                 break;
             case 12:
-                viewAllOrders();
+                removeAgreement();
                 break;
             case 13:
-                viewOrderById();
+                viewAgreementsBySupplier();
                 break;
             case 14:
-                viewOrdersByStatus();
+                insertOrder();
                 break;
             case 15:
+                updateOrderStatus();
+                break;
+            case 16:
+                viewAllOrders();
+                break;
+            case 17:
+                viewOrderById();
+                break;
+            case 18:
+                viewOrdersByStatus();
+                break;
+            case 19:
                 viewOrdersBySupplier();
                 break;
-
             default:
                 System.out.println("Invalid option. Please try again.");
                 break;
@@ -210,9 +224,6 @@ public class SupplierSystemUI {
             case 1:
                 viewSuppliersRequiringPickup();
                 break;
-            /*case 2:
-                markSupplierAsPickedUp();
-                break;*/
             default:
                 System.out.println("Invalid option. Please try again.");
                 break;
@@ -838,38 +849,33 @@ public class SupplierSystemUI {
         }
     }
 
-    /*private void viewAgreementsBySupplier(String supplierId) {
-        System.out.println("\n--- View Agreements by Supplier ---");
+    private void viewAgreementsBySupplier() {
+         System.out.println("\n--- View Agreements by Supplier ---");
+        // Get supplier ID
+        String supplierId = getSupplierIdFromUser();
 
-        System.out.println("\n--- Enter the serial number of the desired agreement ---");
+        // Check if supplier exists
+        boolean supplierExists = supplierSystem.checkIfSupplierExists(supplierId);
+        if (!supplierExists) {
+            System.out.println("Supplier not found. Operation cancelled.");
+            return;
+        }
 
         List<String> agreements = supplierSystem.getAgreementsBySupplier(supplierId);
 
-        int numberOfAgreements = agreements.size();
-        int agreementIndex = -1;
-        while (agreementIndex< 0 || numberOfAgreements < agreementIndex) {
-            if (agreements.isEmpty()) {
-                System.out.println("No agreements found for supplier ID: " + supplierId);
-            } else {
-                System.out.println("Agreements for supplier ID " + supplierId + ":");
-                int index = 0;
-                for (String agreement : agreements) {
-                    System.out.println(index + " - " + agreement);
-                    index++;
-                }
-            }
-            agreementIndex = getUserChoice();
-            if (agreementIndex < 0 || numberOfAgreements < agreementIndex) {
-                System.out.println("Invalid input. Please enter a valid number.");
-            }
+        if (agreements.isEmpty()) {
+            System.out.println("No agreements found for supplier ID: " + supplierId);
+            return;
         }
 
-        List<String> products = supplierSystem.getProductsByAgreement(supplierId,agreementIndex);
-        for(String product: products){
-            System.out.println(product);
+        System.out.println("Agreements for supplier ID " + supplierId + ":");
+        int index = 0;
+        for (String agreement : agreements) {
+            System.out.println(index + " - " + agreement);
+            index++;
         }
 
-    }*/
+    }
 
 
     // Delivery Manager Functions
@@ -969,5 +975,241 @@ public class SupplierSystemUI {
         }
     }
 
+    //Agreement Functions
+
+    private void createAgreement() {
+        System.out.println("\n--- Create New Agreement ---");
+
+        // Step 1: Select supplier
+        viewAllSuppliers();
+        String supplierId = getSupplierIdFromUser();
+        if (!supplierSystem.checkIfSupplierExists(supplierId)) {
+            System.out.println("Supplier not found. Operation cancelled.");
+            return;
+        }
+
+        // Step 2: Select payment method and timing
+        int paymentMethodIndex = getPaymentMethodsFromUser();
+        int paymentTimingIndex = getPaymentTimingFromUser();
+
+        // Step 3: Set agreement validity dates
+        System.out.println("\n--- Set Agreement Validity Period ---");
+        LocalDate validFrom = getValidTo();
+
+
+        LocalDate validTo = getValidFrom();
+
+        // Step 4: Show available products and let user select them
+
+        List<Integer> IndexProducts = updateAgreementProducts(supplierId);
+
+        // Step 6: Create the agreement
+        boolean agreementCreated = supplierSystem.createAgreement(
+                supplierId,
+                paymentMethodIndex,
+                paymentTimingIndex,
+                validFrom,
+                validTo,
+                IndexProducts
+        );
+
+        if (agreementCreated) {
+            System.out.println("Agreement created successfully!");
+        } else {
+            System.out.println("Failed to create agreement. Please check your input.");
+        }
+    }
+
+    private void updateAgreement() {
+        System.out.println("\n--- Update Agreement ---");
+
+        System.out.print("Enter supplier ID: ");
+        String supplierId = scanner.nextLine();
+
+        System.out.print("Enter agreement ID: ");
+        int agreementIndex = getUserChoice();
+
+        System.out.println("Select field to update:");
+        System.out.println("1. Payment Method");
+        System.out.println("2. Payment Timing");
+        System.out.println("3. Valid From");
+        System.out.println("4. Valid To");
+        System.out.println("5. Products");
+        System.out.print("Your choice: ");
+
+        int choice = getUserChoice();
+        boolean success = false;
+        switch (choice) {
+            case 1:
+                int paymentMethodIndex = getPaymentMethodsFromUser();
+                success = supplierSystem.updatePaymentMethods(supplierId, agreementIndex, paymentMethodIndex);
+                break;
+            case 2:
+                int paymentTimingIndex = getPaymentTimingFromUser();
+                success = supplierSystem.updatePaymentTiming(supplierId, agreementIndex, paymentTimingIndex);
+                break;
+            case 3:
+                LocalDate validFrom = getValidFrom();
+                success = supplierSystem.updateValidFrom(supplierId, agreementIndex, validFrom);
+                break;
+            case 4:
+                LocalDate validTo = getValidTo();
+                success = supplierSystem.updateValidTo(supplierId, agreementIndex, validTo);
+                break;
+            case 5:
+                System.out.println("\n--- Update Agreement Products ---");
+                List<Integer> IndexProducts = updateAgreementProducts(supplierId);
+                if (IndexProducts == null) {
+                    success = false;
+                }else {
+                    success = supplierSystem.updateAgreementProducts(supplierId, agreementIndex, IndexProducts);
+                }
+                break;
+            default:
+                System.out.println("Invalid choice. Operation cancelled.");
+                return;
+        }
+
+        if (success) {
+                System.out.println("Agreement updated successfully!");
+        } else {
+                System.out.println("Failed to update agreement.");
+        }
+
+    }
+
+    private void removeAgreement() {
+        System.out.println("\n--- Remove Agreement ---");
+
+        String supplierId = getSupplierIdFromUser();
+
+        System.out.print("Enter agreement ID: ");
+        int agreementIndex = getUserChoice();
+
+        boolean result = supplierSystem.removeAgreement(supplierId, agreementIndex);
+
+        if (result) {
+            System.out.println("Agreement removed successfully!");
+        } else {
+            System.out.println("Failed to remove agreement. Check if supplier ID and agreement ID are correct.");
+        }
+    }
+
+    private LocalDate getValidTo() {
+        System.out.print("Enter valid to date (YYYY-MM-DD): ");
+        LocalDate validTo;
+        try {
+            validTo = LocalDate.parse(scanner.nextLine());
+        } catch (Exception e) {
+            System.out.println("Invalid date format. Setting valid to date to current date.");
+            validTo = LocalDate.now();
+        }
+        return validTo;
+    }
+
+    private LocalDate getValidFrom() {
+        System.out.print("Enter valid from date (YYYY-MM-DD): ");
+        LocalDate validFrom;
+        try {
+            validFrom = LocalDate.parse(scanner.nextLine());
+        } catch (Exception e) {
+            System.out.println("Invalid date format. Setting valid from date to current date.");
+            validFrom = LocalDate.now();
+        }
+        return validFrom;
+    }
+
+    private List<Integer> updateAgreementProducts(String supplierId) {
+
+        List<String> products = supplierSystem.getProductsBySupplier(supplierId);
+
+        if (products.isEmpty()) {
+            System.out.println("No products found for this supplier. Operation cancelled.");
+            return new ArrayList<Integer>();
+        }
+
+        // Display available products
+        System.out.println("\n--- Available Products ---");
+        for (int i = 0; i < products.size(); i++) {
+            System.out.println(i + " - " + products.get(i));
+        }
+
+        // Collect items for order
+        List<Integer> IndexProducts = new ArrayList<Integer>();
+        int productIndex = 0;
+        while (productIndex != -1) {
+            System.out.print("Enter product index (-1 to finish): ");
+            try {
+                productIndex = Integer.parseInt(scanner.nextLine());
+
+                if (productIndex == -1) break;
+
+                if (productIndex < 0 || productIndex >= products.size()) {
+                    System.out.println("Invalid product index. Please try again.");
+                    continue;
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a number.");
+            }
+        }
+
+        return IndexProducts;
+    }
+
+    private int getPaymentMethodsFromUser() {
+        List<String> paymentMethods = supplierSystem.getPaymentMethods();
+        System.out.println("\n--- Available Payment Methods ---");
+        for (int i = 0; i < paymentMethods.size(); i++) {
+            System.out.println(i + " - " + paymentMethods.get(i));
+        }
+
+        int selection = -1;
+        boolean validInput = false;
+
+        while (!validInput) {
+            System.out.print("Enter payment method number (0-" + (paymentMethods.size() - 1) + "): ");
+            try {
+                selection = Integer.parseInt(scanner.nextLine());
+                if (selection >= 0 && selection < paymentMethods.size()) {
+                    validInput = true;
+                } else {
+                    System.out.println("Invalid selection. Please enter a number between 0 and "
+                            + (paymentMethods.size() - 1));
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter a valid number.");
+            }
+        }
+
+        return selection;
+    }
+
+    private int getPaymentTimingFromUser() {
+        List<String> paymentTimings = supplierSystem.getPaymentTimings();
+        System.out.println("\n--- Available Payment Timings ---");
+        for (int i = 0; i < paymentTimings.size(); i++) {
+            System.out.println(i + " - " + paymentTimings.get(i));
+        }
+
+        int selection = -1;
+        boolean validInput = false;
+
+        while (!validInput) {
+            System.out.print("Enter payment timing number (0-" + (paymentTimings.size() - 1) + "): ");
+            try {
+                selection = Integer.parseInt(scanner.nextLine());
+                if (selection >= 0 && selection < paymentTimings.size()) {
+                    validInput = true;
+                } else {
+                    System.out.println("Invalid selection. Please enter a number between 0 and "
+                            + (paymentTimings.size() - 1));
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter a valid number.");
+            }
+        }
+
+        return selection;
+    }
 }
 
