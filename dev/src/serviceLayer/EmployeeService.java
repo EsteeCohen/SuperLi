@@ -2,7 +2,6 @@ package src.serviceLayer;
 
 import domainLayer.EmployeeDL;
 import domainLayer.EmployeeFacade;
-import java.time.LocalDate;
 
 public class EmployeeService {
     private EmployeeFacade employeeFacade;
@@ -27,11 +26,6 @@ public class EmployeeService {
         } else {
             return null; // or throw an exception
         }
-    }
-
-    public void setAvailabilityOfEmployee(String employeeId, LocalDate date, String ShiftType, boolean available) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setAvailabilityOfEmployee'");
     }
 
     public boolean assignRoleToEmployee(String employeeId, String roleName) {

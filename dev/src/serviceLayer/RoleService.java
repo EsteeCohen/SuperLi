@@ -17,8 +17,7 @@ public class RoleService {
     }
 
     public void deleteRole(String name) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteRole'");
+        roleFacade.delete(name);
     }
 
 }

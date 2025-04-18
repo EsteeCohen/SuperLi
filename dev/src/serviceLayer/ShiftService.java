@@ -1,17 +1,16 @@
 package src.serviceLayer;
 
+import domainLayer.AvailabilityDL;
+import domainLayer.ShiftDL;
 import domainLayer.ShiftFacade;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 
 public class ShiftService {
     private ShiftFacade shiftFacade;
-
-    public void assignToShift(String employeeId, LocalDate date, String shiftType) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'assignToShift'");
-    }
+    private AvailabilityDL availabilityFacade;
 
     // checks if there are any shifts where not enough employees are available
     public boolean checkForProblematicShifts() {
@@ -20,8 +19,12 @@ public class ShiftService {
     }
 
     public List<ShiftSL> getAllShift() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getWorkTimes'");
+        List<ShiftDL> allDlShifts  = shiftFacade.getAllShifts();
+        List<ShiftSL> allSlShifts = new ArrayList<>();
+        for (ShiftDL dlShift : allDlShifts) {
+            allSlShifts.add(new ShiftSL(dlShift));
+        }
+        return allSlShifts;
     }
 
     public void setAvailabilityOfEmployeetoShift(String employeeId, LocalDate date, String ShiftType, boolean available) {

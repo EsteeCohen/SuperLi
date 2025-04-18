@@ -1,12 +1,6 @@
 package src.presentationLayer;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
-
 import src.serviceLayer.EmployeeService;
 import src.serviceLayer.HRSystemUIService;
 import src.serviceLayer.RoleService;

@@ -23,9 +23,9 @@ public class RoleFacade{
         return roles.get(name);
     }
 
-    public void delete(RoleDL role) {
-        if (role != null) {
-            roles.remove(role.getName());
+    public void delete(String name) {
+        if (roles.containsKey(name)) {
+            roles.remove(name);
         }
     }
 

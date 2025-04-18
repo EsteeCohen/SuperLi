@@ -21,8 +21,6 @@ public class ShiftDL {
     }
 
     public void assignEmployee(RoleDL role, EmployeeDL employee) {
-        // needs to be checked if the employee is already assigned to this shift
-        // needs to be checked if the employee can preforem this role
         if (!employeesAssignment.containsKey(role)) {
             employeesAssignment.put(role, new ArrayList<EmployeeDL>());
         }
@@ -50,4 +48,17 @@ public class ShiftDL {
         }
         return true;
     }
+
+    public LocalDate getDate() {
+        return date;
+    }
+
+    public ShiftType getShiftType() {
+        return shiftType;
+    }
+
+    public Map<RoleDL, List<EmployeeDL>> getEmployeesAssignment() {
+        return employeesAssignment;
+    }
+
 }
