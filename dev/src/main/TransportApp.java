@@ -1,3 +1,10 @@
+
+package src.main;
+
+import src.main.services.*;
+import src.main.controllers.*;
+import src.main.ui.*;
+
 public class TransportApp {
     public static void main(String[] args) {
         // Initialize services

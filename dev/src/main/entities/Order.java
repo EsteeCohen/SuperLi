@@ -1,8 +1,9 @@
-package BussinessLayer;
+package src.main.entities;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
+import src.main.enums.OrderStatus;
+
 
 public class Order {
     private int id;
@@ -75,7 +76,7 @@ public class Order {
         if (transport == null) {
             return OrderWeight();
         }
-        return OrderWeight() + transport.getTruck().getWeight();
+        return OrderWeight() + transport.getTruck().getEmptyWeight();
     }
     public boolean canBeCancelled(){
         return status == OrderStatus.CREATED;

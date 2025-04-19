@@ -1,12 +1,15 @@
-package ServiceLayer;
-
-import BussinessLayer.Item;
-import BussinessLayer.Transport;
+package src.main.services;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import BussinessLayer.Transport;
+import src.main.entities.Site;
+import src.main.entities.Truck;
+import src.main.enums.ShippingZone;
+import src.main.enums.TransportStatus;
 
 public class TransportService {
     private List<Transport> transports = new ArrayList<>();
@@ -125,5 +128,4 @@ public class TransportService {
     public boolean validateTransport(Transport transport){
         return transport.isWeightValid() && transport.isDriverLicenseValid() && transport.areDestinationsValid();
     }
-
 }

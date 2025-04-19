@@ -1,12 +1,15 @@
-package ServiceLayer;
-
-import BussinessLayer.Item;
-import BussinessLayer.Order;
-import BussinessLayer.Transport;
+package src.main.services;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+
+import BussinessLayer.Transport;
+import src.main.entities.Item;
+import src.main.entities.Order;
+import src.main.entities.Site;
+import src.main.enums.OrderStatus;
+import src.main.services.SiteService;
 
 public class OrderService {
     private List<Order> orders;
@@ -136,5 +139,4 @@ public class OrderService {
         }
         return false;
     }
-
 }
