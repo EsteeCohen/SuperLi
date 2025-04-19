@@ -1,5 +1,6 @@
 package DomainLayer;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -18,7 +19,13 @@ class Product {
     private final TreeMap<LocalDate,Sale> salesReports=new TreeMap<>();
     int brokenQuantity;
 
+    private List<Sale> latestSales;
+    private int latestSalesCount;
 
+    private int supplyRate=7;//the days it takes for a new supply to come, assume for now a week
+    private int lastMondaySales;
+    private int lastThursdaySales;
+    private boolean monday;
 
     private final Map<Integer,Supply> supplies=new HashMap<>();//a map of all the supplies
 
@@ -35,6 +42,11 @@ class Product {
 
         this.sellPrice = sellPrice;
         this.discount = null;
+        latestSales=new ArrayList<>();
+        latestSalesCount=0;
+        lastMondaySales=0;
+        lastThursdaySales=0;
+        monday=LocalDate.now().getDayOfWeek()== DayOfWeek.MONDAY;
     }
     public void SetDiscount(Discount discount)
     {
@@ -52,22 +64,41 @@ class Product {
     }
 
 
+
+
     void updateSoldQuantity(int supplyID, int storeQuantity, int storageQuantity) throws Exception
     {
         int totalSales=updateQuantities(supplyID,storeQuantity,storageQuantity);
 
         //document sells?
+        if(discount.getEndDate().isBefore(LocalDate.now()))//discount ended
+            discount=null;
 
+        Sale sale=new Sale(totalSales,sellPrice, discount==null? 0: discount.getPrecentage());
+        latestSales.add(sale);
+        latestSalesCount+=totalSales;
+        if(monday)
+            lastMondaySales+=totalSales;
+        else
+            lastThursdaySales+=totalSales;
     }
 
 
     void updateFoundBrokenItems(int supplyId, int storeQuantity, int storageQuantity) throws  Exception
     {
         int totalLost=updateQuantities(supplyId,storeQuantity,storageQuantity);
-
-
     }
 
+    /**
+     * calcs the new min quantity
+     * new min= daily sales average*8
+     */
+    void calcMinQuantity()
+    {
+        int dailyAvg=lastMondaySales+lastThursdaySales;
+        dailyAvg/=7;
+        minQuantity=dailyAvg*8;
+    }
 
     /**
      * updates the quantities per batch of a product
