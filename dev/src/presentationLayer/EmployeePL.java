@@ -9,7 +9,6 @@ import serviceLayer.RoleSL;
 
 public class EmployeePL {
     private final String id;
-    private final String password;
     private final String fullName;
     private final LocalDate wordStartingDate;
     private final int wage;
@@ -20,7 +19,6 @@ public class EmployeePL {
 
     public EmployeePL(String id, String password, String fullName, LocalDate wordStartingDate, int wage, char wageTypeChar, int yearlySickDays, int yearlyDaysOff) {
         this.id = id;
-        this.password = password;
         this.fullName = fullName;
         this.wordStartingDate = wordStartingDate;
         this.wage = wage;
@@ -32,7 +30,6 @@ public class EmployeePL {
 
     public EmployeePL(EmployeeSL employeeSL) {
         this.id = employeeSL.getId();
-        this.password = employeeSL.getPassword();
         this.fullName = employeeSL.getFullName();
         this.wordStartingDate = employeeSL.getWordStartingDate();
         this.wage = employeeSL.getWage();

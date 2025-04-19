@@ -15,7 +15,7 @@ public class ShiftsTablePresentation {
 
     public void showShiftTable() {
         System.out.println("=== weekly shift table ===");
-        shiftService.printAllShifts();
+        System.out.println(shiftService.getAllShift());
     }
 
     public void assignEmployeeToShift() {
@@ -41,7 +41,7 @@ public class ShiftsTablePresentation {
     }
 
     public boolean hasShiftsWithMissingWorkers() {
-        boolean hasMissingWorkers = shiftService.checkShiftsWithMissingWorkers();
+        boolean hasMissingWorkers = shiftService.checkForProblematicShifts();
         if (hasMissingWorkers) {
             System.out.println("There are shifts with missing workers.");
         } else {

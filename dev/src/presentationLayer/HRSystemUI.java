@@ -1,6 +1,11 @@
 package presentationLayer;
-
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
+
 import serviceLayer.EmployeeService;
 import serviceLayer.HRSystemUIService;
 import serviceLayer.RoleService;
@@ -99,15 +104,15 @@ public class HRSystemUI {
     private boolean handleHRManagerChoice(int choice,EmployeePL employee) {
         switch (choice) {
             case 1:
-                RegistrationPresentation registration = new RegistrationPresentation(hrService, scanner);
+                RegistrationPresentation registration = new RegistrationPresentation(employeeService, scanner);
                 registration.registerNewEmployee();
                 break;
             case 2:
-                AvailabilityForm availabilityForm = new AvailabilityForm(employeeService,hrService, scanner);
+                AvailabilityForm availabilityForm = new AvailabilityForm(scanner, shiftService);
                 availabilityForm.showAvailabilityForm(employee.getID());
                 break;
             case 3:
-                RoleAssignmentPresentation roleAssignment = new RoleAssignmentPresentation(roleService, scanner);
+                RoleAssignmentPresentation roleAssignment = new RoleAssignmentPresentation(employeeService,roleService, scanner);
                 roleAssignment.assignRoleToEmployee();
                 break;
             case 4:
@@ -120,7 +125,7 @@ public class HRSystemUI {
                 shiftsTable.assignEmployeeToShift();
                 break;
             case 6:
-                EmployeeSearchPresentation employeeSearch = new EmployeeSearchPresentation(hrService, scanner);
+                EmployeeSearchPresentation employeeSearch = new EmployeeSearchPresentation(employeeService, scanner);
                 employeeSearch.searchEmployee();
                 break;
             default:
@@ -133,7 +138,7 @@ public class HRSystemUI {
     private boolean handleEmployeeChoice(int choice, EmployeePL employee) {
         switch (choice) {
             case 1:
-                AvailabilityForm availabilityForm = new AvailabilityForm(employeeService, hrService, scanner);
+                AvailabilityForm availabilityForm = new AvailabilityForm(scanner, shiftService);
                 availabilityForm.showAvailabilityForm(employee.getID());
                 break;
             case 2:
