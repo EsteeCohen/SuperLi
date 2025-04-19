@@ -1,4 +1,4 @@
-package BusinessLayer;
+package DomainLayer;
 import java.time.LocalDate;
 
 //holds an info of a discount

@@ -1,4 +1,4 @@
-package BusinessLayer;
+package DomainLayer;
 
 class Sale {
     private int quantity;

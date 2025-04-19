@@ -1,10 +1,9 @@
 package ServiceLayer;
 
-import BusinessLayer.ProductFacade;
+import DomainLayer.ProductFacade;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Locale;
 
 public class ProductService
 {
@@ -39,5 +38,10 @@ public class ProductService
         catch (Exception e) {
             System.out.println(e.getMessage());
         }
+    }
+
+    public String reportSales(String productName, int supplyId, int shelfCount, int storageCount) throws Exception
+    {
+        return "";
     }
 }

@@ -1,8 +1,7 @@
-package BusinessLayer;
+package DomainLayer;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Dictionary;
 import java.util.List;
 import java.util.Map;
 

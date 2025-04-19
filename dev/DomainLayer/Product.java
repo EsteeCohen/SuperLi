@@ -1,4 +1,4 @@
-package BusinessLayer;
+package DomainLayer;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -17,7 +17,7 @@ class Product {
     private Discount discount;
     private final TreeMap<LocalDate,Sale> salesReports=new TreeMap<>();
     int brokenQuantity;
-    
+
 
 
     private final Map<Integer,Supply> supplies=new HashMap<>();//a map of all the supplies
