@@ -32,4 +32,9 @@ public class ShiftService {
         throw new UnsupportedOperationException("Unimplemented method 'setAvailabilityOfEmployee'");
     }
 
+    public void assignToShift(String employeeId, int shiftNumber) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'assignToShift'");
+    }
+
 }
