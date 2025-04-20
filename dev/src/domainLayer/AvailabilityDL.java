@@ -5,10 +5,10 @@ public class AvailabilityDL {
     private final EmployeeDL employee;
     private boolean isAvailable;
 
-    public AvailabilityDL(ShiftDL shift, EmployeeDL employee, boolean isAvailable) {
+    public AvailabilityDL(ShiftDL shift, EmployeeDL employee) {
         this.shift = shift;
         this.employee = employee;
-        this.isAvailable = isAvailable;
+        this.isAvailable = false; // Default to unavailable
     }
 
     public boolean isAvailable() {

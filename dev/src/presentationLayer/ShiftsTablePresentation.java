@@ -2,13 +2,16 @@ package presentationLayer;
 
 import java.util.Scanner;
 
+import serviceLayer.AssigningService;
 import serviceLayer.ShiftService;
 
 public class ShiftsTablePresentation {
     private ShiftService shiftService;
+    private AssigningService assigningService;
     private Scanner scanner;
 
-    public ShiftsTablePresentation(ShiftService service, Scanner scanner) {
+    public ShiftsTablePresentation(ShiftService service, Scanner scanner, AssigningService assigningService) {
+        this.assigningService = assigningService;
         this.shiftService = service;
         this.scanner = scanner;
     }
@@ -18,27 +21,29 @@ public class ShiftsTablePresentation {
         System.out.println(shiftService.getAllShift());
     }
 
-    public void assignEmployeeToShift() {
-        boolean assignMore = true;
+    // we need to get the shift date and time from the shift number
 
-        while (assignMore) {
-            System.out.print("enter employee ID: ");
-            String employeeId = scanner.nextLine();
-            System.out.print("enter shift number: ");
-            int shiftNumber = scanner.nextInt();
-            scanner.nextLine(); // Clear the buffer
+    // public void assignEmployeeToShift() {
+    //     boolean assignMore = true;
 
-            shiftService.assignToShift(employeeId, shiftNumber);
-            System.out.println("Employee assigned to shift successfully!");
+    //     while (assignMore) {
+    //         System.out.print("enter employee ID: ");
+    //         String employeeId = scanner.nextLine();
+    //         System.out.print("enter shift number: ");
+    //         int shiftNumber = scanner.nextInt();
+    //         scanner.nextLine(); // Clear the buffer
 
-            System.out.print("Assign more? (yes/no): ");
-            String response = scanner.nextLine().trim().toLowerCase();
-            assignMore = response.equals("yes");
-        }
+    //         assigningService.assignToShift(employeeId, shiftNumber); // we need to get the shift date and time from the shift number
+    //         System.out.println("Employee assigned to shift successfully!");
 
-        // Check if there are shifts with missing workers
-        hasShiftsWithMissingWorkers();
-    }
+    //         System.out.print("Assign more? (yes/no): ");
+    //         String response = scanner.nextLine().trim().toLowerCase();
+    //         assignMore = response.equals("yes");
+    //     }
+
+    //     // Check if there are shifts with missing workers
+    //     hasShiftsWithMissingWorkers();
+    // }
 
     public boolean hasShiftsWithMissingWorkers() {
         boolean hasMissingWorkers = shiftService.checkForProblematicShifts();

@@ -5,6 +5,9 @@ import domainLayer.EmployeeFacade;
 import domainLayer.RoleDL;
 import domainLayer.RoleFacade;
 import domainLayer.ShiftFacade;
+import domainLayer.Enums.ShiftType;
+
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 
 public class AssigningService {
@@ -40,6 +43,14 @@ public class AssigningService {
             throw new IllegalArgumentException("Role not found");
         }
         shiftFacade.unassignToShift(employee, date, shiftType, role);
+    }
+
+        public void setShiftRequirement(DayOfWeek day, ShiftType shift, String role, int quantity) {
+        RoleDL roleDL = roleFacade.getRoleByName(role);
+        if (roleDL == null) {
+            throw new IllegalArgumentException("Role not found");
+        }
+        shiftFacade.setRequirements(day, shift, roleDL, quantity);
     }
 
 }

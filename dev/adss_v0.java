@@ -1,7 +1,10 @@
+import presentationLayer.HRSystemUI;
+
 public class adss_v0{
 	public static void main(String[] args)
 	{
-		System.out.println("Hello world!");
+		HRSystemUI hrSystemUI = new HRSystemUI();
+		hrSystemUI.start();
 	}
 }
 

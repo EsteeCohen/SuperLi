@@ -34,13 +34,13 @@ public class AvailabilityFacade {
         return availableEmployees;
     }
 
-    public boolean  getAvailabilitiesForEmployee(EmployeeDL employee, ShiftDL shift) {
+    public AvailabilityDL getAvailabilityForEmployee(EmployeeDL employee, ShiftDL shift) {
         for (AvailabilityDL availability : availabilities) {
             if (availability.getEmployee().equals(employee) && availability.getShift().equals(shift)) {
-                return availability.isAvailable();
+                return availability;
             }
         }
-        return false;
+        return null; // No availability found for the employee and shift
     }
 
 

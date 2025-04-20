@@ -41,7 +41,7 @@ public class AvailabilityForm {
                 LocalDate shiftDate = LocalDate.parse(selectedTime.split(" ")[0]); // Extract date from selectedTime
                 String shiftType = selectedTime.split(" ")[1]; // Extract shift type from selectedTime
                 boolean isAvailable = true; // Assuming availability is true by default
-                shiftService.setAvailabilityOfEmployeetoShift(employeeId, shiftDate, shiftType, isAvailable);
+                shiftService.setAvailabilityOfEmployeeToShift(employeeId, shiftDate, shiftType, isAvailable);
             } else {
                 System.out.println("incorrect number " + number);
             }

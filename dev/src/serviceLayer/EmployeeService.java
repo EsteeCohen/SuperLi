@@ -6,6 +6,10 @@ import domainLayer.EmployeeFacade;
 public class EmployeeService {
     private EmployeeFacade employeeFacade;
 
+    public EmployeeService(EmployeeFacade employeeFacade) {
+        this.employeeFacade = employeeFacade;
+    }
+
     public EmployeeSL login(String id, String password) {
         EmployeeDL edl = employeeFacade.login(id, password);
         if (edl != null) {
@@ -29,5 +33,10 @@ public class EmployeeService {
 
     public boolean assignRoleToEmployee(String employeeId, String roleName) {
         return employeeFacade.assignRoleToEmployee(employeeId, roleName);
+    }
+
+    public void registerAdmin(){
+        registerEmployee("Bombardino Crocodilo", "3", "admin", 9999, "Global", 1000, 1000);
+        assignRoleToEmployee("admin", "HrManager");
     }
 }

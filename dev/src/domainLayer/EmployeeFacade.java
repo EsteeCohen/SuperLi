@@ -1,18 +1,18 @@
 package domainLayer;
 
-import domainLayer.Enums.WageType;
-
 import java.time.LocalDate;
-import java.util.Dictionary;
-import java.util.Hashtable;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.List;
 
 public class EmployeeFacade {
-    private Dictionary<String, EmployeeDL> employees;
+    private Map<String, EmployeeDL> employees;
     private RoleFacade roleFacade;
 
-    private EmployeeFacade(RoleFacade roleFacade) {
+    public EmployeeFacade(RoleFacade roleFacade) {
         this.roleFacade = roleFacade;
-        this.employees = new Hashtable<String, EmployeeDL>();
+        this.employees = new HashMap<String, EmployeeDL>();
     }
 
     public void addEmployee(EmployeeDL e) {
@@ -61,5 +61,9 @@ public class EmployeeFacade {
             }
         }
         return false; // Employee or role not found
+    }
+
+    public List<EmployeeDL> getAllEmployees() {
+        return new ArrayList<>(employees.values());
     }
 }

@@ -6,6 +6,10 @@ import java.util.List;
 public class RoleService {
     private RoleFacade roleFacade;
 
+    public RoleService(RoleFacade roleFacade) {
+        this.roleFacade = roleFacade;
+    }
+
     public List<RoleSL> getAllRoles() {
         return roleFacade.getAllRoles().stream()
                 .map(RoleSL::new)

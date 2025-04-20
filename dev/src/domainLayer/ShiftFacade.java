@@ -1,19 +1,19 @@
 package domainLayer;
 
-import domainLayer.Enums.ShiftType;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Map;
+
+import domainLayer.Enums.ShiftType;
+
 import java.util.HashMap;
 import java.util.List;
 
 public class ShiftFacade {
     private Map<String, ShiftDL> shifts;
 
-    private EmployeeFacade employeeFacade;
-    private AvailabilityFacade availabilityFacade;
-
-    private ShiftFacade() {
+    public ShiftFacade() {
         this.shifts = new HashMap<String, ShiftDL>();
     }
 
@@ -39,5 +39,17 @@ public class ShiftFacade {
             throw new IllegalArgumentException("Shift not found for the given date and type");
         }
         shift.unassignEmployee(role, employee);
+    }
+
+    public ShiftDL getShiftByDateAndType(LocalDate date, String shiftType) {
+        return shifts.get(date.toString() + shiftType);
+    }
+
+    public void addShift(ShiftDL shift) {
+        shifts.put(shift.getDate().toString() + shift.getShiftType().toString(), shift);
+    }
+
+    public void setRequirements(DayOfWeek day, ShiftType shift, RoleDL role, int quantity) {
+        WeeklyShiftRequirements.getInstance().setRequirements(day, shift, role, quantity);
     }
 }

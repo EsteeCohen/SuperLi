@@ -7,7 +7,7 @@ import java.util.List;
 public class RoleFacade{
     private Hashtable<String, RoleDL> roles;
 
-    private RoleFacade() {
+    public RoleFacade() {
         this.roles = new Hashtable<String, RoleDL>();
     }
 
