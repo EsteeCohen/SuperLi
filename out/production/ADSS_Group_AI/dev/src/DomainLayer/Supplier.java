@@ -71,10 +71,6 @@ public abstract class Supplier {
         this.contactPersons.add(contactPerson);
     }
 
-    public boolean removeContactPerson(ContactPerson contactPerson) {
-        return this.contactPersons.remove(contactPerson);
-    }
-
     /**
      * Find all valid agreements for this supplier
      * @return list of currently valid agreements
@@ -87,18 +83,6 @@ public abstract class Supplier {
             }
         }
         return validAgreements;
-    }
-
-    /**
-     * Get all products available from this supplier through valid agreements
-     * @return list of available products
-     */
-    public List<Product> getAvailableProducts() {
-        List<Product> products = new ArrayList<>();
-        for (Agreement agreement : getValidAgreements()) {
-            products.addAll(agreement.getProductCatalog());
-        }
-        return products;
     }
 
     @Override

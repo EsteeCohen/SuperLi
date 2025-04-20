@@ -15,8 +15,9 @@ public class Product {
     private double price;   // price per package
     private Units units;
 
-    public Product(String supplierId, String catalogNumber, int quantityPerPackage,
+    public Product(String name, String supplierId, String catalogNumber, int quantityPerPackage,
                    Map<Integer, Double> discountPerPackage, double price, Units units) {
+        this.ProductName = name;
         this.supplierId = supplierId;
         this.catalogNumber = catalogNumber;
         this.quantityPerPackage = quantityPerPackage;
@@ -67,9 +68,6 @@ public class Product {
         return discountPerPackage;
     }
 
-    public void addDiscountPerPackage(int amount, double discount) {
-        discountPerPackage.put(amount, discount);
-    }
 
     /**
      * Calculate price with discount based on quantity

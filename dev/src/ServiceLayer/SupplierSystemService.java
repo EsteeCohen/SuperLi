@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class SupplierSystemService {
     private static SupplierSystemService instance;
@@ -26,13 +27,14 @@ public class SupplierSystemService {
 
     // ===== Supplier Management =====
 
-    public boolean addSupplierWithDelivery(String name, String id, String bankAccount, String deliveryDays) {
-        return systemController.addSupplierWithDelivery(name, id, bankAccount, deliveryDays);
+    public boolean addSupplierWithDelivery(String name, String id, String bankAccount, String deliveryDays, List<String> contactInputs) {
+        return systemController.addSupplierWithDelivery(name, id, bankAccount, deliveryDays, contactInputs);
     }
 
-    public boolean addSupplierNeedsPickup(String name, String id, String bankAccount, String address) {
-        return systemController.addSupplierNeedsPickup(name, id, bankAccount, address);
+    public boolean addSupplierNeedsPickup(String name, String id, String bankAccount, String address, List<String> contactInputs) {
+        return systemController.addSupplierNeedsPickup(name, id, bankAccount, address, contactInputs);
     }
+
 
     public boolean updateSupplier(String id, String field, String newValue) {
         return systemController.updateSupplierField(id, field, newValue);
@@ -51,20 +53,21 @@ public class SupplierSystemService {
         return systemController.getAgreementsBySupplierAsStrings(supplierId);
     }
 
+    public boolean removeSupplier(String supplierId) {
+        return systemController.removeSupplier(supplierId);
+    }
+
     // ===== Product Management =====
 
-    public boolean addProduct(String supplierId, String catalogNumber, int quantityPerPackage,
+    public boolean addProduct(String name, String supplierId, String catalogNumber, int quantityPerPackage,
                               ArrayList<String> discountInput, double price, int unit) {
-        return systemController.addProductWithDiscounts(supplierId, catalogNumber, quantityPerPackage, discountInput, price, unit);
+        return systemController.addProductWithDiscounts(name, supplierId, catalogNumber, quantityPerPackage, discountInput, price, unit);
     }
 
     public boolean updateProduct(String supplierID, String id, String field, String value) {
         return systemController.updateProductField(supplierID, id, field, value);
     }
 
-    /*public List<Product> getAllProducts() {
-        return systemController.getAllProducts();
-    }*/
 
     public List<String> getAllProducts() {
         return systemController.getAllProducts();
@@ -75,44 +78,11 @@ public class SupplierSystemService {
         return systemController.findProductBySupplierAndCatalog(supplierId, catalogNumber);
     }
 
-    /*public String getProductById(String id) {
-        return systemController.findProduct(id);
-    }*/
-
 
     public boolean removeProduct(String supplierID, String id) {
         return systemController.removeProduct(supplierID, id);
     }
 
-    // ===== Persistence =====
-
-    public boolean loadDataFromFiles(String suppliersPath, String productsPath) {
-        return systemController.loadDataSafe(suppliersPath, productsPath);
-    }
-
-    public boolean saveDataToFiles(String suppliersPath, String productsPath) {
-        return systemController.saveDataSafe(suppliersPath, productsPath);
-    }
-
-    // ===== Reporting (אם תבחרי לשמר את ReportService) =====
-
-    public String getProductDistributionByCategory() {
-        return systemController.getProductDistributionByCategory();
-    }
-
-    public String getSupplierDistributionByLocation() {
-        return systemController.getSupplierDistributionByLocation();
-    }
-
-    public String getPriceAnalysis() {
-        return systemController.getPriceAnalysis();
-    }
-
-    public boolean removeSupplier(String supplierId) {
-        return systemController.removeSupplier(supplierId);
-    }
-
-    // Add these methods to your SupplierSystemService class
 
     // ===== ORDER =====
 
@@ -151,16 +121,7 @@ public class SupplierSystemService {
         return systemController.getOrdersBySupplier(supplierId);
     }
 
-    // Update the save/load methods to include orders
-    /*public boolean saveDataToFiles(String suppliersPath, String productsPath, String ordersPath) {
-        return systemController.saveDataSafe(suppliersPath, productsPath, ordersPath);
-    }
-
-    public boolean loadDataFromFiles(String suppliersPath, String productsPath, String ordersPath) {
-        return systemController.loadDataSafe(suppliersPath, productsPath, ordersPath);
-    }*/
-
-    public boolean createAgreement(String supplierId, int paymentMethod, int paymentTiming, LocalDate validFrom, LocalDate validTo, List<Integer> IndexProducts) {
+    public boolean createAgreement(String supplierId, int paymentMethod, int paymentTiming, LocalDate validFrom, LocalDate validTo, Set<Integer> IndexProducts) {
         return systemController.createAgreement(supplierId, paymentMethod, paymentTiming, validFrom, validTo, IndexProducts);
     }
 
@@ -181,7 +142,9 @@ public class SupplierSystemService {
         return systemController.getProductsBySupplier(supplierId);
     }
 
-
+    public String getSupplierById(String supplierId) {
+        return systemController.getSupplierById(supplierId);
+    }
 
     public boolean updateAgreementProducts(String supplierId, int agreementIndex, List<Integer> indexProducts) {
         return systemController.updateAgreementProducts(supplierId, agreementIndex, indexProducts);
@@ -209,9 +172,9 @@ public class SupplierSystemService {
     public List<String> getPaymentTimings(){
         return systemController.getPaymentTimings();
     }
-    /*
-    public int getAgreementIdByIndex(String supplierId, int index) {
-        return systemController.getAgreementIdByIndex(supplierId, index);
+
+    public LocalDate getValidFromOfAgreement(String supplierId, int agreementIndex) {
+        return systemController.getValidFromOfAgreement(supplierId, agreementIndex);
     }
-*/
+
 }

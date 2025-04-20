@@ -44,18 +44,21 @@ public class SystemController {
 
     // ===================== Supplier Management =====================
 
-    public boolean addSupplierWithDelivery(String name, String id, String bankAccount, String deliveryDays) {
+    public boolean addSupplierWithDelivery(String name, String id, String bankAccount, String deliveryDays,  List<String>  contacts) {
         if (suppliers.containsKey(id)) return false;
         List<DaysOfTheWeek> days = parseDeliveryDays(deliveryDays);
+
         if (days == null) return false;
         Supplier supplier = new SupplierWithDeliveryDays(name, id, bankAccount, days);
+        addAllContacts(supplier, contacts);
         suppliers.put(id, supplier);
         return true;
     }
 
-    public boolean addSupplierNeedsPickup(String name, String id, String bankAccount, String address) {
+    public boolean addSupplierNeedsPickup(String name, String id, String bankAccount, String address,  List<String> contacts) {
         if (suppliers.containsKey(id)) return false;
         Supplier supplier = new SupplierNeedsPickup(name, id, bankAccount, address);
+        addAllContacts(supplier, contacts);
         suppliers.put(id, supplier);
         return true;
     }
@@ -97,7 +100,7 @@ public class SystemController {
                 return addContactPersonFromString(supplier, value);
             case "deliverydays":
                 if (supplier instanceof SupplierWithDeliveryDays) {
-                    List<DaysOfTheWeek> days = parseDeliveryDays(value); // value = "1,3,5"
+                    List<DaysOfTheWeek> days = parseDeliveryDays(value);
                     if (days == null) return false;
                     ((SupplierWithDeliveryDays) supplier).setDeliveryDays(days);
                     return true;
@@ -136,22 +139,25 @@ public class SystemController {
     private List<DaysOfTheWeek> parseDeliveryDays(String input) {
         List<DaysOfTheWeek> days = new ArrayList<>();
         if (input == null || input.isEmpty()) return days;
-        for (String token : input.split(",")) {
+        for (String token : input.trim().split(",")) {
             try {
                 int dayIndex = Integer.parseInt(token.trim());
                 if(dayIndex < 1 || dayIndex > 7) return null;
-                days.add(DaysOfTheWeek.values()[dayIndex - 1]);
-            } catch (Exception ignored) {}
+                DaysOfTheWeek day = DaysOfTheWeek.of(dayIndex);
+                days.add(DaysOfTheWeek.of(dayIndex));
+            } catch (Exception ignored) {
+                System.out.println(ignored);
+            }
         }
         return days;
     }
 
     // ===================== Product Management =====================
 
-    public boolean addProductWithDiscounts(String supplierId, String catalogNumber, int quantityPerPackage, ArrayList<String> discountInput, double price, int unit) {
+    public boolean addProductWithDiscounts(String name, String supplierId, String catalogNumber, int quantityPerPackage, ArrayList<String> discountInput, double price, int unit) {
         if (!suppliers.containsKey(supplierId)) return false;
         Map<Integer, Double> discountMap = parseDiscountInput(discountInput);
-        Product product = new Product(supplierId, catalogNumber, quantityPerPackage, discountMap, price, Units.values()[unit]);
+        Product product = new Product(name, supplierId, catalogNumber, quantityPerPackage, discountMap, price, Units.values()[unit]);
 
         products.putIfAbsent(supplierId, new HashMap<>());
         if (products.get(supplierId).containsKey(catalogNumber)) return false;
@@ -218,7 +224,6 @@ public class SystemController {
 
         return false; // Product not found
     }
-
 
     public List<String> getAllProducts() {
         List<String> all = new ArrayList<>();
@@ -292,22 +297,6 @@ public class SystemController {
         }
     }
 
-    // ===================== Reporting =====================
-
-    public String getProductDistributionByCategory() {
-        // Stub
-        return "Product distribution by category is not implemented yet.";
-    }
-
-    public String getSupplierDistributionByLocation() {
-        // Stub
-        return "Supplier distribution by location is not implemented yet.";
-    }
-
-    public String getPriceAnalysis() {
-        // Stub
-        return "Price analysis is not implemented yet.";
-    }
 
     // ===================== Order Management =====================
 
@@ -323,13 +312,6 @@ public class SystemController {
         return totalPrice;
     }
 
-    /**
-     * Calculate final price for a product considering discounts
-     * @param supplierId ID of the supplier
-     * @param catalogNumber Catalog number of the product
-     * @param quantity Quantity to calculate price for
-     * @return Calculated price or -1 if product not found
-     */
     public double calculateProductPrice(String supplierId, String catalogNumber, int quantity) {
         Product product = getProduct(supplierId, catalogNumber);
         if (product != null) {
@@ -338,12 +320,6 @@ public class SystemController {
         return -1;
     }
 
-    /**
-     * Get product by supplier ID and catalog number
-     * @param supplierId ID of the supplier
-     * @param catalogNumber Catalog number of the product
-     * @return Product object if found, null otherwise
-     */
     public Product getProduct(String supplierId, String catalogNumber) {
         if (products.containsKey(supplierId)) {
             Map<String, Product> supplierProducts = products.get(supplierId);
@@ -352,11 +328,6 @@ public class SystemController {
         return null;
     }
 
-    /**
-     * Get all products for a specific supplier
-     * @param supplierId ID of the supplier
-     * @return List of products for the supplier
-     */
     public List<String> getProductsBySupplier(String supplierId) {
         List<String> supplierProducts = new ArrayList<>();
 
@@ -380,7 +351,7 @@ public class SystemController {
         Map<String, Integer> items = parseIndexTOCatalogNumber(indexQuantityItems, agreement);
         double totalPrice = getTotalPrice(supplierId, items);
         ContactPerson contactPerson = new ContactPerson(contactPresonName, contactPersonPhone);
-        STATUS status = STATUS.values()[statusIndex];
+        STATUS status = STATUS.values()[statusIndex -1];
         Order newOrder = new Order(orderId, supplierId, orderDate, contactPerson, agreement, supplyDate, items, status, totalPrice);
         orders.put(orderId, newOrder);
         return true;
@@ -392,7 +363,7 @@ public class SystemController {
         if (order == null) return false;
 
         try {
-            STATUS status = STATUS.values()[newStatus];
+            STATUS status = STATUS.values()[newStatus-1];
             order.setStatus(status);
             return true;
         } catch (IllegalArgumentException e) {
@@ -431,7 +402,7 @@ public class SystemController {
     public List<String> getOrdersByStatus(int status) {
         List<String> filteredOrders = new ArrayList<>();
         for (Order order : orders.values()) {
-            if (order.getStatus() == STATUS.values()[status]) {
+            if (order.getStatus() == STATUS.values()[status - 1]) {
                 filteredOrders.add(order.toString());
             }
         }
@@ -580,7 +551,7 @@ public class SystemController {
         return true;
     }
 
-    public boolean createAgreement(String supplierId, int paymentMethod, int paymentTiming, LocalDate validFrom, LocalDate validTo, List<Integer> IndexProducts) {
+    public boolean createAgreement(String supplierId, int paymentMethod, int paymentTiming, LocalDate validFrom, LocalDate validTo, Set<Integer> IndexProducts) {
         Supplier supplier = suppliers.get(supplierId);
         if (supplier == null) return false;
 
@@ -591,11 +562,11 @@ public class SystemController {
             supplier.addAgreement(agreement);
             //updateAgreementProducts(supplierId, nextAgreementId, IndexProducts);
             List<Product> catalog = new ArrayList<>();
-            Map<String, Product> map = products.get(supplierId);   // כל המוצרים של הספק
+            Map<String, Product> map = products.get(supplierId);
             List<Product> supplierProducts = new ArrayList<>(map.values());
 
             for (int idx : IndexProducts) {
-                if (idx < 0 || idx >= supplierProducts.size()) return false; // אינדקס לא חוקי
+                if (idx < 0 || idx >= supplierProducts.size()) return false;
                 catalog.add(supplierProducts.get(idx));
             }
             agreement.setProductCatalog(catalog);
@@ -615,5 +586,32 @@ public class SystemController {
 
         agreements.remove(agreementIndex);
         return true;
+    }
+
+    public String getSupplierById(String supplierId) {
+        Supplier supplier =  suppliers.get(supplierId);
+        if(supplier == null) return null;
+        return supplier.toString();
+    }
+
+    public LocalDate getValidFromOfAgreement(String supplierId, int agreementIndex) {
+        LocalDate validFrom = null;
+        Supplier supplier = suppliers.get(supplierId);
+        if (supplier == null) return null;
+        Agreement agreement = supplier.getAgreements().get(agreementIndex);
+        return agreement.getValidFrom();
+    }
+
+    private void addAllContacts(Supplier supplier, List<String> contactInputs) {
+        for (String input : contactInputs) {
+            String[] parts = input.split(",");
+            if (parts.length == 2) {
+                String contactName = parts[0].trim();
+                String phone = parts[1].trim();
+                if (!contactName.isEmpty() && !phone.isEmpty()) {
+                    supplier.addContactPerson(new ContactPerson(contactName, phone));
+                }
+            }
+        }
     }
 }

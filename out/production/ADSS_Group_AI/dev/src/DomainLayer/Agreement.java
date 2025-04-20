@@ -48,14 +48,6 @@ public class Agreement {
         this.productCatalog = productCatalog;
     }
 
-    public void addProduct(Product product) {
-        this.productCatalog.add(product);
-    }
-
-    public boolean removeProduct(Product product) {
-        return this.productCatalog.remove(product);
-    }
-
     public PaymentMethod getPaymentMethod() {
         return paymentMethod;
     }

@@ -1,5 +1,6 @@
 package src.PresentationLayer;
 
+import src.DomainLayer.ContactPerson;
 import src.ServiceLayer.SupplierSystemService;
 
 import java.util.ArrayList;
@@ -93,6 +94,7 @@ public class SupplierSystemUI {
         System.out.println("17. View order by ID");
         System.out.println("18. View orders by status");
         System.out.println("19. View orders by supplier");
+        System.out.println("20. View supplier details By supplier ID");
         System.out.println("0. Exit");
     }
 
@@ -102,7 +104,6 @@ public class SupplierSystemUI {
         //System.out.println("2. Mark supplier as picked up");
         System.out.println("0. Exit");
     }
-
 
     private void displayRegularEmployeeMenu() {
         System.out.println("\n=== Regular Employee Menu ===");
@@ -205,6 +206,9 @@ public class SupplierSystemUI {
             case 19:
                 viewOrdersBySupplier();
                 break;
+            case 20:
+                viewSupplierByID();
+                break;
             default:
                 System.out.println("Invalid option. Please try again.");
                 break;
@@ -255,6 +259,22 @@ public class SupplierSystemUI {
 
         System.out.print("Enter bank account number: ");
         String bankAccount = scanner.nextLine();
+
+        List<String> contacts = new ArrayList<>();
+        System.out.println("You must enter at least one contact person.");
+
+        do {
+            System.out.print("Enter contact person name: ");
+            String personName = scanner.nextLine();
+
+            System.out.print("Enter contact person phone number: ");
+            String phone = scanner.nextLine();
+
+            contacts.add(name + ", " + phone);
+
+            System.out.print("Add another contact person? (Y/N): ");
+        } while (scanner.nextLine().equalsIgnoreCase("Y"));
+
         int type;
         do {
             System.out.print("Enter supplier type:\n 1. Supplier with delivery days\n 2. Supplier needs pickup\n");
@@ -265,11 +285,11 @@ public class SupplierSystemUI {
             System.out.print("Enter delivery days:\n1 - Sunday\n2 - Monday\n3 - Tuesday\n4 - Wednesday\n5 - Thursday\n6 - Friday\n7 - Saturday\n");
             System.out.print("Enter delivery days (comma-separated): ");
             String deliveryDaysInput = scanner.nextLine();
-            result = supplierSystem.addSupplierWithDelivery(name, supplierID, bankAccount, deliveryDaysInput);
+            result = supplierSystem.addSupplierWithDelivery(name, supplierID, bankAccount, deliveryDaysInput, contacts);
         } else {
             System.out.print("Enter address: ");
             String address = scanner.nextLine();
-            result = supplierSystem.addSupplierNeedsPickup(name, supplierID, bankAccount, address);
+            result = supplierSystem.addSupplierNeedsPickup(name, supplierID, bankAccount, address, contacts);
         }
 
         // Check if the supplier was added successfully
@@ -296,6 +316,8 @@ public class SupplierSystemUI {
 
     private void addNewProduct() {
         System.out.println("\n--- Add New Product ---");
+        System.out.println("Enter product name: ");
+        String name = scanner.nextLine();
 
         String supplierId = getSupplierIdFromUser();
 
@@ -315,13 +337,13 @@ public class SupplierSystemUI {
             return;
         }
 
-        System.out.println("Enter product discounts (optional). Format: amount,discount (e.g. 10,5%)");
+        System.out.println("Enter product discounts (optional). Format: amount,discount (e.g. 10,5 indicates a 5 percent discount for 10 units – please enter the number only, without the % symbol)");
         System.out.println("Enter -1 to finish entering discounts:");
         ArrayList<String> listDiscount = new ArrayList<>();
         while (true) {
             String input = scanner.nextLine().trim();
             if (input.equals("-1")) break;
-            listDiscount.add(input);
+            listDiscount.add(input.substring(0, input.length()-1));
         }
 
         System.out.print("Enter product price: ");
@@ -342,7 +364,7 @@ public class SupplierSystemUI {
 
 
 
-        boolean result = supplierSystem.addProduct(supplierId, id, quantityPerPackage, listDiscount, price, unit);
+        boolean result = supplierSystem.addProduct(name, supplierId, id, quantityPerPackage, listDiscount, price, unit);
 
         if (result) {
             System.out.println("Product added successfully!");
@@ -374,7 +396,7 @@ public class SupplierSystemUI {
         System.out.print("Enter supplier ID to update: ");
         String id = scanner.nextLine();
 
-        System.out.println("Select field to update:");
+        System.out.println("Select the field you want to update. Please note: the new value will fully replace the existing one.");
         System.out.println("1. Name");
         System.out.println("2. Supplier ID");
         System.out.println("3. Bank Account");
@@ -423,7 +445,7 @@ public class SupplierSystemUI {
         System.out.print("Enter supplier ID to update: ");
         String supplierID = scanner.nextLine();
 
-        System.out.println("Select field to update:");
+        System.out.println("Select the field you want to update. Please note: the new value will fully replace the existing one.");
         System.out.println("1. Name");
         System.out.println("2. Supplier ID");
         System.out.println("3. Quantity Per Package");
@@ -462,7 +484,7 @@ public class SupplierSystemUI {
                 while (true) {
                     String input = scanner.nextLine().trim();
                     if (input.equals("-1")) break;
-                    discountList.add(input);
+                    discountList.add(input.substring(0, input.length()-1));
                 }
                 newValue = String.join(";", discountList); // נעבד את זה בתוך SystemController
                 break;
@@ -499,6 +521,17 @@ public class SupplierSystemUI {
         } else {
             System.out.println("Failed to update product. Please check your input.");
         }
+    }
+
+    private void viewSupplierByID(){
+        System.out.println("\n--- View Supplier By ID ---");
+        System.out.print("Enter supplier ID to view: ");
+        String supplierID = scanner.nextLine();
+        String supplierInfo = supplierSystem.getSupplierById(supplierID);
+        if (supplierInfo == null)
+            System.out.println("Supplier does not exist.");
+        else System.out.println(supplierInfo);
+
     }
 
     private void viewAllSuppliers() {
@@ -680,14 +713,23 @@ public class SupplierSystemUI {
     }
 
     private LocalDate selectSupplyDate(LocalDate orderDate) {
-        System.out.print("Enter supply date (YYYY-MM-DD): ");
-        LocalDate supplyDate;
-        try {
-            supplyDate = LocalDate.parse(scanner.nextLine());
-        } catch (Exception e) {
-            System.out.println("Invalid date format. Setting supply date to 7 days from now.");
-            supplyDate = orderDate.plusDays(7);
-        }
+        LocalDate supplyDate = null;
+        boolean flag = false;
+        do {
+            System.out.print("Enter supply date (YYYY-MM-DD): ");
+            try {
+                supplyDate = LocalDate.parse(scanner.nextLine());
+                if(supplyDate.isBefore(orderDate))
+                {
+                    System.out.println("Supply date is before order date.");
+                    flag = false;
+                }
+            } catch (Exception e) {
+                System.out.println("Invalid date format. Setting supply date to 7 days from now.");
+                supplyDate = orderDate.plusDays(7);
+                flag = true;
+            }
+        } while (!flag);
         return supplyDate;
     }
 
@@ -772,19 +814,7 @@ public class SupplierSystemUI {
         System.out.println("2. IN_PROCESS (orders in progress)");
         System.out.println("3. CANCELLED (cancelled orders)");
 
-
-        int status = -1;
-        while (status < 1  || 3 < status) {
-            System.out.println("Select new status:");
-            System.out.println("1. DELIVERED");
-            System.out.println("2. IN_PROCESS");
-            System.out.println("3. CANCELLED");
-            status = getUserChoice();
-
-            if(status < 1 || 3 < status) {
-                System.out.println("Invalid choice. Please enter a valid number.");
-            }
-        }
+        int status = getUserChoice();
 
         List<String> orders = supplierSystem.getOrdersByStatus(status);
 
@@ -824,7 +854,7 @@ public class SupplierSystemUI {
     }
 
     private void viewAgreementsBySupplier() {
-         System.out.println("\n--- View Agreements by Supplier ---");
+         System.out.println("\n--- Agreements by Supplier ---");
         // Get supplier ID
         String supplierId = getSupplierIdFromUser();
 
@@ -834,21 +864,7 @@ public class SupplierSystemUI {
             System.out.println("Supplier not found. Operation cancelled.");
             return;
         }
-
-        List<String> agreements = supplierSystem.getAgreementsBySupplier(supplierId);
-
-        if (agreements.isEmpty()) {
-            System.out.println("No agreements found for supplier ID: " + supplierId);
-            return;
-        }
-
-        System.out.println("Agreements for supplier ID " + supplierId + ":");
-        int index = 0;
-        for (String agreement : agreements) {
-            System.out.println(index + " - " + agreement);
-            index++;
-        }
-
+        showAgreementBySupplier(supplierId);
     }
 
     //Agreement Functions
@@ -869,14 +885,13 @@ public class SupplierSystemUI {
 
         // Step 3: Set agreement validity dates
         System.out.println("\n--- Set Agreement Validity Period ---");
-        LocalDate validFrom = getValidTo();
+        LocalDate validFrom = getValidFrom();
+        LocalDate validTo = getValidTo(validFrom);
 
-
-        LocalDate validTo = getValidFrom();
 
         // Step 4: Show available products and let user select them
 
-        List<Integer> IndexProducts = updateAgreementProducts(supplierId);
+        Set<Integer> IndexProducts =new HashSet<Integer>(updateAgreementProducts(supplierId));
 
         // Step 6: Create the agreement
         boolean agreementCreated = supplierSystem.createAgreement(
@@ -898,13 +913,16 @@ public class SupplierSystemUI {
     private void updateAgreement() {
         System.out.println("\n--- Update Agreement ---");
 
-        System.out.print("Enter supplier ID: ");
+        System.out.println("Enter supplier ID: ");
         String supplierId = scanner.nextLine();
 
-        System.out.print("Enter agreement ID: ");
+
+        showAgreementBySupplier(supplierId);
+        System.out.println("Select agreement to update: ");
+
         int agreementIndex = getUserChoice();
 
-        System.out.println("Select field to update:");
+        System.out.println("Select the field you want to update. Please note: the new value will fully replace the existing one.");
         System.out.println("1. Payment Method");
         System.out.println("2. Payment Timing");
         System.out.println("3. Valid From");
@@ -928,7 +946,7 @@ public class SupplierSystemUI {
                 success = supplierSystem.updateValidFrom(supplierId, agreementIndex, validFrom);
                 break;
             case 4:
-                LocalDate validTo = getValidTo();
+                LocalDate validTo = getValidTo(supplierSystem.getValidFromOfAgreement(supplierId, agreementIndex));
                 success = supplierSystem.updateValidTo(supplierId, agreementIndex, validTo);
                 break;
             case 5:
@@ -957,6 +975,8 @@ public class SupplierSystemUI {
         System.out.println("\n--- Remove Agreement ---");
 
         String supplierId = getSupplierIdFromUser();
+
+        showAgreementBySupplier(supplierId);
 
         System.out.print("Enter agreement ID: ");
         int agreementIndex = getUserChoice();
@@ -996,28 +1016,51 @@ public class SupplierSystemUI {
     }
 
     //helper Functions
-
-    private LocalDate getValidTo() {
-        System.out.print("Enter valid to date (YYYY-MM-DD): ");
-        LocalDate validTo;
-        try {
-            validTo = LocalDate.parse(scanner.nextLine());
-        } catch (Exception e) {
-            System.out.println("Invalid date format. Setting valid to date to current date.");
-            validTo = LocalDate.now();
-        }
+    private LocalDate getValidTo(LocalDate validFrom) {
+        LocalDate validTo = null;
+        boolean flag = false;
+        do {
+            try {
+                System.out.println("Enter valid to date (YYYY-MM-DD): ");
+                System.out.println("Enter 0 to initialize the date to one year after the 'valid from' date.");
+                String ans = scanner.nextLine();
+                if (ans.equals("0"))
+                    validTo = validFrom.plusYears(1);
+                else
+                    validTo = LocalDate.parse(ans);
+                flag = true;
+                if(validFrom.isAfter(validTo))
+                {
+                    System.out.println("The date you entered is before the 'from' date.");
+                    flag = false;
+                }
+            } catch (Exception e) {
+                System.out.println("Invalid date format. Setting valid from date to current date.");
+                flag = false;
+            }
+        } while (!flag);
         return validTo;
     }
 
     private LocalDate getValidFrom() {
-        System.out.print("Enter valid from date (YYYY-MM-DD): ");
-        LocalDate validFrom;
-        try {
-            validFrom = LocalDate.parse(scanner.nextLine());
-        } catch (Exception e) {
-            System.out.println("Invalid date format. Setting valid from date to current date.");
-            validFrom = LocalDate.now();
-        }
+
+        LocalDate validFrom = null;
+        boolean flag = false;
+        do {
+            try {
+                System.out.println("Enter valid from date (YYYY-MM-DD): ");
+                System.out.println("Enter 0 to initialize the date to today.");
+                String ans = scanner.nextLine();
+                if (ans.equals("0"))
+                    validFrom = LocalDate.now();
+                else
+                    validFrom = LocalDate.parse(ans);
+                flag = true;
+            } catch (Exception e) {
+                System.out.println("Invalid date format. Setting valid from date to current date.");
+                flag = false;
+            }
+        } while (!flag);
         return validFrom;
     }
 
@@ -1037,7 +1080,7 @@ public class SupplierSystemUI {
         }
 
         // Collect items for order
-        List<Integer> IndexProducts = new ArrayList<Integer>();
+        List<Integer> IndexProducts = new ArrayList<>();
         int productIndex = 0;
         while (productIndex != -1) {
             System.out.print("Enter product index (-1 to finish): ");
@@ -1045,10 +1088,11 @@ public class SupplierSystemUI {
                 productIndex = Integer.parseInt(scanner.nextLine());
 
                 if (productIndex == -1) break;
-
                 if (productIndex < 0 || productIndex >= products.size()) {
                     System.out.println("Invalid product index. Please try again.");
-                    continue;
+                }
+                else {
+                    IndexProducts.add(productIndex);
                 }
             } catch (NumberFormatException e) {
                 System.out.println("Invalid input. Please enter a number.");
@@ -1112,6 +1156,22 @@ public class SupplierSystemUI {
         }
 
         return selection;
+    }
+
+    private void showAgreementBySupplier(String supplierId){
+        List<String> agreements = supplierSystem.getAgreementsBySupplier(supplierId);
+
+        if (agreements.isEmpty()) {
+            System.out.println("No agreements found for supplier ID: " + supplierId);
+            return;
+        }
+
+        System.out.println("Agreements for supplier ID " + supplierId + ":");
+        int index = 0;
+        for (String agreement : agreements) {
+            System.out.println(index + " - " + agreement);
+            index++;
+        }
     }
 }
 
