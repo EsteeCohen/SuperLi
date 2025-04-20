@@ -36,7 +36,7 @@ public class EmployeeService {
     }
 
     public void registerAdmin(){
-        registerEmployee("Bombardino Crocodilo", "3", "admin", 9999, "Global", 1000, 1000);
+        registerEmployee("Bombardino Crocodilo", "3", "admin", 9999, "Hourly", 1000, 1000);
         assignRoleToEmployee("admin", "HrManager");
     }
 }
