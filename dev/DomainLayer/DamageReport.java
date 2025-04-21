@@ -1,4 +1,6 @@
-package BusinessLayer;
+package DomainLayer;
+
+import DomainLayer.Product;
 
 import java.time.LocalDate;
 import java.util.List;

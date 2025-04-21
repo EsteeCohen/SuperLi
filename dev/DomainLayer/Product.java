@@ -1,12 +1,19 @@
-package BusinessLayer;
+package DomainLayer;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.*;
 
-class Product {
+public class Product {
+    private final int BUFFER_SUPPLY_DAYS=1;
+    private final int DAYS_BETWEEN_REPORTS=3;//monday to thursday, thursday to monday, we don't work during shabat
+
     private final String productName;
     private final List<String> subCategories;
     private final String manufacturer;
+    private String storeLocation;
+    private String storageLocation;
+
     private int latestSupplyId=0;
     private int shelfQuantity;
     private int storageQuantity;
@@ -15,10 +22,17 @@ class Product {
 
     private double sellPrice;
     private Discount discount;
+    private final TreeMap<LocalDate,Sale> salesReports=new TreeMap<>();
+    int brokenQuantity;
+
+    private List<Sale> latestSales;//saves sales data since the last restart
+    private int latestSalesCount;//count the sales since the last restart
+
+    private int supplyRate=3;//the days it takes for a new supply to come, assume for now a week
 
     private final Map<Integer,Supply> supplies=new HashMap<>();//a map of all the supplies
 
-    Product(String productName, List<String> subCategories, String manufacturer, int sellPrice)
+    public Product(String productName, List<String> subCategories, String manufacturer, double sellPrice, String shelfPlace, String storageLocation)
     {
         this.productName = productName;
         this.subCategories = subCategories;
@@ -31,6 +45,20 @@ class Product {
 
         this.sellPrice = sellPrice;
         this.discount = null;
+        latestSales=new ArrayList<>();
+        latestSalesCount=0;
+
+        this.storeLocation=shelfPlace;
+        this.storageLocation=storageLocation;
+    }
+
+    String getProductName()
+    {
+        return productName;
+    }
+    Discount getDiscount()
+    {
+        return discount;
     }
     public void SetDiscount(Discount discount)
     {
@@ -47,22 +75,90 @@ class Product {
         return this.storageQuantity;
     }
 
+    List<Sale> getLatestSales()
+    {
+        return latestSales;
+    }
+
+    int getLatestSalesCount() {
+        return latestSalesCount;
+    }
+
+    int getMinQuantity(){
+        return minQuantity;
+    }
+
+    int getBrokenQuantity()
+    {
+        return brokenQuantity;
+    }
+
+    /**
+     * tells the product to start counting sales from the beginning
+     * should be used after getting the latest report
+     */
+    void restartSales()
+    {
+        latestSales=new ArrayList<>();
+        latestSalesCount=0;
+    }
+
+    /**
+     * tells the product to start counting brokens from the beginning
+     * should be used after getting the latest report
+     */
+    void restartBroken()
+    {
+        brokenQuantity=0;
+    }
+
+    /**
+     * updates the quantity and writes the missing amount as sold
+     * @param supplyID the id of the supply to update
+     * @param storeQuantity the new shelf quantity
+     * @param storageQuantity the new storage quantity
+     * @throws Exception if the updated quantity is greater than before
+     */
     void updateSoldQuantity(int supplyID, int storeQuantity, int storageQuantity) throws Exception
     {
         int totalSales=updateQuantities(supplyID,storeQuantity,storageQuantity);
 
         //document sells?
+        if(discount!=null && discount.getEndDate().isBefore(LocalDate.now()))//discount ended
+            discount=null;
+        if(totalSales==0)
+            return;//if just moved, no need to for updates
 
+        Sale sale=new Sale(totalSales,sellPrice, discount==null? 0: discount.getPrecentage());
+        latestSales.add(sale);
+        latestSalesCount+=totalSales;
     }
 
 
-    void updateBrokenItems(int supplyId, int storeQuantity, int storageQuantity) throws  Exception
+    /**
+     * updates the quantity and writes the missing amount as broken
+     * @param supplyId the id of the supply to update
+     * @param storeQuantity the new shelf quantity
+     * @param storageQuantity the new storage quantity
+     * @throws Exception if the updated quantity is greater than before
+     */
+    void updateFoundBrokenItems(int supplyId, int storeQuantity, int storageQuantity) throws  Exception
     {
         int totalLost=updateQuantities(supplyId,storeQuantity,storageQuantity);
-
-        //dovument loss?
+        brokenQuantity+=totalLost;
     }
 
+    /**
+     * calcs the new min quantity
+     * since we report every 72 hours, we just take the accumilated sales and divide them by 3 to get the daily average
+     * then we multiply by the days it takes for new supply to arrive+some buffer
+     * new min= daily sales average*(time it takes for new supply+1)
+     */
+    void calcMinQuantity()
+    {
+        int dailyAvg= (int) Math.ceil((double)latestSalesCount/(double)DAYS_BETWEEN_REPORTS);
+        minQuantity=dailyAvg*(supplyRate+BUFFER_SUPPLY_DAYS);
+    }
 
     /**
      * updates the quantities per batch of a product
@@ -106,17 +202,15 @@ class Product {
      * @param expirationDate the expiration date for said supply
      * @param storeQuantity the quantity in the store
      * @param storageQuantity the quantity in the storage
-     * @param shelfLocation the location in the store
-     * @param storageLocation the location in the storage
      * @return the id for this supply
      * @throws Exception if either quantity or cost is ngative
      */
-    int addSupply(int cost, LocalDate expirationDate, int storeQuantity, int storageQuantity, String shelfLocation, String storageLocation) throws Exception
+    int addSupply(int cost, LocalDate expirationDate, int storeQuantity, int storageQuantity) throws Exception
     {
         if(storeQuantity<0 || storageQuantity<0 || cost<0)
             throw new IllegalArgumentException("one of the quantities or the cost is negative!");
         int id=latestSupplyId++;
-        Supply newSupply= new Supply(id, cost, expirationDate, storeQuantity, storageQuantity, shelfLocation, storageLocation);
+        Supply newSupply= new Supply(id, cost, expirationDate, storeQuantity, storageQuantity);
         this.shelfQuantity+=storeQuantity;
         this.storageQuantity+=storageQuantity;
         supplies.put(id,newSupply);
@@ -158,18 +252,14 @@ class Product {
         private int shelfQuantity;
         private int storageQuantity;
 
-        private String storeLocation;
-        private String storageLocation;
 
-        Supply(int supplyID, int cost, LocalDate expirationDate, int shelfQuantity, int storageQuantity, String storeLocation, String storageLocation )
+        Supply(int supplyID, int cost, LocalDate expirationDate, int shelfQuantity, int storageQuantity)
         {
             this.supplyID=supplyID;
             this.cost=cost;
             this.expirationDate=expirationDate;
             this.shelfQuantity=shelfQuantity;
             this.storageQuantity=storageQuantity;
-            this.storeLocation=storeLocation;
-            this.storageLocation=storageLocation;
         }
     }
 }

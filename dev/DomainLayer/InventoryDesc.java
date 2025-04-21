@@ -1,4 +1,4 @@
-package BusinessLayer;
+package DomainLayer;
 
 import java.util.List;
 
