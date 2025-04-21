@@ -111,6 +111,20 @@ class ProductTest {
 
     @Test
     void calcMinQuantity() {
+        try
+        {
+            milk.updateSoldQuantity(milkId1, 9, 0);
+            ice.updateSoldQuantity(iceId1,1,0);
+            water.updateSoldQuantity(waterId1,8,0);
+        }
+        catch (Exception e){}
+        milk.calcMinQuantity();
+        ice.calcMinQuantity();
+        water.calcMinQuantity();
+        assertEquals(16,milk.getMinQuantity());
+        assertEquals(12,ice.getMinQuantity());
+        assertEquals(4,water.getMinQuantity());
+
     }
 
     @Test

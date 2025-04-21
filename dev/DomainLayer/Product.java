@@ -69,6 +69,10 @@ class Product {
         return latestSalesCount;
     }
 
+    int getMinQuantity(){
+        return minQuantity;
+    }
+
     /**
      * tells the product to start counting sales from the beginning
      * should be used after getting the latest report
@@ -122,7 +126,7 @@ class Product {
      */
     void calcMinQuantity()
     {
-        int dailyAvg=latestSalesCount/DAYS_BETWEEN_REPORTS;
+        int dailyAvg= (int) Math.ceil((double)latestSalesCount/(double)DAYS_BETWEEN_REPORTS);
         minQuantity=dailyAvg*(supplyRate+BUFFER_SUPPLY_DAYS);
     }
 
