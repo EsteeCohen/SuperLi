@@ -12,6 +12,7 @@ class SaleTest {
     Sale sFull;
 
     @BeforeEach
+
     void setup()
     {
         s1=new Sale(10,100,10);
@@ -20,6 +21,9 @@ class SaleTest {
     }
 
     @Test
+    /**
+     * tests if the actual price per item is calculated correctly
+     */
     void getTotalPrice() {
         assertEquals(90.0,s1.getTotalPrice());
         assertEquals(100.0,sZero.getTotalPrice());
@@ -27,6 +31,9 @@ class SaleTest {
     }
 
     @Test
+    /**
+     * tests if the actual revenue is calculated correctly
+     */
     void getTotalRevenue() {
         assertEquals(900.0,s1.getTotalRevenue());
         assertEquals(1000.0,sZero.getTotalRevenue());

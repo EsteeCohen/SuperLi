@@ -5,6 +5,9 @@ import java.time.LocalDate;
 import java.util.*;
 
 class Product {
+    private final int BUFFER_SUPPLY_DAYS=1;
+    private final int DAYS_BETWEEN_REPORTS=3;//monday to thursday, thursday to monday, we don't work during shabat
+
     private final String productName;
     private final List<String> subCategories;
     private final String manufacturer;
@@ -19,17 +22,14 @@ class Product {
     private final TreeMap<LocalDate,Sale> salesReports=new TreeMap<>();
     int brokenQuantity;
 
-    private List<Sale> latestSales;
-    private int latestSalesCount;
+    private List<Sale> latestSales;//saves sales data since the last restart
+    private int latestSalesCount;//count the sales since the last restart
 
-    private int supplyRate=7;//the days it takes for a new supply to come, assume for now a week
-    private int lastMondaySales;
-    private int lastThursdaySales;
-    private boolean monday;
+    private int supplyRate=3;//the days it takes for a new supply to come, assume for now a week
 
     private final Map<Integer,Supply> supplies=new HashMap<>();//a map of all the supplies
 
-    Product(String productName, List<String> subCategories, String manufacturer, int sellPrice)
+    Product(String productName, List<String> subCategories, String manufacturer, double sellPrice)
     {
         this.productName = productName;
         this.subCategories = subCategories;
@@ -44,9 +44,6 @@ class Product {
         this.discount = null;
         latestSales=new ArrayList<>();
         latestSalesCount=0;
-        lastMondaySales=0;
-        lastThursdaySales=0;
-        monday=LocalDate.now().getDayOfWeek()== DayOfWeek.MONDAY;
     }
     public void SetDiscount(Discount discount)
     {
@@ -63,27 +60,55 @@ class Product {
         return this.storageQuantity;
     }
 
+    List<Sale> getLatestSales()
+    {
+        return latestSales;
+    }
 
+    int getLatestSalesCount() {
+        return latestSalesCount;
+    }
 
+    /**
+     * tells the product to start counting sales from the beginning
+     * should be used after getting the latest report
+     */
+    void restartSales()
+    {
+        latestSales=new ArrayList<>();
+        latestSalesCount=0;
+    }
 
+    /**
+     * updates the quantity and writes the missing amount as sold
+     * @param supplyID the id of the supply to update
+     * @param storeQuantity the new shelf quantity
+     * @param storageQuantity the new storage quantity
+     * @throws Exception if the updated quantity is greater than before
+     */
     void updateSoldQuantity(int supplyID, int storeQuantity, int storageQuantity) throws Exception
     {
         int totalSales=updateQuantities(supplyID,storeQuantity,storageQuantity);
 
         //document sells?
-        if(discount.getEndDate().isBefore(LocalDate.now()))//discount ended
+        if(discount!=null && discount.getEndDate().isBefore(LocalDate.now()))//discount ended
             discount=null;
+        if(totalSales==0)
+            return;//if just moved, no need to for updates
 
         Sale sale=new Sale(totalSales,sellPrice, discount==null? 0: discount.getPrecentage());
         latestSales.add(sale);
         latestSalesCount+=totalSales;
-        if(monday)
-            lastMondaySales+=totalSales;
-        else
-            lastThursdaySales+=totalSales;
     }
 
 
+    /**
+     * updates the quantity and writes the missing amount as broken
+     * @param supplyId the id of the supply to update
+     * @param storeQuantity the new shelf quantity
+     * @param storageQuantity the new storage quantity
+     * @throws Exception if the updated quantity is greater than before
+     */
     void updateFoundBrokenItems(int supplyId, int storeQuantity, int storageQuantity) throws  Exception
     {
         int totalLost=updateQuantities(supplyId,storeQuantity,storageQuantity);
@@ -91,13 +116,14 @@ class Product {
 
     /**
      * calcs the new min quantity
-     * new min= daily sales average*8
+     * since we report every 72 hours, we just take the accumilated sales and divide them by 3 to get the daily average
+     * then we multiply by the days it takes for new supply to arrive+some buffer
+     * new min= daily sales average*(time it takes for new supply+1)
      */
     void calcMinQuantity()
     {
-        int dailyAvg=lastMondaySales+lastThursdaySales;
-        dailyAvg/=7;
-        minQuantity=dailyAvg*8;
+        int dailyAvg=latestSalesCount/DAYS_BETWEEN_REPORTS;
+        minQuantity=dailyAvg*(supplyRate+BUFFER_SUPPLY_DAYS);
     }
 
     /**
