@@ -4,12 +4,12 @@ package DomainLayer;
 class Sale {
     private int quantity;
     private final double basePrice;
-    private final double discoundtPrecentage;
-    Sale(int quantity, double basePrice, double discoundtPrecentage)
+    private final double discountPercentage;
+    Sale(int quantity, double basePrice, double discountPercentage)
     {
         this.quantity=quantity;
         this.basePrice=basePrice;
-        this.discoundtPrecentage=discoundtPrecentage;
+        this.discountPercentage = discountPercentage;
     }
 
     int getQuantity() {
@@ -20,8 +20,8 @@ class Sale {
         return basePrice;
     }
 
-    double getDiscoundtPrecentage() {
-        return discoundtPrecentage;
+    double getDiscountPercentage() {
+        return discountPercentage;
     }
 
     /**
@@ -30,12 +30,12 @@ class Sale {
      */
     double getTotalPrice()
     {
-        return basePrice*(1-discoundtPrecentage/100);
+        return basePrice*(1- discountPercentage /100);
     }
 
     /**
-     * caculates the total revenue from this sale
-     * @return totalprice*quantity
+     * calculates the total revenue from this sale
+     * @return totalPrice*quantity
      */
     double getTotalRevenue()
     {

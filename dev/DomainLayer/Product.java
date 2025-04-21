@@ -45,6 +45,15 @@ class Product {
         latestSales=new ArrayList<>();
         latestSalesCount=0;
     }
+
+    String getProductName()
+    {
+        return productName;
+    }
+    Discount getDiscount()
+    {
+        return discount;
+    }
     public void SetDiscount(Discount discount)
     {
         this.discount = discount;

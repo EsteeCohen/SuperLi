@@ -55,4 +55,23 @@ public class ProductFacade
             throw new Exception("No product is named " + productName);
         else return productsByName.get(productName).GetStorageQuantity();
     }
+
+    //for tests!!!!
+    Product getProduct(String name)
+    {
+        return productsByName.get(name);
+    }
+
+    Product getProductFromCategory(String name,String category)
+    {
+        List<Product> products= productsByCategory.get(category);
+        if(products==null)
+            return null;
+        for(Product p:products)
+        {
+            if(p.getProductName().equals(name))
+                return  p;
+        }
+        return null;
+    }
 }
