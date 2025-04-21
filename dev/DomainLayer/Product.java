@@ -11,6 +11,9 @@ class Product {
     private final String productName;
     private final List<String> subCategories;
     private final String manufacturer;
+    private String storeLocation;
+    private String storageLocation;
+
     private int latestSupplyId=0;
     private int shelfQuantity;
     private int storageQuantity;
@@ -29,7 +32,7 @@ class Product {
 
     private final Map<Integer,Supply> supplies=new HashMap<>();//a map of all the supplies
 
-    Product(String productName, List<String> subCategories, String manufacturer, double sellPrice)
+    Product(String productName, List<String> subCategories, String manufacturer, double sellPrice, String shelfPlace,String storageLocation)
     {
         this.productName = productName;
         this.subCategories = subCategories;
@@ -44,6 +47,9 @@ class Product {
         this.discount = null;
         latestSales=new ArrayList<>();
         latestSalesCount=0;
+
+        this.storeLocation=shelfPlace;
+        this.storageLocation=storageLocation;
     }
 
     String getProductName()
@@ -196,17 +202,15 @@ class Product {
      * @param expirationDate the expiration date for said supply
      * @param storeQuantity the quantity in the store
      * @param storageQuantity the quantity in the storage
-     * @param shelfLocation the location in the store
-     * @param storageLocation the location in the storage
      * @return the id for this supply
      * @throws Exception if either quantity or cost is ngative
      */
-    int addSupply(int cost, LocalDate expirationDate, int storeQuantity, int storageQuantity, String shelfLocation, String storageLocation) throws Exception
+    int addSupply(int cost, LocalDate expirationDate, int storeQuantity, int storageQuantity) throws Exception
     {
         if(storeQuantity<0 || storageQuantity<0 || cost<0)
             throw new IllegalArgumentException("one of the quantities or the cost is negative!");
         int id=latestSupplyId++;
-        Supply newSupply= new Supply(id, cost, expirationDate, storeQuantity, storageQuantity, shelfLocation, storageLocation);
+        Supply newSupply= new Supply(id, cost, expirationDate, storeQuantity, storageQuantity);
         this.shelfQuantity+=storeQuantity;
         this.storageQuantity+=storageQuantity;
         supplies.put(id,newSupply);
@@ -227,18 +231,14 @@ class Product {
         private int shelfQuantity;
         private int storageQuantity;
 
-        private String storeLocation;
-        private String storageLocation;
 
-        Supply(int supplyID, int cost, LocalDate expirationDate, int shelfQuantity, int storageQuantity, String storeLocation, String storageLocation )
+        Supply(int supplyID, int cost, LocalDate expirationDate, int shelfQuantity, int storageQuantity)
         {
             this.supplyID=supplyID;
             this.cost=cost;
             this.expirationDate=expirationDate;
             this.shelfQuantity=shelfQuantity;
             this.storageQuantity=storageQuantity;
-            this.storeLocation=storeLocation;
-            this.storageLocation=storageLocation;
         }
     }
 }

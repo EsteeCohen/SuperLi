@@ -11,13 +11,22 @@ public class ProductFacade
     private final Map<String, List<Product>> productsByCategory=new HashMap<>();
     private final Map<String, Product> productsByName=new HashMap<>();
 
-    public void AddProduct(String productName, String category, List<String> subCategories, String manufacturer, int sellPrice) throws Exception
+    /**
+     * adds a new product to the system
+     * @param productName the name of the new product
+     * @param category the category of the new product
+     * @param subCategories the sub cats
+     * @param manufacturer manu
+     * @param sellPrice the current sell price
+     * @throws Exception if product already exists
+     */
+    public void AddProduct(String productName, String category, List<String> subCategories, String manufacturer, int sellPrice, String shelfLocation, String storageLocation) throws Exception
     {
         if(getProduct(productName)!=null)
             throw new Exception("Product with name: "+productName+" already exists!");
         if (!productsByCategory.containsKey(category))
             productsByCategory.put(category, new ArrayList<>());
-        Product product=new Product(productName, subCategories, manufacturer, sellPrice);
+        Product product=new Product(productName, subCategories, manufacturer, sellPrice,shelfLocation,storageLocation);
         productsByCategory.get(category).add(product);
 
         productsByName.put(productName, product);
@@ -31,6 +40,15 @@ public class ProductFacade
             productsByName.get(productName).SetDiscount(new Discount(startDate, endDate, percentage));
         }
     }
+
+    /**
+     * sets a discount for all the products in the category
+     * @param productCategory the ategory
+     * @param startDate discunt start date
+     * @param endDate discount end date
+     * @param percentage the discount precentage
+     * @throws Exception if the category doesnt exist or if its empty
+     */
     public void SetDiscountForCategory(String productCategory, LocalDate startDate, LocalDate endDate, double percentage) throws Exception
     {
         List<Product> products = productsByCategory.get(productCategory);
@@ -44,18 +62,41 @@ public class ProductFacade
                 product.SetDiscount(new Discount(startDate, endDate, percentage));
         }
     }
+
+    /**
+     * sets a discount for a single product
+     * @param productName name
+     * @param startDate discount tart date
+     * @param endDate discount end date
+     * @param percentage discount precentage
+     * @throws Exception if the product doesnt exists
+     */
     public void SetDiscount(String productName, LocalDate startDate, LocalDate endDate, double percentage) throws Exception
     {
         if (!productsByName.containsKey(productName))
             throw new Exception("No product is named " + productName);
         else productsByName.get(productName).SetDiscount(new Discount(startDate, endDate, percentage));
     }
+
+    /**
+     * gets the shelf quantity of a product
+     * @param productName name
+     * @return the quantiy
+     * @throws Exception if product doesnt exists
+     */
     public int GetShelfQuantity(String productName) throws Exception
     {
         if (!productsByName.containsKey(productName))
             throw new Exception("No product is named " + productName);
         else return productsByName.get(productName).GetShelfQuantity();
     }
+
+    /**
+     * gets the storage quantity of a product
+     * @param productName name
+     * @return quantity
+     * @throws Exception if product doesnt exist
+     */
     public int GetStorageQuantity(String productName) throws Exception
     {
         if (!productsByName.containsKey(productName))
@@ -63,12 +104,22 @@ public class ProductFacade
         else return productsByName.get(productName).GetStorageQuantity();
     }
 
+    public void addSupply(String productName, int cost, LocalDate experationDate,int shelfQuantity,int storageQuantity) throws Exception
+    {
+        Product p=getProduct(productName);
+        if(p==null)
+            throw new Exception("Product "+productName+" does not exist!");
+
+        p.addSupply(cost,experationDate,shelfQuantity,storageQuantity);
+    }
     //for tests!!!!
+    //gets a product by its name
     Product getProduct(String name)
     {
         return productsByName.get(name);
     }
 
+    //gets a product from within a certain category, mainly for tests
     Product getProductFromCategory(String name,String category)
     {
         List<Product> products= productsByCategory.get(category);

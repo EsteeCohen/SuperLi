@@ -16,19 +16,19 @@ class ProductTest {
     Product water;
     @BeforeEach
     void setUp() {
-        milk=new Product("milk",new ArrayList<>(),"",5.0);
-        ice=new Product("ice",new ArrayList<>(),"",3.0);
-        water=new Product("water",new ArrayList<>(),"",1.0);
+        milk=new Product("milk",new ArrayList<>(),"",5.0,"","");
+        ice=new Product("ice",new ArrayList<>(),"",3.0,"","");
+        water=new Product("water",new ArrayList<>(),"",1.0,"","");
 
         try {
-            milkId1=milk.addSupply(1, LocalDate.now(), 10, 10, "", "");
-            milkId2=milk.addSupply(2, LocalDate.now(), 10, 10, "", "");
+            milkId1=milk.addSupply(1, LocalDate.now(), 10, 10);
+            milkId2=milk.addSupply(2, LocalDate.now(), 10, 10);
 
-            iceId1=ice.addSupply(1, LocalDate.now(), 0, 10, "", "");
-            iceId2=ice.addSupply(2, LocalDate.now(), 10, 0, "", "");
+            iceId1=ice.addSupply(1, LocalDate.now(), 0, 10);
+            iceId2=ice.addSupply(2, LocalDate.now(), 10, 0);
 
-            waterId1=water.addSupply(1, LocalDate.now(), 5, 5, "", "");
-            waterId2=water.addSupply(2, LocalDate.now(), 5, 5, "", "");
+            waterId1=water.addSupply(1, LocalDate.now(), 5, 5);
+            waterId2=water.addSupply(2, LocalDate.now(), 5, 5);
         }
         catch (Exception ignored)
         {}
@@ -163,8 +163,8 @@ class ProductTest {
     @Test
     void addSupply() {
         //check that you cant add negative quantities
-        assertThrows(Exception.class,()->{milk.addSupply(-10,LocalDate.now(),10,10,"","");});
-        assertThrows(Exception.class,()->{milk.addSupply(10,LocalDate.now(),-10,10,"","");});
+        assertThrows(Exception.class,()->{milk.addSupply(-10,LocalDate.now(),10,10);});
+        assertThrows(Exception.class,()->{milk.addSupply(10,LocalDate.now(),-10,10);});
 
 
         //check that the quantities are added up correctly
@@ -176,9 +176,9 @@ class ProductTest {
         int oldWaterStorage=water.GetStorageQuantity();
         int mid=-1,iid=-1,wid=-1;
         try {
-            mid=milk.addSupply(1, LocalDate.now(), 10, 10, "", "");
-            iid=ice.addSupply(1, LocalDate.now(), 0, 10, "", "");
-            wid=water.addSupply(1, LocalDate.now(), 5, 5, "", "");
+            mid=milk.addSupply(1, LocalDate.now(), 10, 10);
+            iid=ice.addSupply(1, LocalDate.now(), 0, 10);
+            wid=water.addSupply(1, LocalDate.now(), 5, 5);
 
         }
         catch(Exception ignored){}

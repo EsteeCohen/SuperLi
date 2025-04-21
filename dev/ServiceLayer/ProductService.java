@@ -9,11 +9,11 @@ public class ProductService
 {
     protected ProductFacade pf;
 
-    public void AddProduct(String productName, String category, List<String> subCategories, String manufacturer, int sellPrice)
+    public void AddProduct(String productName, String category, List<String> subCategories, String manufacturer, int sellPrice, String shelfLocation, String storageLocation)
     {
         try
         {
-            pf.AddProduct(productName, category, subCategories, manufacturer, sellPrice);
+            pf.AddProduct(productName, category, subCategories, manufacturer, sellPrice,shelfLocation,storageLocation);
         }
         catch (Exception e) {
             System.out.println(e.getMessage());
