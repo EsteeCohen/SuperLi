@@ -73,14 +73,14 @@ public class Site {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Site)) return false;
-
-        Site site = (Site) o;
-
-        if (!id.equals(site.id)) return false;
-        if (!name.equals(site.name)) return false;
-        if (!address.equals(site.address)) return false;
-        if (!contactPhone.equals(site.contactPhone)) return false;
-        if (!contactName.equals(site.contactName)) return false;
-        return shippingZone == site.shippingZone;
+        return id.equals(((Site) o).id); //id is unique
+//        Site site = (Site) o;
+//
+//        if (!id.equals(site.id)) return false;
+//        if (!name.equals(site.name)) return false;
+//        if (!address.equals(site.address)) return false;
+//        if (!contactPhone.equals(site.contactPhone)) return false;
+//        if (!contactName.equals(site.contactName)) return false;
+//        return shippingZone == site.shippingZone;
     }
 }

@@ -1,125 +1,170 @@
 package src.main.entities;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.ArrayList;
 
+import src.main.enums.ShippingZone;
 import src.main.enums.TransportStatus;
 
 public class Transport {
-    private String id;
+    private final int id;
+    private static int idCounter = 1;
     private LocalDate date;
     private LocalTime time;
     private Truck truck;
     private Driver driver;
-    private Site sourceSite;
+    private final Site sourceSite;
     private List<Site> destinations;
     private double currentWeight;
     private TransportStatus status;
 
     //----------------- Constructors -------------------
-    public Transport(String id, LocalDate date, LocalTime time, Truck truck, Driver driver, Site sourceSite, List<Site> destinations, double currentWeight, TransportStatus status) {
-        this.id = id;
-        this.date = date;
-        this.time = time;
-        this.truck = truck;
-        this.driver = driver;
+    public Transport(LocalDate date, LocalTime time, Truck truck, Driver driver, Site sourceSite, List<Site> destinations) {
+        this.id = idCounter++;
+        this.status = TransportStatus.PLANNING;
+        setDate(date);
+        setTime(time);
+        setTruck(truck);
+        setDriver(driver);
+        if (sourceSite == null) {
+            throw new IllegalArgumentException("Source site cannot be null");
+        }
         this.sourceSite = sourceSite;
-        this.destinations = destinations;
-        this.currentWeight = currentWeight;
-        this.status = status;
+        setDestinations(destinations);
+        this.currentWeight = 0;
     }
+
     //----------------- Getters and Setters -------------------
-    public String getId() {
+    public int getId() {
         return id;
     }
-    public void setId(String id) {
-        this.id = id;
-    }
-    public LocalDate getDate() {
+    public LocalDate getDate(){
         return date;
     }
-    public void setDate(LocalDate date) {
-        this.date = date;
-    }
-    public LocalTime getTime() {
+    public LocalTime getTime(){
         return time;
     }
-    public void setTime(LocalTime time) {
-        this.time = time;
-    }
-    public Truck getTruck() {
+    public Truck getTruck(){
         return truck;
     }
-    public void setTruck(Truck truck) {
-        if(truck != null){
-            this.truck = truck;
-        }
-    }
-    public Driver getDriver() {
+    public Driver getDriver(){
         return driver;
     }
-    public void setDriver(Driver driver) {
-        if(driver != null){
-            this.driver = driver;
-        }
-    }
-    public Site getSourceSite() {
+    public Site getSourceSite(){
         return sourceSite;
     }
-    public void setSourceSite(Site sourceSite) {
-        if(sourceSite != null){
-            this.sourceSite = sourceSite;
-        }
+    public List<Site> getDestinations(){
+        return destinations;
     }
-    public List<Site> getDestinations() {
-        return new ArrayList<>(destinations);
-    }
-    public void setDestinations(List<Site> destinations) {
-        this.destinations = destinations;
-    }
-    public double getCurrentWeight() {
+    public double getCurrentWeight(){
         return currentWeight;
     }
+    public TransportStatus getStatus(){
+        return status;
+    }
+
+    public void setDate(LocalDate date){
+        if (date.isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException("Date cannot be in the past");
+        }
+        this.date = date;
+    }
+    public void setTime(LocalTime time){
+        if (date != null && LocalDateTime.of(date, time).isBefore(LocalDateTime.now())) {
+            throw new IllegalArgumentException("Time cannot be in the past");
+        }
+        this.time = time;
+    }
+
+
+    public void setTruck(Truck truck){
+        if (truck == null) {
+            throw new IllegalArgumentException("Truck cannot be null");
+        }
+        if(driver!=null) {
+            if (!driver.canDrive(truck)){
+                throw new IllegalArgumentException("Driver :" + driver.getName() + " that assign to this transport has no valid license");
+            }
+        }
+        if (!canChangeTruck()){
+            throw new IllegalArgumentException("Truck can't be changed after planning status");
+        }
+        if (this.truck != null) {
+            this.truck.available();
+        }
+        this.truck = truck;
+        this.truck.unavailable();
+    }
+
+    public void setDriver(Driver driver){
+        if (driver == null) {
+            throw new IllegalArgumentException("Driver cannot be null");
+        }
+        if (truck != null) {
+            if (!driver.canDrive(truck)) {
+                throw new IllegalArgumentException("Driver :" + driver.getName() + " that assign to this transport has no valid license");
+            }
+        }
+        if (!canChangeDriver()){
+            throw new IllegalArgumentException("Driver can't be changed after planning status");
+        }
+        if(!driver.isAvailable()) {
+            throw new IllegalArgumentException("Driver " + driver.getName() + " is not available");
+        }
+        if (this.driver != null) {
+            this.driver.available();
+        }
+        this.driver = driver;
+        driver.unavailable();
+
+    }
+
+    public void setDestinations(List<Site> destinations) {// With zone validation
+        if(!validateSameRegion(destinations)){
+            throw new IllegalArgumentException("not all sites in the same shipping zone");
+        }
+        this.destinations = destinations;
+    }
+
     public void setCurrentWeight(double currentWeight) {
-        if(currentWeight >= 0){
+        if (isWeightValid(currentWeight)){
             this.currentWeight = currentWeight;
         }
-    }
-    public TransportStatus getStatus() {
-        return status;
+        else {
+            throw new IllegalArgumentException("new current weight isn't valid");
+        }
     }
     public void setStatus(TransportStatus status) {
         if(status != null){
             this.status = status;
         }
     }
-    public double getTotalWeight() {
-        return truck != null ? truck.getEmptyWeight() + currentWeight : 0;
-    }
     //----------------- methods -------------------
-    public boolean isWeightVaild(){
-        return truck != null && truck.canCarryLoad(currentWeight);
-    }
-    public boolean isDriverLicenseValid(){
-        return driver != null && driver.canDrive(truck) && truck != null;
-    }
-    public boolean validateSameRegion(){
-        if (sourceSite == null || destinations == null || destinations.isEmpty()) {
-            return false;
+    public double getTotalWeight() {
+        if(truck == null){
+            throw new IllegalArgumentException("truck cannot be null to calculate total weight");
+
         }
-        
+        return truck.getEmptyWeight() + currentWeight;
+    }
+    public boolean isWeightValid(double currentWeight){
+        return truck != null && truck.canCarryLoad(currentWeight) && currentWeight >= 0;
+    }
+
+    public boolean validateSameRegion(List<Site> destinations){
+        if (destinations == null || destinations.isEmpty()) {
+            throw new IllegalArgumentException("there must be at least one destination");
+        }
+        ShippingZone zone = destinations.getFirst().getShippingZone();
         for(Site destination : destinations) {
-            if (destination.getShippingZone() != sourceSite.getShippingZone()) {
+            if (destination.getShippingZone() != zone) {
                 return false; // Different shipping zones
             }
         }
-        return true; // All destinations are in the same shipping zone as the source site
-    }
-    public boolean validateTransport() {
-        return isWeightVaild() && isDriverLicenseValid() && validateSameRegion();
+        return true; // All destinations are in the same shipping zone
     }
     public boolean canBeCancelled() {
         return status == TransportStatus.PLANNING;
@@ -130,11 +175,7 @@ public class Transport {
     public boolean canChangeTruck() {
         return status == TransportStatus.PLANNING;
     }
-    public void cancelTransport() {
-        if (canBeCancelled()) {
-            status = TransportStatus.CANCELLED;
-        }
-    }
+
     //----------------- toString -------------------
     private String getDestinationsString() {
         if (destinations == null || destinations.isEmpty()) {
@@ -143,7 +184,7 @@ public class Transport {
 
         StringBuilder sb = new StringBuilder();
         for (Site destination : destinations) {
-            if (sb.length() > 0) {
+            if (!sb.isEmpty()) {
                 sb.append(", ");
             }
             sb.append(destination.getName());
@@ -169,11 +210,8 @@ public class Transport {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Transport)) return false;
-
-        Transport transport = (Transport) o;
-
-        return id.equals(transport.id);
+        if (!(o instanceof Transport transport)) return false;
+        return this.id == transport.id;
     }
 
 }

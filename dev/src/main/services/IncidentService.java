@@ -3,6 +3,7 @@ package src.main.services;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import src.main.entities.Incident;
@@ -22,7 +23,7 @@ public class IncidentService {
     }
 
     //דיווח על תקלה חדשה
-    public boolean reportIncident(String transportId, IncidentType type, String description) {
+    public boolean reportIncident(int transportId, IncidentType type, String description) {
         Transport transport = transportService.getTransportById(transportId);
         
         if (transport == null) {
@@ -33,20 +34,13 @@ public class IncidentService {
         String incidentId = "INC" + System.currentTimeMillis();
         
         // יצירת תקלה חדשה
-        Incident incident = new Incident(incidentId, LocalDateTime.now(), type, description, transport);
+        Incident incident = new Incident(incidentId, type, description, transport);
         incident.setStatus(IncidentStatus.REPORTED);
         
         // הוספת התקלה למאגר
         incidents.add(incident);
         
         return true;
-    }
-
-    //הוספת תקלה ישירות למאגר
-    public void addIncident(Incident incident) {
-        if (incident != null) {
-            incidents.add(incident);
-        }
     }
 
     //עדכון סטטוס תקלה
@@ -68,7 +62,7 @@ public class IncidentService {
     }
 
     //הוספת פתרון לתקלה
-    public boolean addResolution(String incidentId, String description, String resolutionType) {
+    public boolean setResolution(String incidentId, String description) {
         Incident incident = getIncidentById(incidentId);
         
         if (incident == null) {
@@ -87,12 +81,11 @@ public class IncidentService {
         IncidentResolution resolution = new IncidentResolution(
             resolutionId, 
             LocalDateTime.now(), 
-            description, 
-            resolutionType
+            description
         );
         
         // הוספת הפתרון לתקלה
-        incident.addResolution(resolution);
+        incident.setResolution(resolution);
         
         // אם התקלה עדיין במצב "דווח", נעדכן אותה למצב "בטיפול"
         if (incident.getStatus() == IncidentStatus.REPORTED) {
@@ -111,9 +104,9 @@ public class IncidentService {
     }
 
     //קבלת תקלות לפי הובלה
-    public List<Incident> getIncidentsByTransport(String transportId) {
+    public List<Incident> getIncidentsByTransport(int transportId) {
         return incidents.stream()
-                .filter(i -> i.getAffectedTransport().getId().equals(transportId))
+                .filter(i -> i.getAffectedTransport().getId()== transportId)
                 .collect(Collectors.toList());
     }
 
@@ -134,7 +127,7 @@ public class IncidentService {
     //קבלת תקלה לפי מזהה
     public Incident getIncidentById(String incidentId) {
         return incidents.stream()
-                .filter(i -> i.getId().equals(incidentId))
+                .filter(i -> Objects.equals(i.getId(), incidentId))
                 .findFirst()
                 .orElse(null);
     }
@@ -145,9 +138,9 @@ public class IncidentService {
     }
 
     //בדיקת קיום תקלות פעילות עבור הובלה
-    public boolean hasActiveIncidents(String transportId) {
+    public boolean hasActiveIncidents(int transportId) {
         return incidents.stream()
-                .anyMatch(i -> i.getAffectedTransport().getId().equals(transportId) &&
+                .anyMatch(i -> i.getAffectedTransport().getId()== transportId &&
                               (i.getStatus() == IncidentStatus.REPORTED || 
                                i.getStatus() == IncidentStatus.IN_PROGRESS));
     }

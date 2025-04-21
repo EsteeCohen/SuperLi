@@ -247,7 +247,7 @@ public class ScheduleUI {
             return;
         }
         
-        String transportId = null;
+        int transportId = -1;
         if (entryType == EntryType.TRANSPORT || entryType == EntryType.LOADING || entryType == EntryType.UNLOADING) {
             // הצגת רשימת הובלות רלוונטיות
             List<Transport> transports = transportController.getTransportsByDate(schedule.getDate());
@@ -273,7 +273,7 @@ public class ScheduleUI {
                 System.out.println("בחירה לא תקינה.");
                 return;
             }
-            
+
             transportId = transports.get(transportIndex).getId();
         }
         

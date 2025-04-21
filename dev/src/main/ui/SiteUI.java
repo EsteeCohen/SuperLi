@@ -101,9 +101,9 @@ public class SiteUI {
                 zone = "CENTER";
         }
         
-        boolean success = siteController.addSite(id, name, address, contactPhone, contactName, zone);
+        Site site = siteController.addSite(id, name, address, contactPhone, contactName, zone);
         
-        if (success) {
+        if (site != null) {
             System.out.println("האתר נוסף בהצלחה!");
         } else {
             System.out.println("שגיאה בהוספת האתר. ייתכן שהמזהה כבר קיים במערכת.");

@@ -4,39 +4,32 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import BussinessLayer.Transport;
-import src.main.entities.Item;
-import src.main.entities.Order;
-import src.main.entities.Site;
+import src.main.entities.*;
+import src.main.enums.IncidentType;
 import src.main.enums.OrderStatus;
-import src.main.services.SiteService;
 
 public class OrderService {
     private List<Order> orders;
     private SiteService siteService;
     private TransportService transportService;
+    private IncidentService incidentService;
 
     // Constructor
-    public OrderService(SiteService siteService, TransportService transportService){
+    public OrderService(SiteService siteService, TransportService transportService, IncidentService incidentService){
         this.siteService = siteService;
         this.transportService = transportService;
+        this.incidentService = incidentService;
         this.orders = new ArrayList<>();
     }
 
     // Methods
     public Order createOrder(LocalDate date, String siteId, List<Item> items){
         Site site = siteService.getSiteById(siteId);
-        if (site == null)
-            return null;
-
-        List<Item> itemsInOrder = new ArrayList<>();
-        for (Item item : items) {
-            if (item.getQuantity() in site && ((itemQuantity - item.getQuantity()) > 0)){ //אפשר לעשות MAP לכל אתר עם המוצרים שיש בו וכמות
-                itemsInOrder.add(item);
-                site.updateItemQuantity(---);
-            }
+        if (site == null){
+            throw new IllegalArgumentException("site not found");
         }
-        Order order = new Order(date, site, itemsInOrder);
+
+        Order order = new Order(date, site, items);
         orders.add(order);
         return order;
     }
@@ -73,6 +66,15 @@ public class OrderService {
         }
         return result;
     }
+
+    public List<Order> getOrdersInTransport(int transportId){
+        List<Order> result = new ArrayList<>();
+        for (Order o : this.orders) {
+            if (o.getTransport().getId() == transportId)
+                result.add(o);
+        }
+        return result;
+    }
     public boolean updateOrderStatus(int id, OrderStatus newStatus){
         Order order = getOrderById(id);
         if (order == null) return false;
@@ -91,19 +93,21 @@ public class OrderService {
 
         double newWeight = order.OrderWeight() + transport.getCurrentWeight();
         if (newWeight > transport.getTruck().getMaxWeight()) {
+            incidentService.reportIncident(transportId, IncidentType.WEIGHT_OVERLOAD,"the weight overload when added this order");
             return false;//1/2/3יש חריגה במשקל צריך לפתןר אותה
         }
         order.setTransport(transport);
         transport.setCurrentWeight(newWeight);
+        order.setStatus(OrderStatus.IN_PROGRESS);
         return true;
     }
 
-    public boolean removeItems (int orderId, int transportId, List<Item> itemsToRemove){//וגם לעדכן בMAP של האתר את הפריטים
+    public boolean removeItems (int orderId, int transportId, List<Item> itemsToRemove){
         Order order = getOrderById(orderId);
         Transport transport = transportService.getTransportById(transportId);
 
-        if (order == null || transport == null || !order.getTransport().equals(transport)) {\
-            return false;
+        if (order == null || !order.getTransport().equals(transport)) {
+            throw new IllegalArgumentException("can't remove items from this order");
         }
 
         List<Item> orderItems = order.getItems();
@@ -119,24 +123,30 @@ public class OrderService {
         transport.setCurrentWeight(transport.getCurrentWeight() - removedWeight);
         return true;
 
-
-
-
-
     }
 
-    public boolean cancelOrder(int id){
-        Order order = getOrderById(id);
+    public boolean removeOrderFromTruck(int orderId) {
+        Order order = getOrderById(orderId);
         if (order == null) return false;
-
-        if(order.canBeCancelled()){
-            if (order.getTransport()!=null){
-                order.setTransport(null);
-                transport.setCurrentWeight(transport.getCurrentWeight() - order.OrderWeight());
-            }
-            order.setStatus(OrderStatus.CANCELLED);
+        if (order.getTransport() != null) {
+            order.getTransport().setCurrentWeight(order.getTransport().getCurrentWeight() - order.OrderWeight());
+            order.setTransport(null);
+            order.setStatus(OrderStatus.DONE);
             return true;
         }
         return false;
     }
+
+    public boolean cancelOrder(int id){
+        Order order = getOrderById(id);
+        if(order.canBeCancelled()) {
+            boolean result = removeOrderFromTruck(id);
+            if (result) {
+                order.setStatus(OrderStatus.CANCELLED);
+                return true;
+            }
+        }
+        return false;
+    }
 }
+

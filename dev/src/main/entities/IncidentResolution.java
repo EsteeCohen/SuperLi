@@ -6,14 +6,12 @@ public class IncidentResolution {
     private String id;
     private LocalDateTime resolutionTime;
     private String description;
-    private String resolutionType;
-    
+
     //בנאי לפתרון תקלה
-    public IncidentResolution(String id, LocalDateTime resolutionTime, String description, String resolutionType) {
+    public IncidentResolution(String id, LocalDateTime resolutionTime, String description) {
         this.id = id;
         this.resolutionTime = resolutionTime;
         this.description = description;
-        this.resolutionType = resolutionType;
     }
     
     // Getters and Setters
@@ -34,21 +32,15 @@ public class IncidentResolution {
         this.description = description;
     }
     
-    public String getResolutionType() {
-        return resolutionType;
-    }
-    
-    public void setResolutionType(String resolutionType) {
-        this.resolutionType = resolutionType;
-    }
-    
+
     //קבלת זמן הפתרון כמחרוזת
     public String getFormattedResolutionTime() {
         return resolutionTime.toString().replace("T", " ");
     }
-    
+
     @Override
     public String toString() {
-        return "פתרון (" + resolutionType + "): " + description + " - זמן: " + getFormattedResolutionTime();
+        return "פתרון: " + description + " - זמן: " + getFormattedResolutionTime();
     }
+
 }

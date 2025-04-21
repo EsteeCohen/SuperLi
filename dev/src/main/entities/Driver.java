@@ -7,6 +7,7 @@ public class Driver {
     private String name;
     private String phone;
     private LicenseType licenseType;
+    private boolean isAvailable;
     
     //----------------- Constructors -------------------
     public Driver(String id, String name, String phone, LicenseType licenseType) {
@@ -14,6 +15,7 @@ public class Driver {
         this.name = name;
         this.phone = phone;
         this.licenseType = licenseType;
+        this.isAvailable = true;
     }
 
     //----------------- Getters and Setters -------------------
@@ -41,11 +43,18 @@ public class Driver {
     public void setLicenseType(LicenseType licenseType) {
         this.licenseType = licenseType;
     }
+    public boolean isAvailable() {
+        return isAvailable;
+    }
+    public void available() {
+        this.isAvailable = true;
+    }
+
+    public void unavailable() {
+        this.isAvailable = false;
+    }
     //----------------- methods -------------------
     public boolean canDrive(Truck truck){
-        if (truck==null){
-            return false;
-        }
         return this.licenseType.ordinal() >= truck.getLicenseType().ordinal();
     }
 
@@ -64,12 +73,12 @@ public class Driver {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Driver)) return false;
-
-        Driver that = (Driver) o;
-
-        if (!id.equals(that.id)) return false;
-        if (!name.equals(that.name)) return false;
-        if (!phone.equals(that.phone)) return false;
-        return licenseType == that.licenseType;
+        return id.equals(((Driver) o).id); //id is unique
+//        Driver that = (Driver) o;
+//
+//        if (!id.equals(that.id)) return false;
+//        if (!name.equals(that.name)) return false;
+//        if (!phone.equals(that.phone)) return false;
+//        return licenseType == that.licenseType;
     }
 }

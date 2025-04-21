@@ -18,7 +18,7 @@ public class IncidentController {
     }
     
     // דיווח על תקלה
-    public boolean reportIncident(String transportId, String type, String description) {
+    public boolean reportIncident(int transportId, String type, String description) {
         try {
             IncidentType incidentType = IncidentType.valueOf(type);
             return incidentService.reportIncident(transportId, incidentType, description);
@@ -38,8 +38,8 @@ public class IncidentController {
     }
     
     // הוספת פתרון לתקלה
-    public boolean addResolution(String incidentId, String description, String resolutionType) {
-        return incidentService.addResolution(incidentId, description, resolutionType);
+    public boolean setResolution(String incidentId, String description, String resolutionType) {
+        return incidentService.setResolution(incidentId, description);
     }
     
     // מחזירה את כל התקלות הפעילות עבור הובלה
@@ -48,7 +48,7 @@ public class IncidentController {
     }
     
     // קבלת תקלות לפי הובלה
-    public List<Incident> getIncidentsByTransport(String transportId) {
+    public List<Incident> getIncidentsByTransport(int transportId) {
         return incidentService.getIncidentsByTransport(transportId);
     }
     
@@ -83,7 +83,7 @@ public class IncidentController {
     }
     
     // קבלת כל התקלות לפי הובלה
-    public boolean hasActiveIncidents(String transportId) {
+    public boolean hasActiveIncidents(int transportId) {
         return incidentService.hasActiveIncidents(transportId);
     }
 }

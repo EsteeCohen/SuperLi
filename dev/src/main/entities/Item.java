@@ -39,5 +39,20 @@ public class Item {
     public double getTotalWeight(){
         return weight * quantity;
     }
+    @Override
+    public String toString() {
+        return "פריט #" + id + ": " + name +
+                ", כמות: " + quantity +
+                ", משקל ליחידה: " + weight + " ק\"ג" +
+                ", משקל כולל: " + getTotalWeight() + " ק\"ג";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Item item)) return false;
+        return this.id == item.id;
+    }
+
 
 }

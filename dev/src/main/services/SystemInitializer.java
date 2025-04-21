@@ -68,95 +68,96 @@ public class SystemInitializer {
     // אתחול הובלות
     private void initializeTransports() {
         // תאריכים לדוגמה להובלות
-        LocalDate date1 = LocalDate.of(2025, 4, 20);
-        LocalDate date2 = LocalDate.of(2025, 4, 21);
-        LocalDate date3 = LocalDate.of(2025, 4, 22);
+        LocalDate date1 = LocalDate.of(2026, 4, 20);
+        LocalDate date2 = LocalDate.of(2026, 4, 21);
+        LocalDate date3 = LocalDate.of(2026, 4, 22);
         
         // שעות לדוגמה להובלות
         LocalTime time1 = LocalTime.of(8, 0);
         LocalTime time2 = LocalTime.of(9, 30);
         LocalTime time3 = LocalTime.of(10, 0);
         
-        // קבלת רפרנסים לישויות
-        Truck truck1 = truckService.getTruckByRegNumber("12-345-67");
-        Truck truck2 = truckService.getTruckByRegNumber("23-456-78");
-        Truck truck3 = truckService.getTruckByRegNumber("34-567-89");
-        
-        Driver driver1 = driverService.getDriverById("234567890");
-        Driver driver2 = driverService.getDriverById("123456789");
-        Driver driver3 = driverService.getDriverById("345678901");
-        
-        Site sourceSite = siteService.getSiteById("SITE001");
-        Site destinationSite1 = siteService.getSiteById("SITE002");
-        Site destinationSite2 = siteService.getSiteById("SITE003");
-        Site destinationSite3 = siteService.getSiteById("SITE004");
-        
-        // יצירת רשימות יעדים
-        List<Site> destinations1 = new ArrayList<>();
-        destinations1.add(destinationSite1);
-        
-        List<Site> destinations2 = new ArrayList<>();
-        destinations2.add(destinationSite2);
-        
-        List<Site> destinations3 = new ArrayList<>();
-        destinations3.add(destinationSite3);
-        
-        // יצירת הובלות
-        Transport transport1 = new Transport("TRN001", date1, time1, truck1, driver1, sourceSite, destinations1);
-        transport1.setStatus(TransportStatus.PLANNING);
-        
-        Transport transport2 = new Transport("TRN002", date2, time2, truck2, driver2, sourceSite, destinations2);
-        transport2.setStatus(TransportStatus.PLANNING);
-        
-        Transport transport3 = new Transport("TRN003", date3, time3, truck3, driver3, sourceSite, destinations3);
-        transport3.setStatus(TransportStatus.PLANNING);
-        
-        // הוספה למאגר
-        transportService.addTransport(transport1);
-        transportService.addTransport(transport2);
-        transportService.addTransport(transport3);
+//        // קבלת רפרנסים לישויות
+//        Truck truck1 = truckService.getTruckByRegNumber("12-345-67");
+//        Truck truck2 = truckService.getTruckByRegNumber("23-456-78");
+//        Truck truck3 = truckService.getTruckByRegNumber("34-567-89");
+//
+//        Driver driver1 = driverService.getDriverById("234567890");
+//        Driver driver2 = driverService.getDriverById("123456789");
+//        Driver driver3 = driverService.getDriverById("345678901");
+//
+//        Site sourceSite = siteService.getSiteById("SITE001");
+//        Site destinationSite1 = siteService.getSiteById("SITE002");
+//        Site destinationSite2 = siteService.getSiteById("SITE003");
+//        Site destinationSite3 = siteService.getSiteById("SITE004");
+//
+//        // יצירת רשימות יעדים
+//        List<Site> destinations1 = new ArrayList<>();
+//        destinations1.add(destinationSite1);
+//
+//        List<Site> destinations2 = new ArrayList<>();
+//        destinations2.add(destinationSite2);
+//
+//        List<Site> destinations3 = new ArrayList<>();
+//        destinations3.add(destinationSite3);
+//
+//        // יצירת הובלות
+//        Transport transport1 = transportService.createTransport(date1, time1, "12-345-67", "234567890", "SITE001", List.of("SITE002"));
+//
+//        transport1.setStatus(TransportStatus.PLANNING);
+//
+//        Transport transport2 = new Transport( date2, time2, truck2, driver2, sourceSite, destinations2);
+//        transport2.setStatus(TransportStatus.PLANNING);
+//
+//        Transport transport3 = new Transport( date3, time3, truck3, driver3, sourceSite, destinations3);
+//        transport3.setStatus(TransportStatus.PLANNING);
+        Transport transport1 = transportService.createTransport(
+                date1, time1, "12-345-67", "234567890", "SITE001", List.of("SITE002"));
+
+        Transport transport2 = transportService.createTransport(
+                date2, time2, "23-456-78", "123456789", "SITE001", List.of("SITE003"));
+
+        Transport transport3 = transportService.createTransport(
+                date3, time3, "34-567-89", "345678901", "SITE001", List.of("SITE004"));
+
     }
 
     // אתחול הזמנות
     private void initializeOrders() {
         // דוגמה להזמנות בסיסיות המקושרות להובלות
         // הנחה: מחלקת Order כבר מוגדרת
-        Transport transport1 = transportService.getTransportById("TRN001");
-        Transport transport2 = transportService.getTransportById("TRN002");
-        Transport transport3 = transportService.getTransportById("TRN003");
+        Transport transport1 = transportService.getTransportById(1);
+        Transport transport2 = transportService.getTransportById(2);
+        Transport transport3 = transportService.getTransportById(3);
         
         Site site1 = siteService.getSiteById("SITE002");
         Site site2 = siteService.getSiteById("SITE003");
         Site site3 = siteService.getSiteById("SITE004");
         
         // יצירת פריטים לדוגמה
-        Item item1 = new Item("ITEM001", "מקרר", 5, 300);
-        Item item2 = new Item("ITEM002", "טלוויזיה", 10, 25);
-        Item item3 = new Item("ITEM003", "מכונת כביסה", 8, 150);
+        Item item1 = new Item(122, "מקרר", 5, 300);
+        Item item2 = new Item(123, "טלוויזיה", 10, 25);
+        Item item3 = new Item(124, "מכונת כביסה", 8, 150);
         
         // יצירת הזמנות
-        Order order1 = new Order("ORD001", transport1.getDate(), site1, new ArrayList<>());
-        order1.addItem(item1);
-        order1.addItem(item2);
-        order1.assignToTransport(transport1);
-        order1.setStatus(OrderStatus.CREATED);
-        
-        Order order2 = new Order("ORD002", transport2.getDate(), site2, new ArrayList<>());
-        order2.addItem(item2);
-        order2.addItem(item3);
-        order2.assignToTransport(transport2);
-        order2.setStatus(OrderStatus.CREATED);
-        
-        Order order3 = new Order("ORD003", transport3.getDate(), site3, new ArrayList<>());
-        order3.addItem(item1);
-        order3.addItem(item3);
-        order3.assignToTransport(transport3);
-        order3.setStatus(OrderStatus.CREATED);
-        
-        // הוספה למאגר
-        orderService.addOrder(order1);
-        orderService.addOrder(order2);
-        orderService.addOrder(order3);
+        List<Item> items1 = new ArrayList<>();
+        items1.add(item1);
+        items1.add(item2);
+        Order order1 = new Order(transport1.getDate(), site1, items1);
+        orderService.assignTransportToOrder(order1.getId(), transport1.getId());
+
+        List<Item> items2 = new ArrayList<>();
+        items2.add(item2);
+        items2.add(item3);
+        Order order2 = new Order(transport2.getDate(), site2, items2);
+        orderService.assignTransportToOrder(order2.getId(), transport2.getId());
+
+        List<Item> items3 = new ArrayList<>();
+        items3.add(item1);
+        items3.add(item3);
+        Order order3 = new Order(transport3.getDate(), site3, items3);
+        orderService.assignTransportToOrder(order3.getId(), transport3.getId());
+
     }
 
     // אתחול לוחות זמנים
@@ -167,9 +168,9 @@ public class SystemInitializer {
         Driver driver3 = driverService.getDriverById("345678901");
         
         // קבלת הובלות מהשירות
-        Transport transport1 = transportService.getTransportById("TRN001");
-        Transport transport2 = transportService.getTransportById("TRN002");
-        Transport transport3 = transportService.getTransportById("TRN003");
+        Transport transport1 = transportService.getTransportById(1);
+        Transport transport2 = transportService.getTransportById(2);
+        Transport transport3 = transportService.getTransportById(3);
         
         // יצירת לוחות זמנים
         DriverSchedule schedule1 = new DriverSchedule("SCH001", driver1, transport1.getDate());
@@ -236,12 +237,11 @@ public class SystemInitializer {
     // אתחול תקלות
     private void initializeIncidents() {
         // נוסיף תקלה אחת לדוגמה
-        Transport transport2 = transportService.getTransportById("TRN002");
+        Transport transport2 = transportService.getTransportById(1);
         
         // יצירת תקלה
         Incident incident = new Incident(
-            "INC001", 
-            LocalDate.of(2025, 4, 20).atTime(15, 30), 
+            "INC001",
             IncidentType.ROAD_CLOSURE, 
             "חסימה בכביש 1 לירושלים עקב תאונת דרכים",
             transport2
@@ -252,17 +252,14 @@ public class SystemInitializer {
         IncidentResolution resolution = new IncidentResolution(
             "RES001", 
             LocalDate.of(2025, 4, 20).atTime(16, 0),
-            "שינוי מסלול דרך כביש 443",
-            "שינוי מסלול"
+            "שינוי מסלול דרך כביש 443"
         );
         
         // הוספת פתרון לתקלה
-        incident.addResolution(resolution);
+        incident.setResolution(resolution);
         
         // עדכון סטטוס
         incident.setStatus(IncidentStatus.IN_PROGRESS);
-        
-        // הוספה למאגר
-        incidentService.addIncident(incident);
+
     }
 }

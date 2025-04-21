@@ -96,46 +96,46 @@ public class MainUI {
                 switch (choice) {
                     case 1:
                         if (hasAccess("TRANSPORT")) {
-                            transportUI.start(sessionId);
+                            transportUI.start();
                         } else {
                             showAccessDenied();
                         }
                         break;
                     case 2:
                         if (hasAccess("FLEET")) {
-                            fleetUI.start(sessionId);
+                            fleetUI.start();
                         } else {
                             showAccessDenied();
                         }
                         break;
                     case 3:
                         if (hasAccess("SITE")) {
-                            siteUI.start(sessionId);
+                            siteUI.start();
                         } else {
                             showAccessDenied();
                         }
                         break;
                     case 4:
                         if (hasAccess("ORDER")) {
-                            orderUI.start(sessionId);
+                            orderUI.start();
                         } else {
                             showAccessDenied();
                         }
                         break;
                     case 5:
                         if (hasAccess("SCHEDULE")) {
-                            scheduleUI.start(sessionId);
+                            scheduleUI.start();
                         } else {
                             showAccessDenied();
                         }
                         break;
-                    case 6:
-                        if (hasAccess("INCIDENT")) {
-                            incidentUI.start(sessionId);
-                        } else {
-                            showAccessDenied();
-                        }
-                        break;
+//                    case 6:
+//                        if (hasAccess("INCIDENT")) {
+//                            incidentUI.start();
+//                        } else {
+//                            showAccessDenied();
+//                        }
+//                        break;
                     case 7:
                         if (hasAccess("USER_MANAGEMENT")) {
                             userManagementUI = new UserManagementUI(userController, sessionId);

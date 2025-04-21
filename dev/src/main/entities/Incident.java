@@ -8,23 +8,23 @@ import src.main.enums.IncidentStatus;
 import src.main.enums.IncidentType;
 
 public class Incident {
-    private String id;
-    private LocalDateTime reportTime;
-    private IncidentType type;
+    private final String id;
+    private final LocalDateTime reportTime;
+    private final IncidentType type;
     private String description;
-    private Transport affectedTransport;
+    private final Transport affectedTransport;
     private IncidentStatus status;
-    private List<IncidentResolution> resolutions;
+    private IncidentResolution resolution;
     
     //בנאי לתקלה חדשה
-    public Incident(String id, LocalDateTime reportTime, IncidentType type, String description, Transport affectedTransport) {
+    public Incident(String id, IncidentType type, String description, Transport affectedTransport) {
         this.id = id;
-        this.reportTime = reportTime;
+        this.reportTime = LocalDateTime.now();
         this.type = type;
         this.description = description;
         this.affectedTransport = affectedTransport;
         this.status = IncidentStatus.REPORTED;
-        this.resolutions = new ArrayList<>();
+        this.resolution = null;
     }
     
     // Getters and Setters
@@ -61,28 +61,24 @@ public class Incident {
         this.status = status;
     }
     
-    public List<IncidentResolution> getResolutions() {
-        return new ArrayList<>(resolutions);
+    public IncidentResolution getResolution() {
+        return resolution;
     }
     
-    //הוספת פתרון לתקלה
-    public void addResolution(IncidentResolution resolution) {
+    public void setResolution(IncidentResolution resolution) {
         if (resolution != null) {
-            this.resolutions.add(resolution);
+            this.resolution = resolution;
+            this.status = IncidentStatus.RESOLVED;
         }
-    }
-    
-    //קבלת הפתרון האחרון שהוסף
-    public IncidentResolution getLatestResolution() {
-        if (this.resolutions.isEmpty()) {
-            return null;
-        }
-        return this.resolutions.get(this.resolutions.size() - 1);
     }
     
     //בדיקה האם יש לתקלה פתרון כלשהו
     public boolean hasResolution() {
-        return !this.resolutions.isEmpty();
+        return !(this.resolution ==null);
+    }
+
+    public void cancelIncident() {
+        this.status = IncidentStatus.CANCELLED;
     }
     
     //קבלת זמן הדיווח על התקלה כמחרוזת
@@ -99,14 +95,8 @@ public class Incident {
         sb.append("תיאור: ").append(description).append("\n");
         sb.append("הובלה מושפעת: ").append(affectedTransport.getId()).append("\n");
         sb.append("סטטוס: ").append(status).append("\n");
-        
-        if (!resolutions.isEmpty()) {
-            sb.append("פתרונות:\n");
-            for (IncidentResolution resolution : resolutions) {
-                sb.append("  - ").append(resolution.toString()).append("\n");
-            }
-        }
-        
+        sb.append("פתרון: ").append(resolution.toString()).append("\n");
+
         return sb.toString();
     }
 }

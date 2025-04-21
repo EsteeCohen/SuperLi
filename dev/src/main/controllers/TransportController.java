@@ -1,6 +1,8 @@
 package src.main.controllers;
 
-import BussinessLayer.Transport;
+import src.main.entities.Transport;
+import src.main.enums.ShippingZone;
+import src.main.enums.TransportStatus;
 import src.main.services.TransportService;
 import src.main.entities.Item;
 
@@ -15,8 +17,8 @@ public class TransportController {
         this.transportService = transportService;
     }
 
-    public Transport createTransport(LocalDate date, LocalTime time, String truckId, String driverId, String sourceId, List<String> destinationIds, double weight) {
-        return transportService.createTransport(date, time, truckId, driverId, sourceId, destinationIds, weight);
+    public Transport createTransport(LocalDate date, LocalTime time, String truckId, String driverId, String sourceId, List<String> destinationIds) {
+        return transportService.createTransport(date, time, truckId, driverId, sourceId, destinationIds);
     }
     public List<Transport> getAllTransports() {
         return transportService.getAllTransports();
@@ -62,8 +64,5 @@ public class TransportController {
         return transportService.cancelTransport(id);
     }
 
-    public boolean validateTransport(Transport transport) {
-        return transportService.validateTransport(transport);
-    }
 
 }

@@ -5,9 +5,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import BussinessLayer.Transport;
-import src.main.entities.Site;
-import src.main.entities.Truck;
+import src.main.entities.*;
 import src.main.enums.ShippingZone;
 import src.main.enums.TransportStatus;
 
@@ -16,12 +14,15 @@ public class TransportService {
     private TruckService truckService;
     private DriverService driverService;
     private SiteService siteService;
+    private OrderService orderService;
+
 
     // Constructor
-    public TransportService(TruckService truckService, DriverService driverService, SiteService siteService){
+    public TransportService(TruckService truckService, DriverService driverService, SiteService siteService, OrderService orderService){
         this.truckService = truckService;
         this.driverService = driverService;
         this.siteService = siteService;
+        this.orderService = orderService;
     }
     // Methods
     public Transport createTransport(LocalDate date, LocalTime time, String truckId, String driverId, String sourceId, List<String> destinationIds){
@@ -75,20 +76,21 @@ public class TransportService {
         }
         return result;
     }
+
     public boolean updateTransportStatus(int id, TransportStatus newStatus){
         Transport t = getTransportById(id);
         if (t == null) return false;
         t.setStatus(newStatus);
         return true;
     }
-    public boolean changeTruck(int transportId, int truckId){
+    public boolean changeTruck(int transportId, String truckId){
         Transport t = getTransportById(transportId);
         Truck truck = truckService.getTruckByRegNumber(truckId);
         if (t == null || truck == null) return false;
         t.setTruck(truck);
         return true;
     }
-    public boolean changeDriver(int transportId, int driverId){
+    public boolean changeDriver(int transportId, String driverId){
         Transport t = getTransportById(transportId);
         Driver driver = driverService.getDriverById(driverId);
         if (t == null || driver == null) return false;
@@ -101,14 +103,16 @@ public class TransportService {
 
         List<Site> destinations = transport.getDestinations();
         if (!destinations.isEmpty()) {
-            ShippingZone zone = destinations.get(0).getShippingZone();
+            ShippingZone zone = destinations.getFirst().getShippingZone();
             if (site.getShippingZone() != zone) return false;
         }
-        destinations.add(site);
+        if (!destinations.contains(site)) {
+            destinations.add(site);
+        }
         return true;
     }
 
-    public boolean removeDestination(int transportId, String siteId) {//removes items to this destination?
+    public boolean removeDestination(int transportId, String siteId) {
         Transport transport = getTransportById(transportId);
         if (transport == null) return false;
 
@@ -118,14 +122,17 @@ public class TransportService {
 
     public boolean cancelTransport(int id){
         Transport t = getTransportById(id);
-        if (t == null) return false;
+        if (t == null)
+            return false;
         if (t.canBeCancelled()) {
+            List<Order> ordersToCancel = orderService.getOrdersInTransport(id);
+            for (Order o : ordersToCancel) {
+                orderService.cancelOrder(o.getId());
+            }
             t.setStatus(TransportStatus.CANCELLED);
             return true;
         }
         return false;
     }
-    public boolean validateTransport(Transport transport){
-        return transport.isWeightValid() && transport.isDriverLicenseValid() && transport.areDestinationsValid();
-    }
+
 }

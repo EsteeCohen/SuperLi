@@ -8,6 +8,7 @@ public class Truck {
     private double emptyWeight;
     private double maxWeight;
     private LicenseType licenseType;
+    private boolean isAvailable;
 
     //----------------- Constructors -------------------
     public Truck(String regNumber, String model, double emptyWeight, double maxWeight, LicenseType licenseType) {
@@ -16,6 +17,7 @@ public class Truck {
         this.emptyWeight = emptyWeight;
         this.maxWeight = maxWeight;
         this.licenseType = licenseType;
+        this.isAvailable = true;
     }
     //----------------- Getters and Setters -------------------
     public String getRegNumber() {
@@ -47,6 +49,16 @@ public class Truck {
     }
     public void setLicenseType(LicenseType licenseType) {
         this.licenseType = licenseType;
+    }
+    public boolean isAvailable() {
+        return isAvailable;
+    }
+    public void available() {
+        this.isAvailable = true;
+    }
+
+    public void unavailable() {
+        this.isAvailable = false;
     }
     //----------------- methods -------------------
     public boolean canCarryLoad(double cargoWeight) {

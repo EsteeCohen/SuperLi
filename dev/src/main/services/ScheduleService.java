@@ -68,7 +68,7 @@ public class ScheduleService {
      * הוספת רשומה ללוח זמנים
      */
     public boolean addScheduleEntry(String scheduleId, LocalTime startTime, LocalTime endTime, 
-                                  String transportId, EntryType type, String description) {
+                                  int transportId, EntryType type, String description) {
         DriverSchedule schedule = getScheduleById(scheduleId);
         
         if (schedule == null) {

@@ -26,8 +26,8 @@ public class FleetUI {
     }
     
     //התחלת ממשק ניהול צי רכב
-    public void start(String sessionId) {
-        this.sessionId = sessionId;
+    public void start() {
+//        this.sessionId = sessionId;
         
         boolean exit = false;
         
@@ -190,7 +190,7 @@ public class FleetUI {
                 licenseType = "C";
         }
         
-        Truck newTruck = truckController.addTruck(regNumber, model, emptyWeight, maxWeight, licenseType);
+        Truck newTruck = truckController.addTruck(regNumber, model, ""+emptyWeight, ""+maxWeight, licenseType);
         
         if (newTruck != null) {
             // הוספת המשאית למערכת הצליחה
@@ -284,7 +284,7 @@ public class FleetUI {
 
         // ------------- חסרה המרה למחרוזת!!! ---------------
         
-        List<Truck> trucks = truckController.getTrucksWithCapacityForWeight(minCapacity);
+        List<Truck> trucks = truckController.getTrucksWithCapacityForWeight(""+minCapacity);
         
         if (trucks.isEmpty()) {
             System.out.println("אין משאיות עם קיבולת מעל " + minCapacity + " ק\"ג.");

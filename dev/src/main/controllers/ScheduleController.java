@@ -41,7 +41,7 @@ public class ScheduleController {
     
     // הוספת רשומה ללוח זמנים
     public boolean addScheduleEntry(String scheduleId, LocalTime startTime, LocalTime endTime, 
-                                  String transportId, String entryTypeStr, String description) {
+                                  int transportId, String entryTypeStr, String description) {
         try {
             EntryType entryType = EntryType.valueOf(entryTypeStr);
             return scheduleService.addScheduleEntry(scheduleId, startTime, endTime, transportId, entryType, description);
@@ -52,7 +52,7 @@ public class ScheduleController {
     
     // הוספת רשומה ללוח זמנים (עם שעות כמחרוזות)
     public boolean addScheduleEntry(String scheduleId, String startTimeStr, String endTimeStr, 
-                                  String transportId, String entryTypeStr, String description) {
+                                  int transportId, String entryTypeStr, String description) {
         try {
             LocalTime startTime = LocalTime.parse(startTimeStr, timeFormatter);
             LocalTime endTime = LocalTime.parse(endTimeStr, timeFormatter);

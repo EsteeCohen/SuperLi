@@ -6,7 +6,7 @@ import src.main.enums.OrderStatus;
 
 
 public class Order {
-    private int id;
+    private final int id;
     private static int idCounter = 1;
     private LocalDate date;
     private Site site;
@@ -72,15 +72,40 @@ public class Order {
         return totalWeight;
     }
 
-    public double totalWeight() {
-        if (transport == null) {
-            return OrderWeight();
-        }
-        return OrderWeight() + transport.getTruck().getEmptyWeight();
-    }
     public boolean canBeCancelled(){
         return status == OrderStatus.CREATED;
     }
 
+    //----------------- toString -------------------
+    private String getItemsString() {
+        if (items == null || items.isEmpty()) {
+            return "אין פריטים";
+        }
+
+        StringBuilder sb = new StringBuilder();
+        for (Item item : items) {
+            sb.append(", ").append(item.toString()).append("\n");
+        }
+        return sb.toString();
+    }
+
+    @Override
+    public String toString() {
+        return "מזהה הזמנה: " + id +
+                ", תאריך: " + (date != null ? date.toString() : "לא צוין") +
+                ", אתר: " + (site != null ? site.getName() : "לא צוין") +
+                ", סטטוס: " + status +
+                "\nמשקל כולל: " + OrderWeight() + " ק\"ג" +
+                (transport != null ? "\nמקושרת להובלה: #" + transport.getId() : "\nללא הובלה") +
+                "\nפריטים:\n" + getItemsString();
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Order order)) return false;
+        return this.id == order.id;
+    }
 
 }
