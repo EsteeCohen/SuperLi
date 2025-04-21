@@ -104,13 +104,23 @@ public class ProductFacade
         else return productsByName.get(productName).GetStorageQuantity();
     }
 
-    public void addSupply(String productName, int cost, LocalDate experationDate,int shelfQuantity,int storageQuantity) throws Exception
+    /**
+     * adds a new supply of a product
+     * @param productName the product the supply belongs to
+     * @param cost how much did the supermarket payed per item
+     * @param expirationDate when does the supply get expired
+     * @param shelfQuantity how many are on the shelfs
+     * @param storageQuantity how many are in the storage
+     * @return the supply id
+     * @throws Exception if product not found or either of the quantities or cost in negative
+     */
+    public int addSupply(String productName, int cost, LocalDate expirationDate,int shelfQuantity,int storageQuantity) throws Exception
     {
         Product p=getProduct(productName);
         if(p==null)
             throw new Exception("Product "+productName+" does not exist!");
 
-        p.addSupply(cost,experationDate,shelfQuantity,storageQuantity);
+        return p.addSupply(cost,expirationDate,shelfQuantity,storageQuantity);
     }
     //for tests!!!!
     //gets a product by its name

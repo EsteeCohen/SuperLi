@@ -51,7 +51,7 @@ public class presentation {
         System.out.println();
 
         System.out.println("to add a new product to the system:");
-        System.out.println("ADD 'productName' 'category' [subCategories] 'manufacturer' 'sellPrice'");
+        System.out.println("ADD 'productName' 'category' [subCategories] 'manufacturer' 'sellPrice' 'shelfLocation' 'storageLocation'");
         System.out.println();
 
         System.out.println("to set a discount on a specific product:");
