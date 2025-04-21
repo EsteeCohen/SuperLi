@@ -1,5 +1,6 @@
 package DomainLayer;
 
+//class mainly used to hold sales data to allow creating a report
 class Sale {
     private int quantity;
     private final double basePrice;
@@ -23,10 +24,19 @@ class Sale {
         return discoundtPrecentage;
     }
 
+    /**
+     * calculates the actual price per product that were paid
+     * @return hw much did the customer pay per product
+     */
     double getTotalPrice()
     {
-        return basePrice*discoundtPrecentage/100;
+        return basePrice*(1-discoundtPrecentage/100);
     }
+
+    /**
+     * caculates the total revenue from this sale
+     * @return totalprice*quantity
+     */
     double getTotalRevenue()
     {
         return getTotalPrice()*quantity;
