@@ -2,21 +2,25 @@ package DomainLayer;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class ProductFacade
 {
-    private Map<String, List<Product>> productsByCategory;
-    private Map<String, Product> productsByName;
+    private final Map<String, List<Product>> productsByCategory=new HashMap<>();
+    private final Map<String, Product> productsByName=new HashMap<>();
 
     public void AddProduct(String productName, String category, List<String> subCategories, String manufacturer, int sellPrice) throws Exception
     {
-        if (!productsByCategory.containsKey(productName))
+        if(getProduct(productName)!=null)
+            throw new Exception("Product with name: "+productName+" already exists!");
+        if (!productsByCategory.containsKey(category))
             productsByCategory.put(category, new ArrayList<>());
-        productsByCategory.get(category).add(new Product(productName, subCategories, manufacturer, sellPrice));
+        Product product=new Product(productName, subCategories, manufacturer, sellPrice);
+        productsByCategory.get(category).add(product);
 
-        productsByName.put(productName, new Product(productName, subCategories, manufacturer, sellPrice));
+        productsByName.put(productName, product);
     }
     void SetDiscountForProduct(String productName, LocalDate startDate, LocalDate endDate, double percentage) throws Exception
     {
@@ -35,7 +39,10 @@ public class ProductFacade
             throw new Exception("No category is named " + productCategory);
         else if (products.isEmpty())
             throw new Exception("Category is empty");
-        else for (Product product : products) product.SetDiscount(new Discount(startDate, endDate, percentage));
+        else {
+            for (Product product : products)
+                product.SetDiscount(new Discount(startDate, endDate, percentage));
+        }
     }
     public void SetDiscount(String productName, LocalDate startDate, LocalDate endDate, double percentage) throws Exception
     {

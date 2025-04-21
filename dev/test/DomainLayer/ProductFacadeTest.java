@@ -45,13 +45,23 @@ class ProductFacadeTest {
 
         //try to discount an existing product
         assertNull(facade.getProduct("11").getDiscount());
-        assertDoesNotThrow(()->{facade.SetDiscount("11", LocalDate.now(),LocalDate.now(),10);});
-        assertNotNull(facade.getProduct("11"));
+        assertNull(facade.getProduct("12").getDiscount());
+        assertDoesNotThrow(()->{facade.SetDiscountForCategory("1", LocalDate.now(),LocalDate.now(),10);});
         assertNotNull(facade.getProduct("11").getDiscount());
+        assertNotNull(facade.getProduct("12").getDiscount());
     }
 
     @Test
     void setDiscountForCategory() {
+        //try to discount a non existing category, should result in an error
+        assertThrows(Exception.class,()->{facade.SetDiscountForCategory("0", LocalDate.now(),LocalDate.now(),10);});
+
+        //try to discount an existing category
+        assertNull(facade.getProduct("11").getDiscount());
+        assertNull(facade.getProduct("12").getDiscount());
+        assertDoesNotThrow(()->{facade.SetDiscount("11", LocalDate.now(),LocalDate.now(),10);});
+        assertNotNull(facade.getProduct("11"));
+        assertNotNull(facade.getProduct("11").getDiscount());
     }
 
     @Test
