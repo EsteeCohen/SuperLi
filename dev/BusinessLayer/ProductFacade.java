@@ -1,5 +1,8 @@
 package BusinessLayer;
 
+import ServiceLayer.ProductService;
+
+import java.sql.Array;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Dictionary;
@@ -19,7 +22,8 @@ public class ProductFacade
 
         productsByName.put(productName, new Product(productName, subCategories, manufacturer, sellPrice));
     }
-    void SetDiscountForProduct(String productName, LocalDate startDate, LocalDate endDate, double percentage) throws Exception
+
+    public void SetDiscountForProduct(String productName, LocalDate startDate, LocalDate endDate, double percentage) throws Exception
     {
         if (!productsByName.containsKey(productName))
             throw new Exception("No product is named " + productName);
@@ -28,6 +32,7 @@ public class ProductFacade
             productsByName.get(productName).SetDiscount(new Discount(startDate, endDate, percentage));
         }
     }
+
     public void SetDiscountForCategory(String productCategory, LocalDate startDate, LocalDate endDate, double percentage) throws Exception
     {
         List<Product> products = productsByCategory.get(productCategory);
@@ -38,22 +43,46 @@ public class ProductFacade
             throw new Exception("Category is empty");
         else for (Product product : products) product.SetDiscount(new Discount(startDate, endDate, percentage));
     }
+
     public void SetDiscount(String productName, LocalDate startDate, LocalDate endDate, double percentage) throws Exception
     {
         if (!productsByName.containsKey(productName))
             throw new Exception("No product is named " + productName);
         else productsByName.get(productName).SetDiscount(new Discount(startDate, endDate, percentage));
     }
+
+    //צריך את זה בכלל?
     public int GetShelfQuantity(String productName) throws Exception
     {
         if (!productsByName.containsKey(productName))
             throw new Exception("No product is named " + productName);
         else return productsByName.get(productName).GetShelfQuantity();
     }
+
+    //צריך את זה בכלל?
     public int GetStorageQuantity(String productName) throws Exception
     {
         if (!productsByName.containsKey(productName))
             throw new Exception("No product is named " + productName);
         else return productsByName.get(productName).GetStorageQuantity();
     }
+
+    List<Product> GetAllProducts()
+    {
+        return new ArrayList<>(productsByName.values());
+    }
+    List<Product> GetProductsByCategory(String category)
+    {
+        return productsByCategory.get(category);
+    }
+    List<Product> GetProductsByCategories(List<String> categories)
+    {
+        List<Product> products = new ArrayList<>();
+        for (int i = 0; i < categories.size(); i++)
+        {
+            products.addAll(GetProductsByCategory(categories.get(i)));
+        }
+        return products;
+    }
+
 }

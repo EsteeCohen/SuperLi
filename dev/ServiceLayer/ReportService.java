@@ -9,7 +9,7 @@ public class ReportService
 {
     protected ReportFacade rf;
 
-    public String GenerateExpiryReport(LocalDate start, LocalDate end)
+    public String GenerateExpiryReport(LocalDate until)
     {
         return null;
     }

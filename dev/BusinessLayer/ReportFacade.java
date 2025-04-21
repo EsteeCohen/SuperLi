@@ -1,27 +1,54 @@
 package BusinessLayer;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ReportFacade
 {
-    private List<ExpiryReport> expiryReports;
-    private List<InventoryReport> inventoryReports;
+    List<DamageReport> damageReports;
+    List<ExpiryReport> expiryReports;
+    List<InventoryReport> inventoryReports;
 
-    String generateExpiryReport(LocalDate start, LocalDate end)
+    ProductFacade pf;
+
+    public void GenerateExpiryReport(LocalDate until)
     {
-        return null;
+        List<Product> allProducts = pf.GetAllProducts();
+        ExpiryReport expiryReport = new ExpiryReport();
+
+        for (Product product : allProducts) {
+            ExpiryDesc currentDesc = product.GetExpiryDescription(until);
+            if (currentDesc.isNotEmpty())
+                expiryReport.add(currentDesc);
+        }
+        expiryReports.add(expiryReport);
     }
-    String generateInventoryReport(String category)
+    public void GenerateInventoryReport(String category)
     {
-        return null;
+        InventoryReport inventoryReport = new InventoryReport();
+        List<Product> products = pf.GetProductsByCategory(category);
+
+        for (Product product : products) {
+            inventoryReport.add(product.GetInventoryDescription());
+        }
+        inventoryReports.add(inventoryReport);
+
     }
-    String generateInventoryReport(List<String> categories)
+    public void GenerateInventoryReport(List<String> categories)
     {
-        return null;
+        InventoryReport inventoryReport = new InventoryReport();
+        List<Product> products = pf.GetProductsByCategories(categories);
+
+        for (Product product : products) {
+            inventoryReport.add(product.GetInventoryDescription());
+        }
+        inventoryReports.add(inventoryReport);
+
     }
-    void reportExpired(String productName, int quantity)
+    public void GenerateDamageReport()
     {
 
     }
+
 }

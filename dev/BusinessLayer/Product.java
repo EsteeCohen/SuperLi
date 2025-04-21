@@ -1,10 +1,7 @@
 package BusinessLayer;
 
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 class Product {
     private final String productName;
@@ -49,7 +46,6 @@ class Product {
     {
         return this.storageQuantity;
     }
-
 
     void updateSoldQuantity(int supplyID, int storeQuantity, int storageQuantity) throws Exception
     {
@@ -125,6 +121,27 @@ class Product {
         this.storageQuantity+=storageQuantity;
         supplies.put(id,newSupply);
         return id;
+    }
+
+    public ExpiryDesc GetExpiryDescription(LocalDate until)
+    {
+        ExpiryDesc expiryDesc = new ExpiryDesc();
+
+        List<LocalDate> expiredDates = new ArrayList<>();
+        List<Supply> allSupplies = new ArrayList<>(supplies.values());
+
+        for (Supply allSupply : allSupplies) {
+            if (allSupply.expirationDate.isAfter(until))
+                expiredDates.add(allSupply.expirationDate);
+        }
+        expiryDesc.setProduct(productName);
+        expiryDesc.setExpiredDates(expiredDates);
+
+        return expiryDesc;
+    }
+    public InventoryDesc GetInventoryDescription()
+    {
+        return new InventoryDesc(productName, shelfQuantity + storageQuantity);
     }
 
     /*
