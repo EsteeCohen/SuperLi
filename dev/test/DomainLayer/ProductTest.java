@@ -29,7 +29,6 @@ class ProductTest {
 
             waterId1=water.addSupply(1, LocalDate.now(), 5, 5, "", "");
             waterId2=water.addSupply(2, LocalDate.now(), 5, 5, "", "");
-
         }
         catch (Exception ignored)
         {}
@@ -163,5 +162,40 @@ class ProductTest {
 
     @Test
     void addSupply() {
+        //check that you cant add negative quantities
+        assertThrows(Exception.class,()->{milk.addSupply(-10,LocalDate.now(),10,10,"","");});
+        assertThrows(Exception.class,()->{milk.addSupply(10,LocalDate.now(),-10,10,"","");});
+
+
+        //check that the quantities are added up correctly
+        int oldMilkShelf=milk.GetShelfQuantity();
+        int oldMilkStorage=milk.GetStorageQuantity();
+        int oldIceShelf=ice.GetShelfQuantity();
+        int oldIceStorage=ice.GetStorageQuantity();
+        int oldWaterShelf=water.GetShelfQuantity();
+        int oldWaterStorage=water.GetStorageQuantity();
+        int mid=-1,iid=-1,wid=-1;
+        try {
+            mid=milk.addSupply(1, LocalDate.now(), 10, 10, "", "");
+            iid=ice.addSupply(1, LocalDate.now(), 0, 10, "", "");
+            wid=water.addSupply(1, LocalDate.now(), 5, 5, "", "");
+
+        }
+        catch(Exception ignored){}
+        assertEquals(oldMilkShelf+10,milk.GetShelfQuantity());
+        assertEquals(oldMilkStorage+10,milk.GetStorageQuantity());
+        assertEquals(oldIceShelf,ice.GetShelfQuantity());
+        assertEquals(oldIceStorage+10,ice.GetStorageQuantity());
+        assertEquals(oldWaterShelf+5,water.GetShelfQuantity());
+        assertEquals(oldWaterStorage+5,water.GetStorageQuantity());
+
+        //ensure that the suplies were actually added to the system
+        int fmid=mid;
+        int fiid=iid;
+        int fwid=wid;
+        assertDoesNotThrow(()->{milk.updateSoldQuantity(fmid,0,0);});
+        assertDoesNotThrow(()->{ice.updateSoldQuantity(fiid,0,0);});
+        assertDoesNotThrow(()->{water.updateSoldQuantity(fwid,0,0);});
+
     }
 }
