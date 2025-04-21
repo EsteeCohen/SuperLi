@@ -31,13 +31,13 @@ class ProductTest {
             waterId2=water.addSupply(2, LocalDate.now(), 5, 5, "", "");
 
         }
-        catch (Exception e)
+        catch (Exception ignored)
         {}
     }
 
 
     @Test
-    /**
+    /*
      * ensure that updating the items as sold, it actually saves the sold data
      */
     void updateSoldQuantity() {
@@ -57,7 +57,7 @@ class ProductTest {
             ice.updateSoldQuantity(iceId1,10,0);
             water.updateSoldQuantity(waterId1,0,10);
         }
-        catch (Exception e)
+        catch (Exception ignored)
         {
 
         }
@@ -86,7 +86,7 @@ class ProductTest {
             ice.updateSoldQuantity(iceId1,1,0);
             water.updateSoldQuantity(waterId1,4,4);
         }
-        catch (Exception e){}
+        catch (Exception ignored){}
         assertEquals(oldMilkShelf+9,milk.GetShelfQuantity());
         assertEquals(oldMilkStorage-10,milk.GetStorageQuantity());
         assertEquals(oldIceShelf-9,ice.GetShelfQuantity());
@@ -107,6 +107,40 @@ class ProductTest {
 
     @Test
     void updateFoundBrokenItems() {
+        //test for correct exceptions, should happen if updated supply>old supply
+        assertThrows(Exception.class,()->{milk.updateFoundBrokenItems(milkId1,10,11);});
+        assertThrows(Exception.class,()->{milk.updateFoundBrokenItems(milkId2,21,0);});
+
+        //test for correct sales data and placements after selling nothing
+        int oldMilkShelf=milk.GetShelfQuantity();
+        int oldMilkStorage=milk.GetStorageQuantity();
+        int oldIceShelf=ice.GetShelfQuantity();
+        int oldIceStorage=ice.GetStorageQuantity();
+        int oldWaterShelf=water.GetShelfQuantity();
+        int oldWaterStorage=water.GetStorageQuantity();
+        try {
+            milk.updateFoundBrokenItems(milkId1, 10, 10);
+            ice.updateFoundBrokenItems(iceId1,10,0);
+            water.updateFoundBrokenItems(waterId1,0,10);
+        }
+        catch (Exception ignored) {}
+        assertEquals(oldMilkShelf,milk.GetShelfQuantity());
+        assertEquals(oldMilkStorage,milk.GetStorageQuantity());
+        assertNotEquals(oldIceShelf,ice.GetShelfQuantity());
+        assertNotEquals(oldIceStorage,ice.GetStorageQuantity());
+        assertNotEquals(oldWaterShelf,water.GetShelfQuantity());
+        assertNotEquals(oldWaterStorage,water.GetStorageQuantity());
+        try
+        {
+            milk.updateFoundBrokenItems(milkId1, 9, 0);
+            ice.updateFoundBrokenItems(iceId1,1,0);
+            water.updateFoundBrokenItems(waterId1,8,0);
+        }
+        catch (Exception ignored){}
+        assertEquals(11,milk.getBrokenQuantity());
+        assertEquals(9,ice.getBrokenQuantity());
+        assertEquals(2,water.getBrokenQuantity());
+
     }
 
     @Test
@@ -117,7 +151,7 @@ class ProductTest {
             ice.updateSoldQuantity(iceId1,1,0);
             water.updateSoldQuantity(waterId1,8,0);
         }
-        catch (Exception e){}
+        catch (Exception ignored){}
         milk.calcMinQuantity();
         ice.calcMinQuantity();
         water.calcMinQuantity();

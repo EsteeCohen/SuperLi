@@ -73,6 +73,11 @@ class Product {
         return minQuantity;
     }
 
+    int getBrokenQuantity()
+    {
+        return brokenQuantity;
+    }
+
     /**
      * tells the product to start counting sales from the beginning
      * should be used after getting the latest report
@@ -81,6 +86,15 @@ class Product {
     {
         latestSales=new ArrayList<>();
         latestSalesCount=0;
+    }
+
+    /**
+     * tells the product to start counting brokens from the beginning
+     * should be used after getting the latest report
+     */
+    void restartBroken()
+    {
+        brokenQuantity=0;
     }
 
     /**
@@ -116,6 +130,7 @@ class Product {
     void updateFoundBrokenItems(int supplyId, int storeQuantity, int storageQuantity) throws  Exception
     {
         int totalLost=updateQuantities(supplyId,storeQuantity,storageQuantity);
+        brokenQuantity+=totalLost;
     }
 
     /**
