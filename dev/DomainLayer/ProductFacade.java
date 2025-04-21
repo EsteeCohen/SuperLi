@@ -130,16 +130,27 @@ public class ProductFacade
     }
 
     //gets a product from within a certain category, mainly for tests
-    Product getProductFromCategory(String name,String category)
-    {
-        List<Product> products= productsByCategory.get(category);
-        if(products==null)
-            return null;
-        for(Product p:products)
-        {
-            if(p.getProductName().equals(name))
-                return  p;
-        }
+    Product getProductFromCategory(String name, String category) {
         return null;
+    }
+
+    public List<Product> GetProductsByCategories(List<String> categories)
+    {
+        List<Product> products = new ArrayList<>();
+        for (int i = 0; i < categories.size(); i++)
+        {
+            products.addAll(productsByCategory.get(categories.get(i)));
+        }
+        return products;
+    }
+
+    public List<Product> GetProductsByCategory(String category)
+    {
+        return productsByCategory.get(category);
+    }
+
+    public List<Product> GetAllProducts()
+    {
+        return new ArrayList<>(productsByName.values());
     }
 }

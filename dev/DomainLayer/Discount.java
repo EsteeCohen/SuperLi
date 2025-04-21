@@ -8,7 +8,7 @@ public class Discount {
     private final LocalDate endDate;
     private final double percentage;
 
-    Discount(LocalDate startDate, LocalDate endDate, double precentage)
+    public Discount(LocalDate startDate, LocalDate endDate, double precentage)
     {
         this.startDate=startDate;
         this.endDate=endDate;
