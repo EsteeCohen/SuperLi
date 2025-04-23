@@ -3,7 +3,6 @@ package PresetationLayer;
 import ServiceLayer.ProductService;
 import ServiceLayer.ReportService;
 
-import javax.rmi.ssl.SslRMIClientSocketFactory;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
@@ -109,7 +108,10 @@ public class presentation {
             {//just pressed enter
                 return;
             }
+            else if(args[0].equals("add"))
+            {
 
+            }
             else
             {
                 System.out.println("Unrecognized command!");
@@ -173,4 +175,65 @@ public class presentation {
     public static boolean isNumber(String str) {
         return isInteger(str) || isDouble(str);
     }
+
+    //parses and add commands
+    private void parseAdd(String[] args)
+    {
+
+    }
+
+    //parses and productDscount commands
+    private void parsePdiscount(String[] args)
+    {
+
+    }
+
+    //parses and categoryDiscount commands
+    private void parseCdiscount(String[] args)
+    {
+
+    }
+
+    //parses and add commands
+    private void parseSupply(String[] args)
+    {
+
+    }
+
+    //parses and productDscount commands
+    private void parseSold(String[] args)
+    {
+
+    }
+
+    //parses and categoryDiscount commands
+    private void parseBroke(String[] args)
+    {
+
+    }
+
+    //parses an Sreport command
+    private void parseSreport(String[] args)
+    {
+
+    }
+
+    //parses an Ireport command
+    private void parseIreport(String[] args)
+    {
+
+    }
+
+    //parses an Dreport command
+    private void parseDreport(String[] args)
+    {
+
+    }
+
+    //parses an Ereport command
+    private void parseEreport(String[] args)
+    {
+
+    }
+
 }
