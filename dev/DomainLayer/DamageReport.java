@@ -7,7 +7,23 @@ import java.util.List;
 
 class DamageReport
 {
-    private List<Product> products;
-    private LocalDate reportDate;
-    private List<String> categories;
+    private List<DamageDesc> damageDescriptions;
+    private final LocalDate reportDate;
+
+    public void add(DamageDesc damageDesc)
+    {
+        damageDescriptions.add(damageDesc);
+    }
+    public DamageReport()
+    {
+        this.reportDate = LocalDate.now();
+    }
+    public String toString()
+    {
+        StringBuilder toReturn = new StringBuilder("המוצרים שהיו פגים נכון לתאריך " + reportDate + " הם: " + "\n");
+        for (DamageDesc damageDesc : damageDescriptions) {
+            toReturn.append(damageDesc.toString()).append("\n");
+        }
+        return toReturn.toString();
+    }
 }
