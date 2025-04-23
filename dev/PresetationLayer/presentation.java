@@ -5,6 +5,9 @@ import ServiceLayer.ReportService;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 
 public class presentation {
@@ -77,6 +80,10 @@ public class presentation {
         System.out.println("SREPORT");
         System.out.println();
 
+        System.out.println("to an inventory report of a single category:");
+        System.out.println("IREPORT category");
+        System.out.println();
+
         System.out.println("to an inventory report of some categories:");
         System.out.println("IREPORT [categories]");
         System.out.println();
@@ -85,8 +92,8 @@ public class presentation {
         System.out.println("DREPORT");
         System.out.println();
 
-        System.out.println("to get a report about all expired products:");
-        System.out.println("EREPORT");
+        System.out.println("to get a report about all products that will expire until a provided date:");
+        System.out.println("EREPORT 'untilDate'");
         System.out.println();
     }
 
@@ -176,6 +183,28 @@ public class presentation {
         return isInteger(str) || isDouble(str);
     }
 
+
+
+
+    public static boolean isListFormat(String str) {
+        // Check if it starts with "[" and ends with "]"
+        if (!str.startsWith("[") || !str.endsWith("]")) {
+            return false;
+        }
+
+        // Remove brackets and split by commas
+        String content = str.substring(1, str.length() - 1);
+        String[] elements = content.split(",");
+
+        // Check if there are elements between the brackets
+        return elements.length > 0;
+    }
+    private List<String> parseList(String str)
+    {
+        String content = str.substring(1, str.length() - 1);
+        return Arrays.asList(content.split(","));
+    }
+
     //parses and add commands
     private void parseAdd(String[] args)
     {
@@ -215,25 +244,31 @@ public class presentation {
     //parses an Sreport command
     private void parseSreport(String[] args)
     {
-
+        //System.out.println(reportService.);
     }
 
     //parses an Ireport command
-    private void parseIreport(String[] args)
+    private void parseIreport(String[] args) throws Exception
     {
+        if(isListFormat(args[1]))
+            System.out.println(reportService.GenerateInventoryReport(parseList(args[1])));
+        else
+            System.out.println(reportService.GenerateInventoryReport(args[1]));
 
     }
 
     //parses an Dreport command
     private void parseDreport(String[] args)
     {
-
+        System.out.println(reportService.GenerateDamageReport());
     }
 
     //parses an Ereport command
-    private void parseEreport(String[] args)
+    private void parseEreport(String[] args) throws Exception
     {
-
+        if(!correctDate(args[1]))
+            throw new Exception("cannot parse the expiery date!");
+        System.out.println(reportService.GenerateExpiryReport(LocalDate.parse(args[1],FORMATTER)));
     }
 
 }
