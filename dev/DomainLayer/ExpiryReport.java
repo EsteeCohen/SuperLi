@@ -3,7 +3,7 @@ package DomainLayer;
 import java.time.LocalDate;
 import java.util.List;
 
-public class ExpiryReport
+class ExpiryReport
 {
     private List<ExpiryDesc> expiryDescs;
     private final LocalDate reportDate;

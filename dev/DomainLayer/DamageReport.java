@@ -5,7 +5,7 @@ import DomainLayer.Product;
 import java.time.LocalDate;
 import java.util.List;
 
-public class DamageReport
+class DamageReport
 {
     private List<DamageDesc> damageDescriptions;
     private final LocalDate reportDate;

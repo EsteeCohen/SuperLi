@@ -3,7 +3,7 @@ package DomainLayer;
 import java.time.LocalDate;
 import java.util.List;
 
-public class InventoryReport
+class InventoryReport
 {
     private List<InventoryDesc> inventoryDescs;
     private final LocalDate reportDate;

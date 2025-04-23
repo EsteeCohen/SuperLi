@@ -65,4 +65,83 @@ class ProductFacadeTest {
         assertNotNull(facade.getProduct("11").getDiscount());
         assertNotNull(facade.getProduct("12").getDiscount());
     }
+
+    @Test
+    void addSupply()
+    {
+        //try adding a supply to a non existing product, should throw exception
+        assertThrows(Exception.class,()->{ facade.addSupply("wow",1,LocalDate.now(),1,1);});
+        assertThrows(Exception.class,()->{ facade.addSupply("wawa",1,LocalDate.now(),1,1);});
+
+        //try to add a supply with negative quantity/cost, should throw exception
+        assertThrows(Exception.class,()->{ facade.addSupply("11",-1,LocalDate.now(),1,1);});
+        assertThrows(Exception.class,()->{ facade.addSupply("11",1,LocalDate.now(),-1,1);});
+        assertThrows(Exception.class,()->{ facade.addSupply("11",1,LocalDate.now(),1,-1);});
+
+        //try to add a supply with quantity 0, should throw exception
+        assertThrows(Exception.class,()->{ facade.addSupply("11",1,LocalDate.now(),0,0);});
+
+        //try to add a new supply with positive quantity, non negative cost, and to an existing product
+        int oldShelfQuantity=facade.getProduct("11").GetShelfQuantity();
+        int oldStorageQuantity=facade.getProduct("11").GetStorageQuantity();
+        assertDoesNotThrow(()->{facade.addSupply("11",1,LocalDate.now(),1,1);});
+        assertEquals(oldShelfQuantity+1,facade.getProduct("11").GetShelfQuantity());
+        assertEquals(oldStorageQuantity+1,facade.getProduct("11").GetStorageQuantity());
+    }
+
+    @Test
+    void updateSoldQuantity()
+    {
+        int supId1=0,supId2=0;
+        try {
+            supId1=facade.addSupply("11",1,LocalDate.now(),10,10);
+            supId2=facade.addSupply("11",1,LocalDate.now(),10,10);
+        }
+        catch(Exception ignored){}
+        int fsupId1=supId1,fsupId2=supId2;
+        //try to update a non existing product, should throw exception
+        assertThrows(Exception.class,()->{facade.updateSoldQuantity("50",fsupId1,1,1);});
+
+        //try to update a non existing supply, should throw exception
+        assertThrows(Exception.class,()->{facade.updateSoldQuantity("11",-1,1,1);});
+
+        //try to update a supply with such that the new quantity>old quantity, Exception
+        assertThrows(Exception.class,()->{facade.updateSoldQuantity("11",fsupId1,11,11);});
+
+        //try to update a supply with all proper things
+        int oldShelf=facade.getProduct("11").GetShelfQuantity();
+        int oldStor=facade.getProduct("11").GetStorageQuantity();
+
+        assertDoesNotThrow(()->{facade.updateSoldQuantity("11",fsupId1,1,1);});
+        assertEquals(oldShelf-9,facade.getProduct("11").GetShelfQuantity());
+        assertEquals(oldStor-9,facade.getProduct("11").GetStorageQuantity());
+    }
+
+    @Test
+    void updateBrokenQuantity()
+    {
+        int supId1=0,supId2=0;
+        try {
+            supId1=facade.addSupply("11",1,LocalDate.now(),10,10);
+            supId2=facade.addSupply("11",1,LocalDate.now(),10,10);
+        }
+        catch(Exception ignored){}
+        int fsupId1=supId1,fsupId2=supId2;
+        //try to update a non existing product, should throw exception
+        assertThrows(Exception.class,()->{facade.updateBrokenQuantity("50",fsupId1,1,1);});
+
+        //try to update a non existing supply, should throw exception
+        assertThrows(Exception.class,()->{facade.updateBrokenQuantity("11",-1,1,1);});
+
+        //try to update a supply with such that the new quantity>old quantity, Exception
+        assertThrows(Exception.class,()->{facade.updateBrokenQuantity("11",fsupId1,11,11);});
+
+        //try to update a supply with all proper things
+        int oldShelf=facade.getProduct("11").GetShelfQuantity();
+        int oldStor=facade.getProduct("11").GetStorageQuantity();
+
+        assertDoesNotThrow(()->{facade.updateBrokenQuantity("11",fsupId1,1,1);});
+        assertEquals(oldShelf-9,facade.getProduct("11").GetShelfQuantity());
+        assertEquals(oldStor-9,facade.getProduct("11").GetStorageQuantity());
+    }
 }

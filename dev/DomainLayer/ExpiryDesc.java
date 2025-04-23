@@ -3,7 +3,7 @@ package DomainLayer;
 import java.time.LocalDate;
 import java.util.List;
 
-public class ExpiryDesc
+class ExpiryDesc
 {
     private String productName;
     private List<LocalDate> expiredDates;
@@ -19,6 +19,12 @@ public class ExpiryDesc
     public boolean isNotEmpty()
     {
         return !expiredDates.isEmpty();
+    }
+
+    //used for tests, return the number of supplies
+    int getSupplyCount()
+    {
+        return expiredDates.size();
     }
 
     @Override

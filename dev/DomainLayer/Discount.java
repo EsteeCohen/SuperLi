@@ -3,7 +3,7 @@ import java.time.LocalDate;
 
 //holds an info of a discount
 //just a subclass that allows us to calc the sell price of a product
-public class Discount {
+class Discount {
     private final LocalDate startDate;
     private final LocalDate endDate;
     private final double percentage;
