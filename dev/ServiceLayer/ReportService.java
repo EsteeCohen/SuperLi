@@ -11,15 +11,23 @@ public class ReportService
 
     public String GenerateExpiryReport(LocalDate until)
     {
-        return null;
+        rf.GenerateExpiryReport(until);
+        return rf.GetLatestExpiryReport();
     }
-    public String GenerateReport(String category)
+    public String GenerateInventoryReport(String category)
     {
-        return null;
+        rf.GenerateInventoryReport(category);
+        return rf.GetLatestInventoryReport();
     }
-    public String GenerateReport(List<String> categories)
+    public String GenerateInventoryReport(List<String> categories)
     {
-        return null;
+        rf.GenerateInventoryReport(categories);
+        return rf.GetLatestInventoryReport();
+    }
+    public String GenerateDamageReport()
+    {
+        rf.GenerateDamageReport();
+        return rf.GetLatestDamageReport();
     }
 
 

@@ -6,9 +6,9 @@ import java.util.List;
 
 public class ReportFacade
 {
-    List<DamageReport> damageReports;
-    List<ExpiryReport> expiryReports;
-    List<InventoryReport> inventoryReports;
+    DamageReport damageReport;
+    ExpiryReport expiryReport;
+    InventoryReport inventoryReport;
 
     ProductFacade pf;
 
@@ -22,7 +22,7 @@ public class ReportFacade
             if (currentDesc.isNotEmpty())
                 expiryReport.add(currentDesc);
         }
-        expiryReports.add(expiryReport);
+        this.expiryReport = expiryReport;
     }
     public void GenerateInventoryReport(String category)
     {
@@ -32,7 +32,7 @@ public class ReportFacade
         for (Product product : products) {
             inventoryReport.add(product.GetInventoryDescription());
         }
-        inventoryReports.add(inventoryReport);
+        this.inventoryReport = inventoryReport;
 
     }
     public void GenerateInventoryReport(List<String> categories)
@@ -43,7 +43,7 @@ public class ReportFacade
         for (Product product : products) {
             inventoryReport.add(product.GetInventoryDescription());
         }
-        inventoryReports.add(inventoryReport);
+        this.inventoryReport = inventoryReport;
 
     }
     public void GenerateDamageReport()
@@ -54,7 +54,21 @@ public class ReportFacade
         for (Product product : products) {
             damageReport.add(product.GetDamageDescription());
         }
-        damageReports.add(damageReport);
+        this.damageReport = damageReport;
     }
 
+    public String GetLatestExpiryReport()
+    {
+        return expiryReport.toString();
+    }
+
+    public String GetLatestInventoryReport()
+    {
+        return inventoryReport.toString();
+    }
+
+    public String GetLatestDamageReport()
+    {
+        return damageReport.toString();
+    }
 }
