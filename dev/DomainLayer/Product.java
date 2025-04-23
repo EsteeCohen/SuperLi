@@ -4,7 +4,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.*;
 
-public class Product {
+class Product {
     private final int BUFFER_SUPPLY_DAYS=1;
     private final int DAYS_BETWEEN_REPORTS=3;//monday to thursday, thursday to monday, we don't work during shabat
 
@@ -193,6 +193,9 @@ public class Product {
         supply.storageQuantity=newStorageQuantity;
         supply.shelfQuantity=newStoreQuantity;
 
+        if(newQuantity==0)//if supply is empty, delete it
+            supplies.remove(supplyID);
+
         return oldQuantity-newQuantity;
     }
 
@@ -225,7 +228,7 @@ public class Product {
         List<Supply> allSupplies = new ArrayList<>(supplies.values());
 
         for (Supply allSupply : allSupplies) {
-            if (allSupply.expirationDate.isAfter(until))
+            if (allSupply.expirationDate.isBefore(until))
                 expiredDates.add(allSupply.expirationDate);
         }
         expiryDesc.setProduct(productName);

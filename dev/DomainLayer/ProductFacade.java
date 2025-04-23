@@ -131,6 +131,15 @@ public class ProductFacade
 
     //gets a product from within a certain category, mainly for tests
     Product getProductFromCategory(String name, String category) {
+
+        List<Product> products=productsByCategory.get(category);
+        if(products==null)
+            return null;
+        for(Product p:products)
+        {
+            if(p.getProductName().equals(name))
+                return p;
+        }
         return null;
     }
 

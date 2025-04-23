@@ -198,4 +198,25 @@ class ProductTest {
         assertDoesNotThrow(()->{water.updateSoldQuantity(fwid,0,0);});
 
     }
+
+    @Test
+    void GetExpiryDescription()
+    {
+        try {
+            milk.addSupply(1, LocalDate.of(1, 1, 1), 10, 10);
+            milk.addSupply(1, LocalDate.of(1, 1, 1), 10, 10);
+            milk.addSupply(1, LocalDate.of(1, 1, 1), 10, 10);
+
+            ice.addSupply(1, LocalDate.of(1, 1, 1), 10, 10);
+
+            water.addSupply(1, LocalDate.of(2100, 1, 1), 10, 10);
+
+        }
+        catch(Exception ignored){}
+        //check that the number of expired supplies found is correct
+        assertEquals(3,milk.GetExpiryDescription(LocalDate.now()).getSupplyCount());
+        assertEquals(1,ice.GetExpiryDescription(LocalDate.now()).getSupplyCount());
+        assertEquals(0,water.GetExpiryDescription(LocalDate.now()).getSupplyCount());
+
+    }
 }

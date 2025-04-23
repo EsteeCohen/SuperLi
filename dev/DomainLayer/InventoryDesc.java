@@ -2,7 +2,7 @@ package DomainLayer;
 
 import java.util.List;
 
-public class InventoryDesc
+class InventoryDesc
 {
     private String productName;
     private int totalQuantity;
