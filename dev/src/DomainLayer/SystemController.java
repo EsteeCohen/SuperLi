@@ -20,7 +20,6 @@ public class SystemController {
     private Map<String, Supplier> suppliers;
 
     // Product Management
-    private Map<String, Map<String, Product>> products; //<supplier ID, <catalogNumber, product>>
 
     private SystemController() {
         // Initialize order management
@@ -30,9 +29,6 @@ public class SystemController {
 
         // Initialize supplier management
         this.suppliers = new HashMap<>();
-
-        // Initialize product management
-        this.products = new HashMap<>();
     }
 
     public static SystemController getInstance() {
@@ -64,6 +60,7 @@ public class SystemController {
     }
 
     public boolean removeSupplier(String supplierID) {
+        Map<String, Product> products = this.suppliers.get(supplierID).getProductCatalog();
         if(!suppliers.containsKey(supplierID)) return false;
         suppliers.remove(supplierID);
         products.remove(supplierID);
@@ -71,6 +68,7 @@ public class SystemController {
     }
 
     public boolean updateSupplierField(String id, String field, String value) {
+        Map<String, Product> supplierProducts = this.suppliers.get(id).getProductCatalog();
         Supplier supplier = suppliers.get(id);
         if (supplier == null) return false;
 
@@ -85,13 +83,11 @@ public class SystemController {
                 supplier.setSupplierId(value);
                 suppliers.remove(id);
                 suppliers.put(value, supplier);
-
-                if (products.containsKey(id)) {
-                    Map<String, Product> supplierProducts = products.remove(id);
-                    products.put(value, supplierProducts);
-                    for(Product product: supplierProducts.values())
-                        product.setSupplierId(value);
+                // Update the product catalog with the new supplier ID
+                for (Product product : supplierProducts.values()) {
+                    product.setSupplierId(value);
                 }
+
                 return true;
             case "bankaccount":
                 supplier.setBankAccount(value);
@@ -154,23 +150,13 @@ public class SystemController {
 
     // ===================== Product Management =====================
 
-    public boolean addProductWithDiscounts(String name, String supplierId, String catalogNumber, int quantityPerPackage, ArrayList<String> discountInput, double price, int unit) {
-        if (!suppliers.containsKey(supplierId)) return false;
-        Map<Integer, Double> discountMap = parseDiscountInput(discountInput);
-        Product product = new Product(name, supplierId, catalogNumber, quantityPerPackage, discountMap, price, Units.values()[unit]);
-
-        products.putIfAbsent(supplierId, new HashMap<>());
-        if (products.get(supplierId).containsKey(catalogNumber)) return false;
-
-        products.get(supplierId).put(catalogNumber, product);
-        return true;
-    }
 
     public boolean updateProductField(String supplierID, String catalogNumber, String field, String value) {
-        if(!products.containsKey(supplierID))
+        if(!suppliers.containsKey(supplierID))
             return false;
 
-        Map<String, Product>  supplierProducts = products.get(supplierID);
+        Map<String, Product> supplierProducts = this.suppliers.get(supplierID).getProductCatalog();
+
             if (supplierProducts.containsKey(catalogNumber)) {
                 Product product = supplierProducts.get(catalogNumber);
 
@@ -210,12 +196,6 @@ public class SystemController {
                             return false;
                         }
 
-                    case "discounts":
-                        ArrayList<String> rawList = new ArrayList<>(Arrays.asList(value.split(";")));
-                        Map<Integer, Double> discountMap = parseDiscountInput(rawList);
-                        product.setDiscountPerPackage(discountMap);
-                        return true;
-
                     default:
                         return false;
                 }
@@ -227,8 +207,8 @@ public class SystemController {
 
     public List<String> getAllProducts() {
         List<String> all = new ArrayList<>();
-        for (Map<String, Product> supplierProducts : products.values()) {
-            for (Product p : supplierProducts.values()) {
+        for(Supplier supplier : suppliers.values()) {
+            for(Product p : supplier.getProductCatalog().values()) {
                 all.add(p.toString());
             }
         }
@@ -237,18 +217,18 @@ public class SystemController {
 
 
     public String findProductBySupplierAndCatalog(String supplierId, String catalogNumber) {
-        if (!products.containsKey(supplierId)) return null;
+        if (!suppliers.containsKey(supplierId)) return null;
 
-        Map<String, Product> supplierProducts = products.get(supplierId);
+        Map<String, Product> supplierProducts = suppliers.get(supplierId).getProductCatalog();
         Product product = supplierProducts.get(catalogNumber);
         return (product != null) ? product.toString() : null;
     }
 
 
     public boolean removeProduct(String supplierID, String catalogNumber) {
-        if(!products.containsKey(supplierID))
+        if(!suppliers.containsKey(supplierID))
             return false;
-        Map<String, Product>  supplierProducts = products.get(supplierID);
+        Map<String, Product>  supplierProducts = this.suppliers.get(supplierID).getProductCatalog();
         if (!supplierProducts.containsKey(catalogNumber))
             return false;
         supplierProducts.remove(catalogNumber);
@@ -273,57 +253,16 @@ public class SystemController {
         return map;
     }
 
-    // ===================== Persistence =====================
-
-    public boolean saveDataSafe(String suppliersPath, String productsPath) {
-        try (ObjectOutputStream sOut = new ObjectOutputStream(new FileOutputStream(suppliersPath));
-             ObjectOutputStream pOut = new ObjectOutputStream(new FileOutputStream(productsPath))) {
-            sOut.writeObject(suppliers);
-            pOut.writeObject(products);
-            return true;
-        } catch (IOException e) {
-            return false;
-        }
-    }
-
-    public boolean loadDataSafe(String suppliersPath, String productsPath) {
-        try (ObjectInputStream sIn = new ObjectInputStream(new FileInputStream(suppliersPath));
-             ObjectInputStream pIn = new ObjectInputStream(new FileInputStream(productsPath))) {
-            suppliers = (Map<String, Supplier>) sIn.readObject();
-            products = (Map<String, Map<String, Product>>) pIn.readObject();
-            return true;
-        } catch (IOException | ClassNotFoundException e) {
-            return false;
-        }
-    }
-
-
     // ===================== Order Management =====================
 
-    public double getTotalPrice(String supplierId, Map<String, Integer> items) {
-        SystemController systemController = SystemController.getInstance();
-        double totalPrice = 0;
-        for (Map.Entry<String, Integer> entry : items.entrySet()) {
-            String catalogNumber = entry.getKey();
-            Integer amount = entry.getValue();
-
-            totalPrice += calculateProductPrice(supplierId, catalogNumber, amount);
-        }
-        return totalPrice;
-    }
-
-    public double calculateProductPrice(String supplierId, String catalogNumber, int quantity) {
-        Product product = getProduct(supplierId, catalogNumber);
-        if (product != null) {
-            return product.calculatePriceWithDiscount(quantity);
-        }
-        return -1;
-    }
 
     public Product getProduct(String supplierId, String catalogNumber) {
-        if (products.containsKey(supplierId)) {
-            Map<String, Product> supplierProducts = products.get(supplierId);
-            return supplierProducts.get(catalogNumber);
+        Supplier supplier = suppliers.get(supplierId);
+        if (supplier == null) {
+            return null;
+        }
+        if (supplier.getProductCatalog().containsKey(catalogNumber)) {
+            return supplier.getProductCatalog().get(catalogNumber);
         }
         return null;
     }
@@ -331,8 +270,8 @@ public class SystemController {
     public List<String> getProductsBySupplier(String supplierId) {
         List<String> supplierProducts = new ArrayList<>();
 
-        if (products.containsKey(supplierId)) {
-            List<Product> productsList = new ArrayList<>(products.get(supplierId).values());
+        if (suppliers.containsKey(supplierId)) {
+            List<Product> productsList = new ArrayList<>(suppliers.get(supplierId).getProductCatalog().values());
             for (Product product : productsList) {
                 supplierProducts.add(product.toString());
             }
@@ -349,7 +288,7 @@ public class SystemController {
         int orderId = nextOrderId++;
         Agreement agreement = suppliers.get(supplierId).getAgreements().get(agreementIndex);
         Map<String, Integer> items = parseIndexTOCatalogNumber(indexQuantityItems, agreement);
-        double totalPrice = getTotalPrice(supplierId, items);
+        double totalPrice = getTotalPrice(supplierId, items, agreementIndex);
         ContactPerson contactPerson = new ContactPerson(contactPresonName, contactPersonPhone);
         STATUS status = STATUS.values()[statusIndex -1];
         Order newOrder = new Order(orderId, supplierId, orderDate, contactPerson, agreement, supplyDate, items, status, totalPrice);
@@ -431,27 +370,25 @@ public class SystemController {
         List<String> productsString = new ArrayList<String>();
         Supplier supplier = suppliers.get(supplierId);
         Agreement agreement = supplier.getAgreements().get(agreementIndex);
-        List<Product> products = agreement.getProductCatalog();
-        for(Product product : products) {
-            productsString.add(product.toString());
+        Map<String, Map<Integer, Integer>> productCatalog = agreement.getProductCatalog();
+        List<String> Keys = new ArrayList<>(productCatalog.keySet());
+        List<Product> products = new ArrayList<>();
+        for(String key : Keys) {
+            products.add(supplier.getProductFromCatalog(key));
         }
+
         return productsString;
     }
 
 
+    // parse Map<Index, Quantity> to Map<CatalogNumber, Quantity>
     private Map<String, Integer> parseIndexTOCatalogNumber(Map<Integer, Integer> indexQuantityItems, Agreement agreement){
         Map<String, Integer> result = new HashMap<>();
-        List<Product> productList = agreement.getProductCatalog();
-
-        for (Map.Entry<Integer, Integer> entry : indexQuantityItems.entrySet()) {
-            int index = entry.getKey();
-            int quantity = entry.getValue();
-
-            if (index >= 0 && index < productList.size()) {
-                Product product = productList.get(index);
-                String catalogNumber = product.getCatalogNumber();
-                result.put(catalogNumber, quantity);
-            }
+        Map<String, Map<Integer,Integer>> productCatalog = agreement.getProductCatalog();
+        for(int index : indexQuantityItems.keySet()) {
+            if (index < 0 || index >= productCatalog.size()) continue;
+            String catalogNumber = productCatalog.keySet().toArray(new String[0])[index];
+            result.put(catalogNumber, indexQuantityItems.get(index));
         }
 
         return result;
@@ -475,25 +412,16 @@ public class SystemController {
         return timings;
     }
 
-    public boolean updateAgreementProducts(String supplierId, int agreementIndex, List<Integer> indexProducts) {
+    public boolean updateAgreementProducts(String supplierId, int agreementIndex, Map<Integer, Map<Integer,Integer>> indexProducts) {
         Supplier supplier = suppliers.get(supplierId);
         if (supplier == null) return false;
 
         Agreement agreement = supplier.getAgreements().get(agreementIndex);
         if (agreement == null) return false;
 
-        Map<String, Product> allSupplierProducts = products.get(supplierId);
-        if (allSupplierProducts == null) return false;
 
-        List<Product> supplierProductList = new ArrayList<>(allSupplierProducts.values());
-        List<Product> updatedCatalog = new ArrayList<>();
-
-        for (int index : indexProducts) {
-            if (index < 0 || index >= supplierProductList.size()) return false;
-            updatedCatalog.add(supplierProductList.get(index));
-        }
-
-        agreement.setProductCatalog(updatedCatalog);
+        Map<String, Map<Integer, Integer>> productDiscounts = parseOrderItems(indexProducts, supplier);
+        agreement.setProductCatalog(productDiscounts);
         return true;
     }
 
@@ -551,7 +479,7 @@ public class SystemController {
         return true;
     }
 
-    public boolean createAgreement(String supplierId, int paymentMethod, int paymentTiming, LocalDate validFrom, LocalDate validTo, Set<Integer> IndexProducts) {
+    public boolean createAgreement(String supplierId, int paymentMethod, int paymentTiming, LocalDate validFrom, LocalDate validTo, Map<Integer, Map<Integer,Integer>> IndexProducts) {
         Supplier supplier = suppliers.get(supplierId);
         if (supplier == null) return false;
 
@@ -560,16 +488,7 @@ public class SystemController {
             PaymentTiming timing = PaymentTiming.values()[paymentTiming];
             Agreement agreement = new Agreement(supplierId, nextAgreementId, method, timing, validFrom, validTo);
             supplier.addAgreement(agreement);
-            //updateAgreementProducts(supplierId, nextAgreementId, IndexProducts);
-            List<Product> catalog = new ArrayList<>();
-            Map<String, Product> map = products.get(supplierId);
-            List<Product> supplierProducts = new ArrayList<>(map.values());
-
-            for (int idx : IndexProducts) {
-                if (idx < 0 || idx >= supplierProducts.size()) return false;
-                catalog.add(supplierProducts.get(idx));
-            }
-            agreement.setProductCatalog(catalog);
+            updateAgreementProducts(supplierId, nextAgreementId, IndexProducts);
             nextAgreementId++;
             return true;
         } catch (IllegalArgumentException e) {
@@ -614,4 +533,72 @@ public class SystemController {
             }
         }
     }
+
+
+
+    public boolean addProductWithDiscounts(String name, String supplierId, String catalogNumber,
+                                           int quantityPerPackage, double price, int unit) {
+        if (!suppliers.containsKey(supplierId)) return false;
+        Supplier supplier = suppliers.get(supplierId);
+        Product product = new Product(name, supplierId, catalogNumber, quantityPerPackage, price, Units.values()[unit]);
+
+        return supplier.addProductToCatalog(product);
+    }
+
+//    public boolean setProductDiscountsInAgreement(String supplierId, int agreementIndex,
+//                                                  String catalogNumber, ArrayList<String> discountInput) {
+//        Supplier supplier = suppliers.get(supplierId);
+//        if (supplier == null) return false;
+//
+//        if (agreementIndex < 0 || agreementIndex >= supplier.getAgreements().size()) return false;
+//        Agreement agreement = supplier.getAgreements().get(agreementIndex);
+//
+//        Map<Integer, Integer> discountMap = parseDiscountInput(discountInput);
+//        agreement.setDiscountForProduct(catalogNumber, discountMap);
+//        return true;
+//    }
+
+    public double calculateProductPrice(String supplierId, String catalogNumber, int quantity, int agreementIndex) {
+        Supplier supplier = suppliers.get(supplierId);
+        if (supplier == null) return -1;
+
+        if (agreementIndex < 0 || agreementIndex >= supplier.getAgreements().size()) return -1;
+        Agreement agreement = supplier.getAgreements().get(agreementIndex);
+
+        Product product = getProduct(supplierId, catalogNumber);
+        if (product == null) return -1;
+
+        return agreement.calculatePriceWithDiscount(product, quantity);
+    }
+
+    public double getTotalPrice(String supplierId, Map<String, Integer> items, int agreementIndex) {
+        Supplier supplier = suppliers.get(supplierId);
+        if (supplier == null) return -1;
+
+        if (agreementIndex < 0 || agreementIndex >= supplier.getAgreements().size()) return -1;
+
+        double totalPrice = 0;
+        for (Map.Entry<String, Integer> entry : items.entrySet()) {
+            String catalogNumber = entry.getKey();
+            Integer amount = entry.getValue();
+
+            totalPrice += calculateProductPrice(supplierId, catalogNumber, amount, agreementIndex);
+        }
+        return totalPrice;
+    }
+    // parse order items from the UI, from index to catalog number
+    public Map<String, Map<Integer,Integer>> parseOrderItems(Map<Integer, Map<Integer, Integer>> items, Supplier supplier) {
+        Map<String, Map<Integer, Integer>> parsedItems = new HashMap<>();
+
+        for (Map.Entry<Integer, Map<Integer, Integer>> entry : items.entrySet()) {
+            int index = entry.getKey();
+            Map<Integer, Integer> quantities = entry.getValue();
+
+            String catalogNumber = supplier.getCatalogNumberByIndex(index);
+            parsedItems.put(catalogNumber, quantities);
+        }
+        return parsedItems;
+    }
+
+
 }

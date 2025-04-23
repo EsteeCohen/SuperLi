@@ -60,8 +60,8 @@ public class SupplierSystemService {
     // ===== Product Management =====
 
     public boolean addProduct(String name, String supplierId, String catalogNumber, int quantityPerPackage,
-                              ArrayList<String> discountInput, double price, int unit) {
-        return systemController.addProductWithDiscounts(name, supplierId, catalogNumber, quantityPerPackage, discountInput, price, unit);
+                              double price, int unit) {
+        return systemController.addProductWithDiscounts(name, supplierId, catalogNumber, quantityPerPackage, price, unit);
     }
 
     public boolean updateProduct(String supplierID, String id, String field, String value) {
@@ -121,7 +121,7 @@ public class SupplierSystemService {
         return systemController.getOrdersBySupplier(supplierId);
     }
 
-    public boolean createAgreement(String supplierId, int paymentMethod, int paymentTiming, LocalDate validFrom, LocalDate validTo, Set<Integer> IndexProducts) {
+    public boolean createAgreement(String supplierId, int paymentMethod, int paymentTiming, LocalDate validFrom, LocalDate validTo, Map<Integer, Map<Integer,Integer>> IndexProducts) {
         return systemController.createAgreement(supplierId, paymentMethod, paymentTiming, validFrom, validTo, IndexProducts);
     }
 
@@ -146,7 +146,7 @@ public class SupplierSystemService {
         return systemController.getSupplierById(supplierId);
     }
 
-    public boolean updateAgreementProducts(String supplierId, int agreementIndex, List<Integer> indexProducts) {
+    public boolean updateAgreementProducts(String supplierId, int agreementIndex, Map<Integer, Map<Integer,Integer>> indexProducts) {
         return systemController.updateAgreementProducts(supplierId, agreementIndex, indexProducts);
     }
 

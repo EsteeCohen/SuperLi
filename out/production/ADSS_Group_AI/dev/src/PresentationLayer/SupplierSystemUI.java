@@ -39,7 +39,6 @@ public class SupplierSystemUI {
         System.out.println("Select your role:");
         System.out.println("1. Purchasing Manager");
         System.out.println("2. Delivery Manager");
-        //System.out.println("3. General Manager");
         System.out.println("3. Regular Employee");
         System.out.print("Your choice: ");
 
@@ -48,7 +47,6 @@ public class SupplierSystemUI {
         switch (choice) {
             case 1: return UserRole.PURCHASING_MANAGER;
             case 2: return UserRole.DELIVERY_MANAGER;
-            //case 3: return UserRole.GENERAL_MANAGER;
             case 3: return UserRole.REGULAR_EMPLOYEE;
             default:
                 System.out.println("Invalid choice.");
@@ -64,9 +62,6 @@ public class SupplierSystemUI {
             case DELIVERY_MANAGER:
                 displayDeliveryManagerMenu();
                 break;
-            /*case GENERAL_MANAGER:
-                displayGeneralManagerMenu();
-                break;*/
             case REGULAR_EMPLOYEE:
                 displayRegularEmployeeMenu();
                 break;
@@ -101,7 +96,7 @@ public class SupplierSystemUI {
     private void displayDeliveryManagerMenu() {
         System.out.println("\n=== Delivery Manager Menu ===");
         System.out.println("1. View suppliers requiring pickup");
-        //System.out.println("2. Mark supplier as picked up");
+        System.out.println("2. Mark supplier as delivered");
         System.out.println("0. Exit");
     }
 
@@ -137,9 +132,6 @@ public class SupplierSystemUI {
             case DELIVERY_MANAGER:
                 handleDeliveryManagerChoice(choice);
                 break;
-            /*case GENERAL_MANAGER:
-                handleGeneralManagerChoice(choice);
-                break;*/
             case REGULAR_EMPLOYEE:
                 handleRegularEmployeeChoice(choice);
                 break;
@@ -220,6 +212,8 @@ public class SupplierSystemUI {
             case 1:
                 viewSuppliersRequiringPickup();
                 break;
+            case 2:
+                updateOrderStatus();
             default:
                 System.out.println("Invalid option. Please try again.");
                 break;
@@ -549,7 +543,6 @@ public class SupplierSystemUI {
     }
 
     // order-related methods:
-
     private void insertOrder() {
         System.out.println("\n--- Insert Existing Order ---");
 

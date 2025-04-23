@@ -21,6 +21,6 @@ public class SupplierNeedsPickup extends Supplier {
 
     @Override
     public String toString() {
-        return super.toString() + "  Address: " + address + "\n";
+        return "Supplier Needs Pickup:" + "\n" + super.toString() + "  Address: " + address + "\n";
     }
 }

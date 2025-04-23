@@ -5,6 +5,7 @@
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/dev" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/dev/Tests/DomainLayer" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
