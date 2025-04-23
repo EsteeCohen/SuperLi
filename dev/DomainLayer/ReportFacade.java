@@ -48,7 +48,13 @@ public class ReportFacade
     }
     public void GenerateDamageReport()
     {
+        DamageReport damageReport = new DamageReport();
+        List<Product> products = pf.GetAllProducts();
 
+        for (Product product : products) {
+            damageReport.add(product.GetDamageDescription());
+        }
+        damageReports.add(damageReport);
     }
 
 }

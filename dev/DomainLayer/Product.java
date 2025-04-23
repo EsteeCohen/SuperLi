@@ -224,9 +224,9 @@ public class Product {
         List<LocalDate> expiredDates = new ArrayList<>();
         List<Supply> allSupplies = new ArrayList<>(supplies.values());
 
-        for (Supply allSupply : allSupplies) {
-            if (allSupply.expirationDate.isAfter(until))
-                expiredDates.add(allSupply.expirationDate);
+        for (Supply supply : allSupplies) {
+            if (supply.expirationDate.isBefore(until))
+                expiredDates.add(supply.expirationDate);
         }
         expiryDesc.setProduct(productName);
         expiryDesc.setExpiredDates(expiredDates);
@@ -236,6 +236,13 @@ public class Product {
     public InventoryDesc GetInventoryDescription()
     {
         return new InventoryDesc(productName, shelfQuantity + storageQuantity);
+    }
+    public DamageDesc GetDamageDescription()
+    {
+        int brokenQuantity = this.brokenQuantity;
+        restartBroken();
+
+        return new DamageDesc(productName, brokenQuantity);
     }
 
     /*

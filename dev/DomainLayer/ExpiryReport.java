@@ -6,11 +6,16 @@ import java.util.List;
 public class ExpiryReport
 {
     private List<ExpiryDesc> expiryDescs;
-    private LocalDate reportDate;
+    private final LocalDate reportDate;
 
     public void add(ExpiryDesc currentDesc)
     {
         expiryDescs.add(currentDesc);
+    }
+
+    public ExpiryReport()
+    {
+        this.reportDate = LocalDate.now();
     }
 
     @Override
