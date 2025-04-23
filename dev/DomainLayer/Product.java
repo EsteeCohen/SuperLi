@@ -241,6 +241,11 @@ class Product {
             return new DamageDesc(productName, brokenQuantity);
         }
 
+    public AbscenceDesc GetAbscenceDescription()
+    {
+        return new AbscenceDesc(productName, minQuantity - (storageQuantity + shelfQuantity));
+    }
+
     /*
     will represent each supply independetly
     each supply hold its own experation date
