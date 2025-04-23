@@ -149,10 +149,11 @@ public class ProductFacade
         if(p==null)
             throw new Exception("Product " +productName+" is not found!");
         p.updateFoundBrokenItems(supplyId,newShelfQuantity,newStorageQuantity);
-        p.calcMinQuantity();
         int total=p.GetShelfQuantity()+p.GetStorageQuantity();
         return total<p.getMinQuantity();
     }
+
+    //#################################################################################
     //for tests!!!!
     //gets a product by its name
     Product getProduct(String name)
