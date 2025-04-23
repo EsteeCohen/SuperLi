@@ -96,7 +96,7 @@ public class SupplierSystemUI {
     private void displayDeliveryManagerMenu() {
         System.out.println("\n=== Delivery Manager Menu ===");
         System.out.println("1. View suppliers requiring pickup");
-        System.out.println("2. Mark supplier as delivered");
+        System.out.println("2. Update order status");
         System.out.println("0. Exit");
     }
 
@@ -331,14 +331,14 @@ public class SupplierSystemUI {
             return;
         }
 
-        System.out.println("Enter product discounts (optional). Format: amount,discount (e.g. 10,5 indicates a 5 percent discount for 10 units – please enter the number only, without the % symbol)");
+        /*System.out.println("Enter product discounts (optional). Format: amount,discount (e.g. 10,5 indicates a 5 percent discount for 10 units – please enter the number only, without the % symbol)");
         System.out.println("Enter -1 to finish entering discounts:");
         ArrayList<String> listDiscount = new ArrayList<>();
         while (true) {
             String input = scanner.nextLine().trim();
             if (input.equals("-1")) break;
             listDiscount.add(input.substring(0, input.length()-1));
-        }
+        }*/
 
         System.out.print("Enter product price: ");
         double price;
@@ -358,7 +358,7 @@ public class SupplierSystemUI {
 
 
 
-        boolean result = supplierSystem.addProduct(name, supplierId, id, quantityPerPackage, listDiscount, price, unit);
+        boolean result = supplierSystem.addProduct(name, supplierId, id, quantityPerPackage, price, unit);
 
         if (result) {
             System.out.println("Product added successfully!");
@@ -443,9 +443,9 @@ public class SupplierSystemUI {
         System.out.println("1. Name");
         System.out.println("2. Supplier ID");
         System.out.println("3. Quantity Per Package");
-        System.out.println("4. Discounts (format: amount,discount)");
-        System.out.println("5. Price");
-        System.out.println("6. Units");
+        //System.out.println("4. Discounts (format: amount,discount)");
+        System.out.println("4. Price");
+        System.out.println("5. Units");
         System.out.print("Your choice: ");
 
         int choice = getUserChoice();
@@ -471,7 +471,7 @@ public class SupplierSystemUI {
                 newValue = scanner.nextLine();
                 break;
 
-            case 4:
+            /*case 4:
                 fieldToUpdate = "discounts";
                 System.out.println("Enter new discounts (format: amount,discount). Enter -1 to finish:");
                 ArrayList<String> discountList = new ArrayList<>();
@@ -481,15 +481,15 @@ public class SupplierSystemUI {
                     discountList.add(input.substring(0, input.length()-1));
                 }
                 newValue = String.join(";", discountList); // נעבד את זה בתוך SystemController
-                break;
+                break;*/
 
-            case 5:
+            case 4:
                 fieldToUpdate = "price";
                 System.out.print("Enter new price: ");
                 newValue = scanner.nextLine();
                 break;
 
-            case 6:
+            case 5:
                 fieldToUpdate = "units";
                 System.out.println("Enter new unit:");
                 System.out.println("1 - Unit");
@@ -884,7 +884,8 @@ public class SupplierSystemUI {
 
         // Step 4: Show available products and let user select them
 
-        Set<Integer> IndexProducts =new HashSet<Integer>(updateAgreementProducts(supplierId));
+        //Set<Integer> IndexProducts =new HashSet<Integer>(updateAgreementProducts(supplierId));
+        Map<Integer, Map<Integer,Integer>> IndexProducts = updateAgreementProducts(supplierId);
 
         // Step 6: Create the agreement
         boolean agreementCreated = supplierSystem.createAgreement(
@@ -944,7 +945,7 @@ public class SupplierSystemUI {
                 break;
             case 5:
                 System.out.println("\n--- Update Agreement Products ---");
-                List<Integer> IndexProducts = updateAgreementProducts(supplierId);
+                Map<Integer, Map<Integer,Integer>> IndexProducts = updateAgreementProducts(supplierId);
                 if (IndexProducts == null) {
                     success = false;
                 }else {
@@ -1029,7 +1030,6 @@ public class SupplierSystemUI {
                 }
             } catch (Exception e) {
                 System.out.println("Invalid date format. Setting valid from date to current date.");
-                flag = false;
             }
         } while (!flag);
         return validTo;
@@ -1051,19 +1051,19 @@ public class SupplierSystemUI {
                 flag = true;
             } catch (Exception e) {
                 System.out.println("Invalid date format. Setting valid from date to current date.");
-                flag = false;
             }
         } while (!flag);
         return validFrom;
     }
 
-    private List<Integer> updateAgreementProducts(String supplierId) {
+    private Map<Integer, Map<Integer,Integer>>  updateAgreementProducts(String supplierId) {
 
+        Map<Integer, Map<Integer,Integer>> productsMap = new HashMap<>();//<INDEX, <PRODUCT_QUANTITY, DISCOUNT>>
         List<String> products = supplierSystem.getProductsBySupplier(supplierId);
 
         if (products.isEmpty()) {
             System.out.println("No products found for this supplier. Operation cancelled.");
-            return new ArrayList<Integer>();
+            return new HashMap<>();
         }
 
         // Display available products
@@ -1085,14 +1085,44 @@ public class SupplierSystemUI {
                     System.out.println("Invalid product index. Please try again.");
                 }
                 else {
-                    IndexProducts.add(productIndex);
+                    Map<Integer,Integer> contractQuantities = getContractQuantitiesFromUser();
+                    productsMap.put(productIndex, contractQuantities);
                 }
             } catch (NumberFormatException e) {
                 System.out.println("Invalid input. Please enter a number.");
             }
         }
 
-        return IndexProducts;
+        return productsMap;
+    }
+
+    private Map<Integer,Integer> getContractQuantitiesFromUser (){
+        Map<Integer,Integer> contractQuantities = new HashMap<>();
+        System.out.println("Enter discounts for quantity if available (contract quantities):");
+        System.out.println("Enter -1 to skip or finish entering discounts.");
+        while (true) {
+            System.out.print("Enter quantity for discount (-1 to finish): ");
+            int discountQuantity = getUserChoice();
+
+            if (discountQuantity == -1) {
+                break;
+            }
+
+            if (discountQuantity <= 0) {
+                System.out.println("Quantity must be greater than 0. Please try again.");
+                continue;
+            }
+
+            System.out.print("Enter discount percentage for quantity " + discountQuantity + ": ");
+            int discountPercentage = getUserChoice();
+
+            if (discountPercentage < 0 || discountPercentage > 100) {
+                System.out.println("Discount percentage must be between 0 and 100. Please try again.");
+                continue;
+            }
+            contractQuantities.put(discountQuantity, discountPercentage);
+        }
+        return contractQuantities;
     }
 
     private int getPaymentMethodsFromUser() {

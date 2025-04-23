@@ -7,7 +7,7 @@ import java.util.*;
 public class SystemInitializer {
     public static void initializeSystem(SupplierSystemService service) {
         /* ---------------- Suppliers ---------------- */
-        service.addSupplierWithDelivery("Supplier 1", "SUP001", "111222333", "1,3,5",List.of("ofek, 054318083"));
+        service.addSupplierWithDelivery("Supplier 1", "SUP001", "111222333", "1,3,5",List.of("Ofek, 054318083"));
         service.addSupplierNeedsPickup("Supplier 2",  "SUP002", "444555666", "123 Tech Avenue", List.of("Shiri,0522555555"));
         System.out.println("Suppliers initialized.");
 
@@ -19,8 +19,8 @@ public class SystemInitializer {
         System.out.println("Products initialized.");
 
         /* ---------------- Supplier 1 agreement & order ---------------- */
-        Map<String, Map<Integer, Integer>> supplier2Discounts = new HashMap<>();
-        supplier2Discounts.put("AM001", Map.of(5, 3, 10, 6));  // 3% at 5 units, 6% at 10 units
+        Map<Integer, Map<Integer, Integer>> supplier2Discounts = new HashMap<>();
+        supplier2Discounts.put(0, Map.of(5, 3, 10, 6));  // 3% at 5 units, 6% at 10 units
         if (service.createAgreement("SUP001", 0, 2, LocalDate.now().minusDays(5), LocalDate.now().plusDays(30), supplier2Discounts)) {
             System.out.println("Supplier 1 agreement created with products [0,1]");
             Map<Integer,Integer> Supplier1Items = Map.of(0,3, 1,2); // WM001 x3, WM002 x2

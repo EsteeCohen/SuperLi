@@ -1,7 +1,9 @@
 package src.DomainLayer;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public abstract class Supplier {
     private String name;
@@ -9,6 +11,7 @@ public abstract class Supplier {
     private String bankAccount;
     private List<Agreement> agreements;
     private List<ContactPerson> contactPersons;
+    Map<String, Product> productCatalog; // <catalogNumber, Product>
 
     public Supplier(String name, String supplierId, String bankAccount) {
         this.name = name;
@@ -16,6 +19,7 @@ public abstract class Supplier {
         this.bankAccount = bankAccount;
         this.agreements = new ArrayList<>();
         this.contactPersons = new ArrayList<>();
+        this.productCatalog = new HashMap<>();
     }
 
     // Getters and setters
@@ -71,18 +75,34 @@ public abstract class Supplier {
         this.contactPersons.add(contactPerson);
     }
 
-    /**
-     * Find all valid agreements for this supplier
-     * @return list of currently valid agreements
-     */
-    public List<Agreement> getValidAgreements() {
-        List<Agreement> validAgreements = new ArrayList<>();
-        for (Agreement agreement : agreements) {
-            if (agreement.isValid()) {
-                validAgreements.add(agreement);
-            }
+    public Map<String, Product> getProductCatalog() {
+        return productCatalog;
+    }
+
+    public boolean addProductToCatalog(Product product) {
+        try {
+            this.productCatalog.put(product.getCatalogNumber(), product);
+            return true;
+        } catch (Exception e) {
+            return false;
         }
-        return validAgreements;
+    }
+
+    public void removeProductFromCatalog(String catalogNumber) {
+        this.productCatalog.remove(catalogNumber);
+    }
+
+    public Product getProductFromCatalog(String catalogNumber) {
+        return this.productCatalog.get(catalogNumber);
+    }
+
+    public void updateProductInCatalog(String catalogNumber, Product product) {
+        this.productCatalog.put(catalogNumber, product);
+    }
+
+    public String getCatalogNumberByIndex(int index) {
+        List<String> keys = new ArrayList<>(this.productCatalog.keySet());
+        return keys.get(index);
     }
 
     @Override
@@ -107,4 +127,13 @@ public abstract class Supplier {
         );
     }
 
+    public int getAgreementSerialNumber(int agreementId) {
+        int serialNumber = 0;
+        for(Agreement agreement : agreements) {
+            if(agreement.getAgreementId() == agreementId)
+                return serialNumber;
+            serialNumber++;
+        }
+        return -1;
+    }
 }

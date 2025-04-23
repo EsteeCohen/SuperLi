@@ -127,4 +127,13 @@ public abstract class Supplier {
         );
     }
 
+    public int getAgreementSerialNumber(int agreementId) {
+        int serialNumber = 0;
+        for(Agreement agreement : agreements) {
+            if(agreement.getAgreementId() == agreementId)
+                return serialNumber;
+            serialNumber++;
+        }
+        return -1;
+    }
 }

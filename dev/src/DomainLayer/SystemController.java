@@ -488,7 +488,8 @@ public class SystemController {
             PaymentTiming timing = PaymentTiming.values()[paymentTiming];
             Agreement agreement = new Agreement(supplierId, nextAgreementId, method, timing, validFrom, validTo);
             supplier.addAgreement(agreement);
-            updateAgreementProducts(supplierId, nextAgreementId, IndexProducts);
+            int serialNumber = supplier.getAgreementSerialNumber(nextAgreementId);
+            updateAgreementProducts(supplierId, serialNumber, IndexProducts);
             nextAgreementId++;
             return true;
         } catch (IllegalArgumentException e) {
