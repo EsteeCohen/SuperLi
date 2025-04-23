@@ -29,6 +29,11 @@ public class ReportService
         rf.GenerateDamageReport();
         return rf.GetLatestDamageReport();
     }
+    public String GenerateAbscenceReport()
+    {
+        rf.GenerateAbscenceReport();
+        return rf.GetLatestAbscenceReport();
+    }
 
 
 }

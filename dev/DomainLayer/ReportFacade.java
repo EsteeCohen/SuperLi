@@ -9,6 +9,7 @@ public class ReportFacade
     DamageReport damageReport;
     ExpiryReport expiryReport;
     InventoryReport inventoryReport;
+    AbscenceReport abscenceReport;
 
     ProductFacade pf;
 
@@ -56,6 +57,16 @@ public class ReportFacade
         }
         this.damageReport = damageReport;
     }
+    public void GenerateAbscenceReport()
+    {
+        AbscenceReport abscenceReport = new AbscenceReport();
+        List<Product> products = pf.GetAllProducts();
+
+        for (Product product : products) {
+            abscenceReport.add(product.GetAbscenceDescription());
+        }
+        this.abscenceReport = abscenceReport;
+    }
 
     public String GetLatestExpiryReport()
     {
@@ -70,5 +81,10 @@ public class ReportFacade
     public String GetLatestDamageReport()
     {
         return damageReport.toString();
+    }
+
+    public String GetLatestAbscenceReport()
+    {
+        return abscenceReport.toString();
     }
 }
