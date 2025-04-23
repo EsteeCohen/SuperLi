@@ -31,15 +31,6 @@ public class ProductFacade
 
         productsByName.put(productName, product);
     }
-    void SetDiscountForProduct(String productName, LocalDate startDate, LocalDate endDate, double percentage) throws Exception
-    {
-        if (!productsByName.containsKey(productName))
-            throw new Exception("No product is named " + productName);
-        else
-        {
-            productsByName.get(productName).SetDiscount(new Discount(startDate, endDate, percentage));
-        }
-    }
 
     /**
      * sets a discount for all the products in the category
@@ -121,6 +112,46 @@ public class ProductFacade
             throw new Exception("Product "+productName+" does not exist!");
 
         return p.addSupply(cost,expirationDate,shelfQuantity,storageQuantity);
+    }
+
+    /**
+     * update the supply quantity and mark all missing product as sold
+     * @param productName the product to update
+     * @param supplyId the id of the supply to update
+     * @param newShelfQuantity the new quantity on the shelfs
+     * @param newStorageQuantity the new quantity in the storage
+     * @return is the new total quantity< min quantity
+     * @throws Exception if product not found, supply not found, or the new quantity is greater than the old quantity
+     */
+    public boolean updateSoldQuantity(String productName, int supplyId, int newShelfQuantity, int newStorageQuantity) throws Exception
+    {
+        Product p=getProduct(productName);
+        if(p==null)
+            throw new Exception("Product " +productName+" is not found!");
+        p.updateSoldQuantity(supplyId,newShelfQuantity,newStorageQuantity);
+        p.calcMinQuantity();
+        int total=p.GetShelfQuantity()+p.GetStorageQuantity();
+        return total<p.getMinQuantity();
+    }
+
+    /**
+     * update the supply quantity and mark all missing product as broken
+     * @param productName the product to update
+     * @param supplyId the id of the supply to update
+     * @param newShelfQuantity the new quantity on the shelfs
+     * @param newStorageQuantity the new quantity in the storage
+     * @return is the new total quantity< min quantity
+     * @throws Exception if product not found, supply not found, or the new quantity is greater than the old quantity
+     */
+    public boolean updateBrokenQuantity(String productName, int supplyId, int newShelfQuantity, int newStorageQuantity) throws Exception
+    {
+        Product p=getProduct(productName);
+        if(p==null)
+            throw new Exception("Product " +productName+" is not found!");
+        p.updateFoundBrokenItems(supplyId,newShelfQuantity,newStorageQuantity);
+        p.calcMinQuantity();
+        int total=p.GetShelfQuantity()+p.GetStorageQuantity();
+        return total<p.getMinQuantity();
     }
     //for tests!!!!
     //gets a product by its name

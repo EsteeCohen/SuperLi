@@ -246,21 +246,21 @@ class Product {
     each supply hold its own experation date
     and its own cost price to allow managing purchacing prices
      */
-        private class Supply {
-            private final int supplyID;
-            private final int cost;//the cost per product that the store had to pay
-            private final LocalDate expirationDate;
+    private class Supply {
+        private final int supplyID;
+        private final int cost;//the cost per product that the store had to pay
+        private final LocalDate expirationDate;
 
-            private int shelfQuantity;
-            private int storageQuantity;
+        private int shelfQuantity;
+        private int storageQuantity;
 
 
-            Supply(int supplyID, int cost, LocalDate expirationDate, int shelfQuantity, int storageQuantity) {
-                this.supplyID = supplyID;
-                this.cost = cost;
-                this.expirationDate = expirationDate;
-                this.shelfQuantity = shelfQuantity;
-                this.storageQuantity = storageQuantity;
-            }
+        Supply(int supplyID, int cost, LocalDate expirationDate, int shelfQuantity, int storageQuantity) {
+            this.supplyID = supplyID;
+            this.cost = cost;
+            this.expirationDate = expirationDate;
+            this.shelfQuantity = shelfQuantity;
+            this.storageQuantity = storageQuantity;
         }
     }
+}
