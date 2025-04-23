@@ -212,6 +212,8 @@ class Product {
     {
         if(storeQuantity<0 || storageQuantity<0 || cost<0)
             throw new IllegalArgumentException("one of the quantities or the cost is negative!");
+        if(storeQuantity+storageQuantity==0)
+            throw new IllegalArgumentException("new supply has quantity of 0! its like its not even there!");
         int id=latestSupplyId++;
         Supply newSupply= new Supply(id, cost, expirationDate, storeQuantity, storageQuantity);
         this.shelfQuantity+=storeQuantity;

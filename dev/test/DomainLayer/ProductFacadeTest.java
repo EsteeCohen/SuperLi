@@ -65,4 +65,27 @@ class ProductFacadeTest {
         assertNotNull(facade.getProduct("11").getDiscount());
         assertNotNull(facade.getProduct("12").getDiscount());
     }
+
+    @Test
+    void addSupply()
+    {
+        //try adding a supply to a non existing product, should throw exception
+        assertThrows(Exception.class,()->{ facade.addSupply("wow",1,LocalDate.now(),1,1);});
+        assertThrows(Exception.class,()->{ facade.addSupply("wawa",1,LocalDate.now(),1,1);});
+
+        //try to add a supply with negative quantity/cost, should throw exception
+        assertThrows(Exception.class,()->{ facade.addSupply("11",-1,LocalDate.now(),1,1);});
+        assertThrows(Exception.class,()->{ facade.addSupply("11",1,LocalDate.now(),-1,1);});
+        assertThrows(Exception.class,()->{ facade.addSupply("11",1,LocalDate.now(),1,-1);});
+
+        //try to add a supply with quantity 0, should throw exception
+        assertThrows(Exception.class,()->{ facade.addSupply("11",1,LocalDate.now(),0,0);});
+
+        //try to add a new supply with positive quantity, non negative cost, and to an existing product
+        int oldShelfQuantity=facade.getProduct("11").GetShelfQuantity();
+        int oldStorageQuantity=facade.getProduct("11").GetStorageQuantity();
+        assertDoesNotThrow(()->{facade.addSupply("11",1,LocalDate.now(),1,1);});
+        assertEquals(oldShelfQuantity+1,facade.getProduct("11").GetShelfQuantity());
+        assertEquals(oldStorageQuantity+1,facade.getProduct("11").GetStorageQuantity());
+    }
 }
