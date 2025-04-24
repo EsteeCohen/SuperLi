@@ -7,7 +7,7 @@ import java.util.List;
 
 public class ProductService
 {
-    protected ProductFacade pf;
+    private ProductFacade pf;
 
     /**
      * adds a new product to the system
