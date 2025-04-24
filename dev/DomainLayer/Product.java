@@ -200,7 +200,7 @@ class Product {
      * @return the id for this supply
      * @throws Exception if either quantity or cost is ngative
      */
-    int addSupply(int cost, LocalDate expirationDate, int storeQuantity, int storageQuantity) throws Exception {
+    int addSupply(double cost, LocalDate expirationDate, int storeQuantity, int storageQuantity) throws Exception {
         if (storeQuantity < 0 || storageQuantity < 0 || cost < 0)
             throw new IllegalArgumentException("one of the quantities or the cost is negative!");
         if (storeQuantity + storageQuantity == 0)
@@ -255,14 +255,14 @@ class Product {
      */
     private class Supply {
         private final int supplyID;
-        private final int cost;//the cost per product that the store had to pay
+        private final double cost;//the cost per product that the store had to pay
         private final LocalDate expirationDate;
 
         private int shelfQuantity;
         private int storageQuantity;
 
 
-        Supply(int supplyID, int cost, LocalDate expirationDate, int shelfQuantity, int storageQuantity) {
+        Supply(int supplyID, double cost, LocalDate expirationDate, int shelfQuantity, int storageQuantity) {
             this.supplyID = supplyID;
             this.cost = cost;
             this.expirationDate = expirationDate;

@@ -5,7 +5,7 @@ import DomainLayer.ReportFacade;
 import java.time.LocalDate;
 import java.util.List;
 
-public class ReportService
+class ReportService
 {
     private final ReportFacade rf;
     ReportService(ReportFacade rf)

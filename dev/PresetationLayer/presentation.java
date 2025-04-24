@@ -11,8 +11,7 @@ import java.util.Scanner;
 public class presentation {
     private final Scanner scanner=new Scanner(System.in);
     private final ServiceFactory serviceFactory=new ServiceFactory();
-    private final ProductService productService= serviceFactory.getProductService();
-    private final ReportService reportService=serviceFactory.getReportService();
+
 
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
@@ -250,7 +249,7 @@ public class presentation {
             throw new Exception("[subcategories] is a list of subcategories! list should be [a,b,c...,z] with no spaces between!");
         if(!isNumber(args[5]))
             throw new Exception("sellPrice must be a number!");
-        System.out.println(productService.AddProduct(args[1],args[2],parseList(args[3]),args[4],Double.parseDouble(args[5]),args[6],args[7]));
+        System.out.println(serviceFactory.AddProduct(args[1],args[2],parseList(args[3]),args[4],Double.parseDouble(args[5]),args[6],args[7]));
     }
 
     //parses and productDscount commands
@@ -262,7 +261,7 @@ public class presentation {
             throw new Exception("StartDate and EndDate must be of format dd/MM/yyyy");
         if(!isNumber(args[4]))
             throw new Exception("Discount precentage must be a number!");
-        System.out.println(productService.SetDiscount(args[1],LocalDate.parse(args[2],FORMATTER),LocalDate.parse(args[3],FORMATTER),Double.parseDouble(args[4])));
+        System.out.println(serviceFactory.SetDiscount(args[1],LocalDate.parse(args[2],FORMATTER),LocalDate.parse(args[3],FORMATTER),Double.parseDouble(args[4])));
     }
 
     //parses a categoryDiscount command
@@ -274,7 +273,7 @@ public class presentation {
             throw new Exception("StartDate and EndDate must be of format dd/MM/yyyy");
         if(!isNumber(args[4]))
             throw new Exception("Discount precentage must be a number!");
-        System.out.println(productService.SetDiscountForCategory(args[1],LocalDate.parse(args[2],FORMATTER),LocalDate.parse(args[3],FORMATTER),Double.parseDouble(args[4])));
+        System.out.println(serviceFactory.SetDiscountForCategory(args[1],LocalDate.parse(args[2],FORMATTER),LocalDate.parse(args[3],FORMATTER),Double.parseDouble(args[4])));
     }
 
     //parses a SUPPLY command
@@ -289,7 +288,7 @@ public class presentation {
         if(!correctDate(args[5]))
             throw new Exception("ExpirationDate must be of format: dd/MM/yyyy!");
 
-        System.out.println(productService.addSupply(args[1],Integer.parseInt(args[4]),LocalDate.parse(args[5],FORMATTER),Integer.parseInt(args[2]),Integer.parseInt(args[3])));
+        System.out.println(serviceFactory.addSupply(args[1],Double.parseDouble(args[4]),LocalDate.parse(args[5],FORMATTER),Integer.parseInt(args[2]),Integer.parseInt(args[3])));
     }
 
     //parses a SOLD command
@@ -301,7 +300,7 @@ public class presentation {
         if(!isInteger(args[2])||!isInteger(args[3])||!isInteger(args[4]))
             throw new Exception("supplyId and quantities must be integers!");
 
-        System.out.println(productService.reportSales(args[1],Integer.parseInt(args[2]),Integer.parseInt(args[3]),Integer.parseInt(args[4])));
+        System.out.println(serviceFactory.reportSales(args[1],Integer.parseInt(args[2]),Integer.parseInt(args[3]),Integer.parseInt(args[4])));
     }
 
     //parses a BROKE command
@@ -313,13 +312,13 @@ public class presentation {
         if(!isInteger(args[2])||!isInteger(args[3])||!isInteger(args[4]))
             throw new Exception("supplyId and quantities must be integers!");
 
-        System.out.println(productService.reportBroke(args[1],Integer.parseInt(args[2]),Integer.parseInt(args[3]),Integer.parseInt(args[4])));
+        System.out.println(serviceFactory.reportBroke(args[1],Integer.parseInt(args[2]),Integer.parseInt(args[3]),Integer.parseInt(args[4])));
     }
 
     //parses an Sreport command
     private void parseSreport(String[] args)
     {
-        System.out.println(reportService.GenerateAbscenceReport());
+        System.out.println(serviceFactory.GenerateAbscenceReport());
     }
 
     //parses an Ireport command
@@ -328,16 +327,16 @@ public class presentation {
         if(args.length!=2)
             throw new Exception("IREPORT takes exactly 1 argument!");
         if(isListFormat(args[1]))
-            System.out.println(reportService.GenerateInventoryReport(parseList(args[1])));
+            System.out.println(serviceFactory.GenerateInventoryReport(parseList(args[1])));
         else
-            System.out.println(reportService.GenerateInventoryReport(args[1]));
+            System.out.println(serviceFactory.GenerateInventoryReport(args[1]));
 
     }
 
     //parses an Dreport command
     private void parseDreport(String[] args)
     {
-        System.out.println(reportService.GenerateDamageReport());
+        System.out.println(serviceFactory.GenerateDamageReport());
     }
 
     //parses an Ereport command
@@ -347,7 +346,7 @@ public class presentation {
             throw new Exception("EREPORT takes exactly 1 argumet!");
         if(!correctDate(args[1]))
             throw new Exception("cannot parse the expiery date!");
-        System.out.println(reportService.GenerateExpiryReport(LocalDate.parse(args[1],FORMATTER)));
+        System.out.println(serviceFactory.GenerateExpiryReport(LocalDate.parse(args[1],FORMATTER)));
     }
 
 }

@@ -105,7 +105,7 @@ public class ProductFacade
      * @return the supply id
      * @throws Exception if product not found or either of the quantities or cost in negative
      */
-    public int addSupply(String productName, int cost, LocalDate expirationDate,int shelfQuantity,int storageQuantity) throws Exception
+    public int addSupply(String productName, double cost, LocalDate expirationDate,int shelfQuantity,int storageQuantity) throws Exception
     {
         Product p=getProduct(productName);
         if(p==null)

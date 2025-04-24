@@ -5,7 +5,7 @@ import DomainLayer.ProductFacade;
 import java.time.LocalDate;
 import java.util.List;
 
-public class ProductService
+class ProductService
 {
     private final ProductFacade pf;
     ProductService(ProductFacade pf)
@@ -39,7 +39,7 @@ public class ProductService
      * @return the supply id
      * @throws Exception if product not found or either of the quantities or cost in negative
      */
-    public String addSupply(String productName, int cost, LocalDate expirationDate,int shelfQuantity,int storageQuantity) throws Exception
+    public String addSupply(String productName, double cost, LocalDate expirationDate,int shelfQuantity,int storageQuantity) throws Exception
     {
         return "added new supply, supply ID: "+String.valueOf(pf.addSupply(productName,cost,expirationDate,shelfQuantity,storageQuantity));
     }
