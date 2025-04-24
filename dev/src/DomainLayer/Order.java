@@ -104,7 +104,7 @@ public class Order {
     @Override
     public String toString() {
         return String.format(
-                "Order #%d\n  Supplier ID: %s\n  Agreement ID: %d\n  Order Date: %s\n  Supply Date: %s\n  Status: %s\n  Total Price: %.2f\n  Items: %d products",
+                "Order #%d\n  Supplier ID: %s\n  Agreement ID: %d\n  Order Date: %s\n  Supply Date: %s\n  Status: %s\n  Total Price: %.2f\n  Items: %s ",
                 orderId,
                 supplierId,
                 agreement.getAgreementId(),
@@ -112,7 +112,7 @@ public class Order {
                 supplyDate,
                 status,
                 totalPrice,
-                items.size()
+                items.toString()
         );
     }
 

@@ -60,17 +60,17 @@ public class SystemController {
     }
 
     public boolean removeSupplier(String supplierID) {
-        Map<String, Product> products = this.suppliers.get(supplierID).getProductCatalog();
         if(!suppliers.containsKey(supplierID)) return false;
+        Map<String, Product> products = this.suppliers.get(supplierID).getProductCatalog();
         suppliers.remove(supplierID);
         products.remove(supplierID);
         return true;
     }
 
     public boolean updateSupplierField(String id, String field, String value) {
-        Map<String, Product> supplierProducts = this.suppliers.get(id).getProductCatalog();
         Supplier supplier = suppliers.get(id);
         if (supplier == null) return false;
+        Map<String, Product> supplierProducts = supplier.getProductCatalog();
 
         switch (field.toLowerCase()) {
             case "name":
@@ -138,12 +138,14 @@ public class SystemController {
         for (String token : input.trim().split(",")) {
             try {
                 int dayIndex = Integer.parseInt(token.trim());
-                if(dayIndex < 1 || dayIndex > 7) return null;
+                if (dayIndex < 1 || dayIndex > 7) return null;
                 DaysOfTheWeek day = DaysOfTheWeek.of(dayIndex);
                 days.add(DaysOfTheWeek.of(dayIndex));
-            } catch (Exception ignored) {
-                System.out.println(ignored);
             }
+            catch (NumberFormatException e) {
+                return null;
+            }
+
         }
         return days;
     }
@@ -165,9 +167,9 @@ public class SystemController {
                         product.setProductName(value);
                         return true;
 
-                    case "supplierid":
-                        product.setSupplierId(value);
-                        return true;
+                    //case "supplierid":
+                    //    product.setSupplierId(value);
+                    //    return true;
 
                     case "quantityperpackage":
                         try {
@@ -236,36 +238,8 @@ public class SystemController {
         return true;
     }
 
-    private Map<Integer, Double> parseDiscountInput(ArrayList<String> input) {
-        Map<Integer, Double> map = new HashMap<>();
-        if (input == null || input.isEmpty()) return map;
-        for(String pair : input)
-        {
-            String[] parts = pair.trim().split(",");
-            if (parts.length == 2) {
-                try {
-                    int quantity = Integer.parseInt(parts[0].replaceAll("[^\\d]", ""));
-                    double discount = Double.parseDouble(parts[1].replaceAll("[^\\d.]", "")) / 100.0;
-                    map.put(quantity, discount);
-                } catch (Exception ignored) {}
-            }
-        }
-        return map;
-    }
 
     // ===================== Order Management =====================
-
-
-    public Product getProduct(String supplierId, String catalogNumber) {
-        Supplier supplier = suppliers.get(supplierId);
-        if (supplier == null) {
-            return null;
-        }
-        if (supplier.getProductCatalog().containsKey(catalogNumber)) {
-            return supplier.getProductCatalog().get(catalogNumber);
-        }
-        return null;
-    }
 
     public List<String> getProductsBySupplier(String supplierId) {
         List<String> supplierProducts = new ArrayList<>();
@@ -367,17 +341,16 @@ public class SystemController {
 
 
     public List<String> getProductsByAgreement(String supplierId, int agreementIndex) {
-        List<String> productsString = new ArrayList<String>();
         Supplier supplier = suppliers.get(supplierId);
         Agreement agreement = supplier.getAgreements().get(agreementIndex);
         Map<String, Map<Integer, Integer>> productCatalog = agreement.getProductCatalog();
         List<String> Keys = new ArrayList<>(productCatalog.keySet());
-        List<Product> products = new ArrayList<>();
+        List<String> products = new ArrayList<>();
         for(String key : Keys) {
-            products.add(supplier.getProductFromCatalog(key));
+            products.add(supplier.getProductFromCatalog(key).toString());
         }
 
-        return productsString;
+        return products;
     }
 
 
@@ -541,35 +514,9 @@ public class SystemController {
                                            int quantityPerPackage, double price, int unit) {
         if (!suppliers.containsKey(supplierId)) return false;
         Supplier supplier = suppliers.get(supplierId);
-        Product product = new Product(name, supplierId, catalogNumber, quantityPerPackage, price, Units.values()[unit]);
+        Product product = new Product(name, supplierId, catalogNumber, quantityPerPackage, price, Units.values()[unit-1]);
 
         return supplier.addProductToCatalog(product);
-    }
-
-//    public boolean setProductDiscountsInAgreement(String supplierId, int agreementIndex,
-//                                                  String catalogNumber, ArrayList<String> discountInput) {
-//        Supplier supplier = suppliers.get(supplierId);
-//        if (supplier == null) return false;
-//
-//        if (agreementIndex < 0 || agreementIndex >= supplier.getAgreements().size()) return false;
-//        Agreement agreement = supplier.getAgreements().get(agreementIndex);
-//
-//        Map<Integer, Integer> discountMap = parseDiscountInput(discountInput);
-//        agreement.setDiscountForProduct(catalogNumber, discountMap);
-//        return true;
-//    }
-
-    public double calculateProductPrice(String supplierId, String catalogNumber, int quantity, int agreementIndex) {
-        Supplier supplier = suppliers.get(supplierId);
-        if (supplier == null) return -1;
-
-        if (agreementIndex < 0 || agreementIndex >= supplier.getAgreements().size()) return -1;
-        Agreement agreement = supplier.getAgreements().get(agreementIndex);
-
-        Product product = getProduct(supplierId, catalogNumber);
-        if (product == null) return -1;
-
-        return agreement.calculatePriceWithDiscount(product, quantity);
     }
 
     public double getTotalPrice(String supplierId, Map<String, Integer> items, int agreementIndex) {
@@ -577,16 +524,13 @@ public class SystemController {
         if (supplier == null) return -1;
 
         if (agreementIndex < 0 || agreementIndex >= supplier.getAgreements().size()) return -1;
+        Agreement agreement = supplier.getAgreements().get(agreementIndex);
 
-        double totalPrice = 0;
-        for (Map.Entry<String, Integer> entry : items.entrySet()) {
-            String catalogNumber = entry.getKey();
-            Integer amount = entry.getValue();
+        Map<String, Product> supplierProducts = supplier.getProductCatalog();
 
-            totalPrice += calculateProductPrice(supplierId, catalogNumber, amount, agreementIndex);
-        }
-        return totalPrice;
+        return agreement.calculateTotalPrice(items, supplierProducts);
     }
+
     // parse order items from the UI, from index to catalog number
     public Map<String, Map<Integer,Integer>> parseOrderItems(Map<Integer, Map<Integer, Integer>> items, Supplier supplier) {
         Map<String, Map<Integer, Integer>> parsedItems = new HashMap<>();

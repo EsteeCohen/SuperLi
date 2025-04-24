@@ -59,10 +59,6 @@ public abstract class Supplier {
         this.agreements.add(agreement);
     }
 
-    public boolean removeAgreement(Agreement agreement) {
-        return this.agreements.remove(agreement);
-    }
-
     public List<ContactPerson> getContactPersons() {
         return contactPersons;
     }
@@ -88,17 +84,10 @@ public abstract class Supplier {
         }
     }
 
-    public void removeProductFromCatalog(String catalogNumber) {
-        this.productCatalog.remove(catalogNumber);
-    }
-
     public Product getProductFromCatalog(String catalogNumber) {
         return this.productCatalog.get(catalogNumber);
     }
 
-    public void updateProductInCatalog(String catalogNumber, Product product) {
-        this.productCatalog.put(catalogNumber, product);
-    }
 
     public String getCatalogNumberByIndex(int index) {
         List<String> keys = new ArrayList<>(this.productCatalog.keySet());

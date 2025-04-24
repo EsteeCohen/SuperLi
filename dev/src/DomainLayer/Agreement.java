@@ -115,17 +115,23 @@ public class Agreement {
             }
         }
 
-        return product.getPrice() * quantity * (1 - discount);
+        return product.getPrice() * quantity * (1 - discount / 100.0);
     }
 
-    /**
-     * Check if the agreement is currently valid
-     * @return true if agreement is valid as of current date
-     */
-    public boolean isValid() {
-        LocalDate today = LocalDate.now();
-        return !today.isBefore(validFrom) && !today.isAfter(validTo);
+    public double calculateTotalPrice(Map<String, Integer> items, Map<String, Product> products) {
+        double totalPrice = 0;
+        for (Map.Entry<String, Integer> entry : items.entrySet()) {
+            String catalogNumber = entry.getKey();
+            Integer quantity = entry.getValue();
+
+            Product product = products.get(catalogNumber);
+            if (product == null) continue;
+
+            totalPrice += calculatePriceWithDiscount(product, quantity);
+        }
+        return totalPrice;
     }
+
 
     @Override
     public String toString() {

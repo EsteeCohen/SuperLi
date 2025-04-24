@@ -42,7 +42,12 @@ public class SupplierSystemUI {
         System.out.println("3. Regular Employee");
         System.out.print("Your choice: ");
 
-        int choice = Integer.parseInt(scanner.nextLine());
+        int choice = getUserChoice();
+        while (choice < 1 || choice > 3) {
+            System.out.println("Invalid choice. Please try again.");
+            System.out.print("Your choice: ");
+            choice = getUserChoice();
+        }
 
         switch (choice) {
             case 1: return UserRole.PURCHASING_MANAGER;
@@ -50,7 +55,7 @@ public class SupplierSystemUI {
             case 3: return UserRole.REGULAR_EMPLOYEE;
             default:
                 System.out.println("Invalid choice.");
-                return selectRole(); // Recursive call to select role again
+                return selectRole(); // Recursive call to select a role again
         }
     }
 
@@ -237,6 +242,9 @@ public class SupplierSystemUI {
 
 
     private String getSupplierIdFromUser() {
+        boolean hasSuppliers = viewAllSuppliers();
+        if (!hasSuppliers)
+            return "";
         System.out.print("Enter supplier ID: ");
         return scanner.nextLine();
     }
@@ -246,7 +254,9 @@ public class SupplierSystemUI {
         boolean result = false;
         System.out.println("\n--- Add New Supplier ---");
 
-        String supplierID = getSupplierIdFromUser();
+
+        System.out.print("Enter supplier ID: ");
+        String supplierID = scanner.nextLine();
 
         System.out.print("Enter supplier name: ");
         String name = scanner.nextLine();
@@ -263,6 +273,12 @@ public class SupplierSystemUI {
 
             System.out.print("Enter contact person phone number: ");
             String phone = scanner.nextLine();
+            while (!phone.matches("^0\\d{9}$")) {
+                System.out.println("Invalid phone number. Please enter a 10-digit number starting with 0.");
+                System.out.print("Enter contact person phone number: ");
+                phone = scanner.nextLine();
+            }
+
 
             contacts.add(name + ", " + phone);
 
@@ -276,10 +292,15 @@ public class SupplierSystemUI {
         } while (type != 1 && type != 2);
 
         if(type == 1) {
-            System.out.print("Enter delivery days:\n1 - Sunday\n2 - Monday\n3 - Tuesday\n4 - Wednesday\n5 - Thursday\n6 - Friday\n7 - Saturday\n");
-            System.out.print("Enter delivery days (comma-separated): ");
-            String deliveryDaysInput = scanner.nextLine();
-            result = supplierSystem.addSupplierWithDelivery(name, supplierID, bankAccount, deliveryDaysInput, contacts);
+            while (!result) {
+                System.out.print("Enter delivery days:\n1 - Sunday\n2 - Monday\n3 - Tuesday\n4 - Wednesday\n5 - Thursday\n6 - Friday\n7 - Saturday\n");
+                System.out.print("Enter delivery days (comma-separated): ");
+                String deliveryDaysInput = scanner.nextLine();
+                result = supplierSystem.addSupplierWithDelivery(name, supplierID, bankAccount, deliveryDaysInput, contacts);
+                if(!result) {
+                    System.out.println("Invalid input. Please try again.");
+                }
+            }
         } else {
             System.out.print("Enter address: ");
             String address = scanner.nextLine();
@@ -298,63 +319,57 @@ public class SupplierSystemUI {
         System.out.println("\n--- Remove Supplier ---");
 
         String supplierID = getSupplierIdFromUser();
+        if (supplierID.equals("")) return;
 
         boolean result = supplierSystem.removeSupplier(supplierID);
 
         if (result) {
             System.out.println("Supplier removed successfully!");
         } else {
-            System.out.println("Failed to remove Supplier. Check if supplier ID is correct.");
+            System.out.println("Failed to remove Supplier. Supplier does not exits.");
         }
     }
 
     private void addNewProduct() {
         System.out.println("\n--- Add New Product ---");
-        System.out.println("Enter product name: ");
+        String supplierId = getSupplierIdFromUser();
+        if (supplierId.equals("")) return;
+        System.out.print("Enter product name: ");
         String name = scanner.nextLine();
 
-        String supplierId = getSupplierIdFromUser();
 
         System.out.print("Enter product catalog number: ");
         String id = scanner.nextLine();
 
-        System.out.print("Enter product quantity per package: ");
-        int quantityPerPackage;
-        try {
-            quantityPerPackage = Integer.parseInt(scanner.nextLine());
-            if (quantityPerPackage <= 0) {
-                System.out.println("Quantity must be greater than 0. Operation cancelled.");
-                return;
-            }
-        } catch (NumberFormatException e) {
-            System.out.println("Invalid quantity. Operation cancelled.");
-            return;
+        int quantityPerPackage = -1;
+        while(quantityPerPackage < 0) {
+            System.out.print("Enter product quantity per package: ");
+            quantityPerPackage = getUserChoice();
+            if (quantityPerPackage <= 0)
+                System.out.println("Invalid quantity.");
+
         }
 
-        /*System.out.println("Enter product discounts (optional). Format: amount,discount (e.g. 10,5 indicates a 5 percent discount for 10 units – please enter the number only, without the % symbol)");
-        System.out.println("Enter -1 to finish entering discounts:");
-        ArrayList<String> listDiscount = new ArrayList<>();
-        while (true) {
-            String input = scanner.nextLine().trim();
-            if (input.equals("-1")) break;
-            listDiscount.add(input.substring(0, input.length()-1));
-        }*/
-
-        System.out.print("Enter product price: ");
-        double price;
-        try {
-            price = Double.parseDouble(scanner.nextLine());
-            if (price <= 0) {
-                System.out.println("Price must be greater than 0. Operation cancelled.");
-                return;
+        double price = -1;
+        while (price < 0) {
+            System.out.print("Enter product price: ");
+            try {
+                price = Double.parseDouble(scanner.nextLine());
+                if (price <= 0)
+                    System.out.println("Price must be greater than 0. Operation cancelled.");
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid price. Operation cancelled.");
             }
-        } catch (NumberFormatException e) {
-            System.out.println("Invalid price. Operation cancelled.");
-            return;
         }
 
-        System.out.print("Enter Unit.\n1 - Unit\n2 - KG");
-        int unit = getUserChoice();
+        int unit = -1;
+        while(unit < 0 || unit > 2) {
+            System.out.println("Enter Unit.\n1 - Unit\n2 - KG");
+            unit = getUserChoice();
+            if (unit != 1 && unit != 2) {
+                System.out.println("Invalid unit. Try again.");
+            }
+        }
 
 
 
@@ -371,6 +386,7 @@ public class SupplierSystemUI {
         System.out.println("\n--- Remove Product ---");
 
         String supplierId = getSupplierIdFromUser();
+        if (supplierId.equals("")) return;
 
         System.out.print("Enter product catalog number: ");
         String catalogNumber = scanner.nextLine();
@@ -380,15 +396,15 @@ public class SupplierSystemUI {
         if (result) {
             System.out.println("Product removed successfully!");
         } else {
-            System.out.println("Failed to remove product. Check if supplier ID and catalog number are correct.");
+            System.out.println("Failed to remove product. Supplier ID or product does not exist.");
         }
     }
 
     private void updateSupplier() {
         System.out.println("\n--- Update Supplier ---");
 
-        System.out.print("Enter supplier ID to update: ");
-        String id = scanner.nextLine();
+        String id = getSupplierIdFromUser();
+        if (id.equals("")) return;
 
         System.out.println("Select the field you want to update. Please note: the new value will fully replace the existing one.");
         System.out.println("1. Name");
@@ -398,28 +414,47 @@ public class SupplierSystemUI {
 
         int choice = getUserChoice();
         String fieldToUpdate;
+        String newValue;
 
         switch (choice) {
             case 1:
                 fieldToUpdate = "name";
+                System.out.print("Enter new name: ");
+                newValue = scanner.nextLine();
                 break;
             case 2:
                 fieldToUpdate = "supplierId";
+                System.out.print("Enter new supplier ID: ");
+                newValue = scanner.nextLine();
                 break;
             case 3:
                 fieldToUpdate = "bankAccount";
+                System.out.print("Enter new bank account number: ");
+                newValue = scanner.nextLine();
                 break;
             case 4:
                 fieldToUpdate = "contactPersons";
-                System.out.print("Enter contact person details in the format: name, phone (e.g. Israel Israeli, 0501234567): ");
+
+                    System.out.print("Enter new contact person name: ");
+                    String personName = scanner.nextLine();
+
+                    System.out.print("Enter contact person phone number: ");
+                    String phone = scanner.nextLine();
+                    while (!phone.matches("^0\\d{9}$")) {
+                        System.out.println("Invalid phone number. Please enter a 10-digit number starting with 0.");
+                        System.out.print("Enter contact person phone number: ");
+                        phone = scanner.nextLine();
+                    }
+
+                    newValue = personName + "," + phone;
+
                 break;
             default:
                 System.out.println("Invalid choice. Operation cancelled.");
                 return;
         }
 
-        System.out.print("Enter new value: ");
-        String newValue = scanner.nextLine();
+
 
         boolean result = supplierSystem.updateSupplier(id, fieldToUpdate, newValue);
 
@@ -433,19 +468,18 @@ public class SupplierSystemUI {
     private void updateProduct() {
         System.out.println("\n--- Update Product ---");
 
+        String supplierID = getSupplierIdFromUser();
+        if (supplierID.equals("")) return;
+
         System.out.print("Enter product catalog number to update: ");
         String catalogNumber = scanner.nextLine();
 
-        System.out.print("Enter supplier ID to update: ");
-        String supplierID = scanner.nextLine();
-
         System.out.println("Select the field you want to update. Please note: the new value will fully replace the existing one.");
         System.out.println("1. Name");
-        System.out.println("2. Supplier ID");
-        System.out.println("3. Quantity Per Package");
-        //System.out.println("4. Discounts (format: amount,discount)");
-        System.out.println("4. Price");
-        System.out.println("5. Units");
+        //System.out.println("2. Supplier ID");
+        System.out.println("2. Quantity Per Package");
+        System.out.println("3. Price");
+        System.out.println("4. Units");
         System.out.print("Your choice: ");
 
         int choice = getUserChoice();
@@ -459,13 +493,13 @@ public class SupplierSystemUI {
                 newValue = scanner.nextLine();
                 break;
 
-            case 2:
+            /*case 2:
                 fieldToUpdate = "supplierId";
                 System.out.print("Enter new supplier ID: ");
                 newValue = scanner.nextLine();
-                break;
+                break;*/
 
-            case 3:
+            case 2:
                 fieldToUpdate = "quantityPerPackage";
                 System.out.print("Enter new quantity per package: ");
                 newValue = scanner.nextLine();
@@ -483,24 +517,25 @@ public class SupplierSystemUI {
                 newValue = String.join(";", discountList); // נעבד את זה בתוך SystemController
                 break;*/
 
-            case 4:
+            case 3:
                 fieldToUpdate = "price";
                 System.out.print("Enter new price: ");
                 newValue = scanner.nextLine();
                 break;
 
-            case 5:
-                fieldToUpdate = "units";
-                System.out.println("Enter new unit:");
-                System.out.println("1 - Unit");
-                System.out.println("2 - KG");
-                int unitChoice = getUserChoice();
-                if (unitChoice == 1) newValue = "Unit";
-                else if (unitChoice == 2) newValue = "KG";
-                else {
-                    System.out.println("Invalid unit. Operation cancelled.");
-                    return;
+            case 4:
+                fieldToUpdate = "unit";
+                int unit = -1;
+                while(unit < 0 || unit > 2) {
+                    System.out.println("Enter Unit.\n1 - Unit\n2 - KG");
+                    unit = getUserChoice();
+                    if (unit != 1 && unit != 2) {
+                        System.out.println("Invalid unit. Try again.");
+                    }
                 }
+                if (unit == 1) newValue = "Unit";
+                else newValue = "KG";
+
                 break;
 
             default:
@@ -528,11 +563,16 @@ public class SupplierSystemUI {
 
     }
 
-    private void viewAllSuppliers() {
+    private boolean viewAllSuppliers() {
+        if (supplierSystem.getAllSuppliers().isEmpty()) {
+            System.out.println("No suppliers found.");
+            return false;
+        }
         System.out.println("\n--- All Suppliers ---");
         for (String s : supplierSystem.getAllSuppliers()) {
             System.out.println(s);
         }
+        return true;
     }
 
     private void viewAllProducts() {
@@ -546,11 +586,12 @@ public class SupplierSystemUI {
     private void insertOrder() {
         System.out.println("\n--- Insert Existing Order ---");
 
-        viewAllSuppliers();
 
         String supplierId = getSupplierIdFromUser();
+        if (supplierId.equals("")) return;
 
         int agreementIndex = selectAgreement(supplierId);
+        if (agreementIndex < 0) return;
 
         // Step 3: Show products and collect items for order
         List<String> productsList = supplierSystem.getProductsByAgreement(supplierId, agreementIndex);
@@ -615,19 +656,21 @@ public class SupplierSystemUI {
 
         int numberOfAgreements = agreements.size();
         int agreementIndex = -1;
-        while (agreementIndex< 0 || numberOfAgreements < agreementIndex) {
-            if (agreements.isEmpty()) {
-                System.out.println("No agreements found for supplier ID: " + supplierId);
-            } else {
-                System.out.println("Agreements for supplier ID " + supplierId + ":");
-                int index = 0;
-                for (String agreement : agreements) {
-                    System.out.println(index + " - " + agreement);
-                    index++;
-                }
-            }
+        if (agreements.isEmpty()) {
+            System.out.println("No agreements found for supplier ID: " + supplierId);
+            return agreementIndex;
+        }
+        //print agreement
+        System.out.println("Agreements for supplier ID " + supplierId + ":");
+        int index = 0;
+        for (String agreement : agreements) {
+            System.out.println(index + " - " + agreement);
+            index++;
+        }
+        while (agreementIndex< 0 || index<= agreementIndex) {
+            System.out.print("Enter the serial number: ");
             agreementIndex = getUserChoice();
-            if (agreementIndex < 0 || numberOfAgreements < agreementIndex) {
+            if (agreementIndex < 0 || numberOfAgreements <= agreementIndex) {
                 System.out.println("Invalid input. Please enter a valid number.");
             }
         }
@@ -708,21 +751,19 @@ public class SupplierSystemUI {
     private LocalDate selectSupplyDate(LocalDate orderDate) {
         LocalDate supplyDate = null;
         boolean flag = false;
-        do {
+        while (!flag) {
             System.out.print("Enter supply date (YYYY-MM-DD): ");
             try {
                 supplyDate = LocalDate.parse(scanner.nextLine());
-                if(supplyDate.isBefore(orderDate))
-                {
+                if (supplyDate.isBefore(orderDate)) {
                     System.out.println("Supply date is before order date.");
-                    flag = false;
+                }else{
+                    flag = true;
                 }
             } catch (Exception e) {
-                System.out.println("Invalid date format. Setting supply date to 7 days from now.");
-                supplyDate = orderDate.plusDays(7);
-                flag = true;
+                System.out.println("Invalid date format. please enter a valid date.");
             }
-        } while (!flag);
+        }
         return supplyDate;
     }
 
@@ -825,6 +866,7 @@ public class SupplierSystemUI {
         System.out.println("\n--- View Orders by Supplier ---");
 
         String supplierId = getSupplierIdFromUser();
+        if (supplierId.equals("")) return;
 
         // Check if supplier exists
         boolean supplierExists = supplierSystem.checkIfSupplierExists(supplierId);
@@ -850,6 +892,7 @@ public class SupplierSystemUI {
          System.out.println("\n--- Agreements by Supplier ---");
         // Get supplier ID
         String supplierId = getSupplierIdFromUser();
+        if (supplierId.equals("")) return;
 
         // Check if supplier exists
         boolean supplierExists = supplierSystem.checkIfSupplierExists(supplierId);
@@ -865,8 +908,9 @@ public class SupplierSystemUI {
         System.out.println("\n--- Create New Agreement ---");
 
         // Step 1: Select supplier
-        viewAllSuppliers();
+
         String supplierId = getSupplierIdFromUser();
+        if (supplierId == "") return;
         if (!supplierSystem.checkIfSupplierExists(supplierId)) {
             System.out.println("Supplier not found. Operation cancelled.");
             return;
@@ -907,14 +951,16 @@ public class SupplierSystemUI {
     private void updateAgreement() {
         System.out.println("\n--- Update Agreement ---");
 
-        System.out.println("Enter supplier ID: ");
-        String supplierId = scanner.nextLine();
+        String supplierId = getSupplierIdFromUser();
+        if (supplierId.equals("")) return;
 
-
-        showAgreementBySupplier(supplierId);
-        System.out.println("Select agreement to update: ");
-
-        int agreementIndex = getUserChoice();
+        int agreementIndex = -1;
+        int size = showAgreementBySupplier(supplierId);
+        if (size == 0) return;
+        do {
+            System.out.println("Select serial number of agreement to update: (0 to "+ size +")");
+            agreementIndex = getUserChoice();
+        }while(agreementIndex < 0 || agreementIndex >= size);
 
         System.out.println("Select the field you want to update. Please note: the new value will fully replace the existing one.");
         System.out.println("1. Payment Method");
@@ -969,8 +1015,9 @@ public class SupplierSystemUI {
         System.out.println("\n--- Remove Agreement ---");
 
         String supplierId = getSupplierIdFromUser();
+        if (supplierId.equals("")) return;
 
-        showAgreementBySupplier(supplierId);
+        if(showAgreementBySupplier(supplierId) == 0) return;
 
         System.out.print("Enter agreement ID: ");
         int agreementIndex = getUserChoice();
@@ -980,7 +1027,7 @@ public class SupplierSystemUI {
         if (result) {
             System.out.println("Agreement removed successfully!");
         } else {
-            System.out.println("Failed to remove agreement. Check if supplier ID and agreement ID are correct.");
+            System.out.println("Failed to remove agreement. Supplier ID or agreement does not exist.");
         }
     }
 
@@ -999,6 +1046,7 @@ public class SupplierSystemUI {
         String catalogNum = scanner.nextLine();
 
         String supplierId = getSupplierIdFromUser();
+        if (supplierId.equals("")) return;
 
         String productInfo = supplierSystem.getProductBySupplierAndCatalog(supplierId, catalogNum);
 
@@ -1181,12 +1229,12 @@ public class SupplierSystemUI {
         return selection;
     }
 
-    private void showAgreementBySupplier(String supplierId){
+    private int showAgreementBySupplier(String supplierId){
         List<String> agreements = supplierSystem.getAgreementsBySupplier(supplierId);
 
         if (agreements.isEmpty()) {
-            System.out.println("No agreements found for supplier ID: " + supplierId);
-            return;
+            System.out.println("No agreements found for supplier ID \"" + supplierId +"\"");
+            return 0;
         }
 
         System.out.println("Agreements for supplier ID " + supplierId + ":");
@@ -1195,6 +1243,7 @@ public class SupplierSystemUI {
             System.out.println(index + " - " + agreement);
             index++;
         }
+        return agreements.size();
     }
 }
 
