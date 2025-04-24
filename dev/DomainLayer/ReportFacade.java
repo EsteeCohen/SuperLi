@@ -70,6 +70,7 @@ public class ReportFacade
 
         for (Product product : products) {
             abscenceReport.add(product.GetAbscenceDescription());
+            product.restartSales();//assumed that called once every 3 days
         }
         this.abscenceReport = abscenceReport;
     }

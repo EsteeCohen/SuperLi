@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Scanner;
 
 public class presentation {
-    private final Scanner scanner=new Scanner(System.in);
+    private Scanner scanner=new Scanner(System.in);
     private final ServiceFactory serviceFactory=new ServiceFactory();
 
 
@@ -28,6 +28,23 @@ public class presentation {
      */
     private void run()
     {
+        System.out.println("Welcome to the storage/inventory managment system!");
+        System.out.println("pls enter a command, for all commands enter help:");
+        String command =scanner.nextLine().toLowerCase();
+        while(!command.equals("exit"))
+        {
+            parse(command);
+            System.out.println("pls enter a command, for all commands enter help:");
+            command =scanner.nextLine().toLowerCase();
+        }
+        System.out.println("Good bye!");
+    }
+
+    //like normal run, but with a custom scanner
+    //used for tests
+    void run(Scanner scanner)
+    {
+        this.scanner=scanner;
         System.out.println("Welcome to the storage/inventory managment system!");
         System.out.println("pls enter a command, for all commands enter help:");
         String command =scanner.nextLine().toLowerCase();
@@ -258,7 +275,7 @@ public class presentation {
         if(args.length!=5)
             throw new Exception("CDICOUNT command gets exactly 4 argument!");
         if(!correctDate(args[2])||!correctDate(args[3]))
-            throw new Exception("StartDate and EndDate must be of format dd/MM/yyyy");
+            throw new Exception("StartDate and EndDate must be of format dd/MM/yyyy!");
         if(!isNumber(args[4]))
             throw new Exception("Discount precentage must be a number!");
         System.out.println(serviceFactory.SetDiscount(args[1],LocalDate.parse(args[2],FORMATTER),LocalDate.parse(args[3],FORMATTER),Double.parseDouble(args[4])));
@@ -270,7 +287,7 @@ public class presentation {
         if(args.length!=5)
             throw new Exception("CDICOUNT command gets exactly 4 argument!");
         if(!correctDate(args[2])||!correctDate(args[3]))
-            throw new Exception("StartDate and EndDate must be of format dd/MM/yyyy");
+            throw new Exception("StartDate and EndDate must be of format dd/MM/yyyy!");
         if(!isNumber(args[4]))
             throw new Exception("Discount precentage must be a number!");
         System.out.println(serviceFactory.SetDiscountForCategory(args[1],LocalDate.parse(args[2],FORMATTER),LocalDate.parse(args[3],FORMATTER),Double.parseDouble(args[4])));
