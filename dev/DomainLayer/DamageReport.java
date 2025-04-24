@@ -3,11 +3,12 @@ package DomainLayer;
 import DomainLayer.Product;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 class DamageReport
 {
-    private List<DamageDesc> damageDescriptions;
+    private List<DamageDesc> damageDescriptions=new ArrayList<>();
     private final LocalDate reportDate;
 
     public void add(DamageDesc damageDesc)

@@ -13,6 +13,12 @@ public class ReportFacade
 
     ProductFacade pf;
 
+    public ReportFacade(ProductFacade pf)
+    {
+        this.pf=pf;
+
+    }
+
     public void GenerateExpiryReport(LocalDate until)
     {
         List<Product> allProducts = pf.GetAllProducts();

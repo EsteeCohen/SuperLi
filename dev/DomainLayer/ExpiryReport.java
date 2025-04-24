@@ -1,11 +1,12 @@
 package DomainLayer;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 class ExpiryReport
 {
-    private List<ExpiryDesc> expiryDescs;
+    private List<ExpiryDesc> expiryDescs=new ArrayList<>();
     private final LocalDate reportDate;
 
     public void add(ExpiryDesc currentDesc)

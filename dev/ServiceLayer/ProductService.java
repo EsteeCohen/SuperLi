@@ -7,7 +7,11 @@ import java.util.List;
 
 public class ProductService
 {
-    protected ProductFacade pf;
+    private final ProductFacade pf;
+    ProductService(ProductFacade pf)
+    {
+        this.pf=pf;
+    }
 
     /**
      * adds a new product to the system
@@ -19,15 +23,10 @@ public class ProductService
      * @param shelfLocation the location of the product on the shelfs
      * @param storageLocation the locations in the storage where the product is stored
      */
-    public void AddProduct(String productName, String category, List<String> subCategories, String manufacturer, int sellPrice, String shelfLocation, String storageLocation)
+    public String AddProduct(String productName, String category, List<String> subCategories, String manufacturer, double sellPrice, String shelfLocation, String storageLocation) throws Exception
     {
-        try
-        {
-            pf.AddProduct(productName, category, subCategories, manufacturer, sellPrice,shelfLocation,storageLocation);
-        }
-        catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
+        pf.AddProduct(productName, category, subCategories, manufacturer, sellPrice,shelfLocation,storageLocation);
+        return "added product "+productName+" to category "+category;
     }
 
     /**
@@ -40,9 +39,9 @@ public class ProductService
      * @return the supply id
      * @throws Exception if product not found or either of the quantities or cost in negative
      */
-    public int addSupply(String productName, int cost, LocalDate expirationDate,int shelfQuantity,int storageQuantity) throws Exception
+    public String addSupply(String productName, int cost, LocalDate expirationDate,int shelfQuantity,int storageQuantity) throws Exception
     {
-        return pf.addSupply(productName,cost,expirationDate,shelfQuantity,storageQuantity);
+        return "added new supply, supply ID: "+String.valueOf(pf.addSupply(productName,cost,expirationDate,shelfQuantity,storageQuantity));
     }
 
     /**
@@ -52,15 +51,10 @@ public class ProductService
      * @param endDate end date of the discount
      * @param percentage discount percentage
      */
-    public void SetDiscountForCategory(String category, LocalDate startDate, LocalDate endDate, double percentage)
+    public String SetDiscountForCategory(String category, LocalDate startDate, LocalDate endDate, double percentage) throws Exception
     {
-        try
-        {
-            pf.SetDiscountForCategory(category, startDate, endDate, percentage);
-        }
-        catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
+        pf.SetDiscountForCategory(category, startDate, endDate, percentage);
+        return "added discount for category: "+category;
     }
 
     /**
@@ -70,15 +64,10 @@ public class ProductService
      * @param endDate the end date for the discount
      * @param percentage the discount percentage
      */
-    public void SetDiscount(String productName, LocalDate startDate, LocalDate endDate, double percentage)
+    public String SetDiscount(String productName, LocalDate startDate, LocalDate endDate, double percentage) throws Exception
     {
-        try
-        {
-            pf.SetDiscount(productName, startDate, endDate, percentage);
-        }
-        catch (Exception e) {
-            System.out.println(e.getMessage());
-        }
+        pf.SetDiscount(productName, startDate, endDate, percentage);
+        return "added discount for product: "+productName;
     }
 
     /**
@@ -87,9 +76,25 @@ public class ProductService
      * @param supplyId the id of the supply, should be pn the barcode ;)
      * @param shelfCount the new quantity on the shelfs
      * @param storageCount the new quantity in the storage
+     * @return the string representing the report
      * @throws Exception if product not found, new quantity is greater than old quantity
      */
-    public void reportSales(String productName, int supplyId, int shelfCount, int storageCount) throws Exception
+    public String reportSales(String productName, int supplyId, int shelfCount, int storageCount) throws Exception
     {
+        return pf.updateSoldQuantity(productName,supplyId,shelfCount,storageCount)? "updated" + System.lineSeparator()+ "Alert! "+productName+" quantity has reached below minimal quantity! pls order a new supply ASAP!":"updated";
+    }
+
+    /**
+     * update the product supply quantities and report all the missing items as broken
+     * @param productName the product to update
+     * @param supplyId the id of the supply, should be pn the barcode ;)
+     * @param shelfCount the new quantity on the shelfs
+     * @param storageCount the new quantity in the storage
+     * @return the string representing the report
+     * @throws Exception if product not found, new quantity is greater than old quantity
+     */
+    public String reportBroke(String productName, int supplyId, int shelfCount, int storageCount) throws Exception
+    {
+        return pf.updateBrokenQuantity(productName,supplyId,shelfCount,storageCount)? "updated" + System.lineSeparator()+ "Alert! "+productName+" quantity has reached below minimal quantity! pls order a new supply ASAP!":"updated";
     }
 }

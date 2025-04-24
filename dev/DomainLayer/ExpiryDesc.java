@@ -7,7 +7,7 @@ class ExpiryDesc
 {
     private String productName;
     private List<LocalDate> expiredDates;
-
+    private int expiredAmount=0;
     public void setExpiredDates(List<LocalDate> expiredDates)
     {
         this.expiredDates = expiredDates;
@@ -26,14 +26,19 @@ class ExpiryDesc
     {
         return expiredDates.size();
     }
+    //add the amount of the expired supply
+    void addAmount(int amount)
+    {
+        this.expiredAmount+=amount;
+    }
 
     @Override
     public String toString()
     {
-        StringBuilder toReturn = new StringBuilder(productName + ":" + "\n");
+        StringBuilder toReturn = new StringBuilder("product:"+productName + ":, amount:" +String.valueOf(expiredAmount)+ "\n");
         for (int i = 0; i < expiredDates.size(); i++)
         {
-            toReturn.append(expiredDates.get(i)).append("\n");
+            toReturn.append("    ").append(expiredDates.get(i)).append("\n");
         }
         return toReturn.toString();
     }

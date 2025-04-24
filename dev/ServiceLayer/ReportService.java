@@ -7,7 +7,11 @@ import java.util.List;
 
 public class ReportService
 {
-    protected ReportFacade rf;
+    private final ReportFacade rf;
+    ReportService(ReportFacade rf)
+    {
+        this.rf=rf;
+    }
 
     public String GenerateExpiryReport(LocalDate until)
     {

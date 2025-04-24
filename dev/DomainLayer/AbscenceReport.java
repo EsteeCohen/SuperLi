@@ -1,11 +1,12 @@
 package DomainLayer;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 public class AbscenceReport
 {
-    List<AbscenceDesc> abscenceDescriptions;
+    List<AbscenceDesc> abscenceDescriptions=new ArrayList<>();
     private final LocalDate reportDate;
 
     public void add(AbscenceDesc abscenceReport)

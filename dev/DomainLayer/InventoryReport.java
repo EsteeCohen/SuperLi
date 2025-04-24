@@ -1,11 +1,12 @@
 package DomainLayer;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 class InventoryReport
 {
-    private List<InventoryDesc> inventoryDescs;
+    private List<InventoryDesc> inventoryDescs=new ArrayList<>();
     private final LocalDate reportDate;
 
     public void add(InventoryDesc inventoryDesc)

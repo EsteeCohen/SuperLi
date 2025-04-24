@@ -218,11 +218,13 @@ class Product {
 
         List<LocalDate> expiredDates = new ArrayList<>();
         List<Supply> allSupplies = new ArrayList<>(supplies.values());
-
+        int amount=0;
 
             for (Supply supply : allSupplies) {
-                if (supply.expirationDate.isBefore(until))
+                if (supply.expirationDate.isBefore(until)) {
                     expiredDates.add(supply.expirationDate);
+                    expiryDesc.addAmount( supply.shelfQuantity+supply.storageQuantity);
+                }
             }
             expiryDesc.setProduct(productName);
             expiryDesc.setExpiredDates(expiredDates);
