@@ -7,15 +7,12 @@ import java.util.List;
 
 class ProductService
 {
-<<<<<<< HEAD
+
     private final ProductFacade pf;
     ProductService(ProductFacade pf)
     {
         this.pf=pf;
     }
-=======
-    private ProductFacade pf;
->>>>>>> d1700c56bf3ed291593488561a2c7c09bf4cad8e
 
     /**
      * adds a new product to the system

@@ -7,15 +7,11 @@ import java.util.List;
 
 class ReportService
 {
-<<<<<<< HEAD
     private final ReportFacade rf;
     ReportService(ReportFacade rf)
     {
         this.rf=rf;
     }
-=======
-    private ReportFacade rf;
->>>>>>> d1700c56bf3ed291593488561a2c7c09bf4cad8e
 
     public String GenerateExpiryReport(LocalDate until)
     {
