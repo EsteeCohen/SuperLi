@@ -22,7 +22,7 @@ class ExpiryReport
     @Override
     public String toString()
     {
-        StringBuilder toReturn = new StringBuilder("המוצרים פגי-התוקף נכון לתאריך " + reportDate + " הם: " + "\n");
+        StringBuilder toReturn = new StringBuilder("the expired product as of " + reportDate + " are: " + "\n");
         for (ExpiryDesc expiryDesc : expiryDescs) {
             toReturn.append(expiryDesc.toString()).append("\n");
         }

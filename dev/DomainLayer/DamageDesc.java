@@ -14,6 +14,6 @@ public class DamageDesc
     @Override
     public String toString()
     {
-        return "The amount of broken products from " + productName + ":" + brokenQuantity;
+        return "    The amount of broken products from " + productName + ":" + brokenQuantity;
     }
 }

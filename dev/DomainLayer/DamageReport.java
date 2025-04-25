@@ -21,7 +21,7 @@ class DamageReport
     }
     public String toString()
     {
-        StringBuilder toReturn = new StringBuilder("המוצרים שהיו פגים נכון לתאריך " + reportDate + " הם: " + "\n");
+        StringBuilder toReturn = new StringBuilder("the defected products reported as of " + reportDate + " are: " + "\n");
         for (DamageDesc damageDesc : damageDescriptions) {
             toReturn.append(damageDesc.toString()).append("\n");
         }

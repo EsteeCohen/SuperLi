@@ -19,7 +19,7 @@ public class AbscenceReport
     }
     public String toString()
     {
-        StringBuilder toReturn = new StringBuilder("המוצרים שהיה בהם חוסר נכון לתאריך " + reportDate + " הם: " + "\n");
+        StringBuilder toReturn = new StringBuilder("the product with an absence as of " + reportDate + " are: " + "\n");
         for (AbscenceDesc abscenceDesc : abscenceDescriptions) {
             if (abscenceDesc.getAbscenceAmount() > 0)
                 toReturn.append(abscenceDesc.toString()).append("\n");

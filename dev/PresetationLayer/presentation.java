@@ -28,14 +28,13 @@ public class presentation {
      */
     private void run()
     {
-        System.out.println("Welcome to the storage/inventory managment system!");
-
         //allow to initialize default data
         System.out.println("Do you want to initialize the system with default data? (Y/N):");
         String initialize=scanner.nextLine().toLowerCase();
         if(initialize.equals("y"))
             startUp();
 
+        System.out.println("Welcome to the storage/inventory management system!");
 
         System.out.println("pls enter a command, for all commands enter help:");
         String command =scanner.nextLine().toLowerCase();
@@ -60,7 +59,7 @@ public class presentation {
         while(!command.equals("exit"))
         {
             parse(command);
-            System.out.println("pls enter a command, for all commands enter help:");
+            System.out.println("pls enter a command, for all commands enter HELP:");
             command =scanner.nextLine().toLowerCase();
         }
         System.out.println("Good bye!");
@@ -73,7 +72,7 @@ public class presentation {
     {   System.out.println("symbols: 'abs' means a string,");
         System.out.println("         [abc] means a list of strings encased in [], for example [a,b,c]");
         System.out.println("         dates should be of format dd/mm/yyyy, for example 31/11/2025");
-        System.out.println("         for 'precentage, only write the number, np need to write %");
+        System.out.println("         for 'percentage, only write the number, no need to write %");
         System.out.println();
 
         System.out.println("to add a new product to the system:");
@@ -93,11 +92,11 @@ public class presentation {
         System.out.println();
 
         System.out.println("to report about sales of a product:");
-        System.out.println("SOLD 'productName' 'supplyId' 'newShelfQuantity' 'newStoreCostPerItem'");
+        System.out.println("SOLD 'productName' 'supplyId' 'newShelfQuantity' 'newStorageQuantity'");
         System.out.println();
 
         System.out.println("to report about bad product found:");
-        System.out.println("BROKE 'productName' 'supplyId' 'newShelfQuantity' 'newStoreCostPerItem'");
+        System.out.println("BROKE 'productName' 'supplyId' 'newShelfQuantity' 'newStorageQuantity'");
         System.out.println();
 
         System.out.println("to get a missing supply report(only use after updating all the products!):");
@@ -122,6 +121,10 @@ public class presentation {
 
         System.out.println("to load some default data(note that it will delete all previous data):");
         System.out.println("STARTUP");
+        System.out.println();
+
+        System.out.println("to exit the program:");
+        System.out.println("EXIT");
         System.out.println();
     }
 

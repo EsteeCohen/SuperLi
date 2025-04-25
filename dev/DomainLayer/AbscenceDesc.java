@@ -18,6 +18,6 @@ public class AbscenceDesc
     @Override
     public String toString()
     {
-        return "The amount of abscent products from " + productName + ":" + abscenceAmount;
+        return "    The amount of absent products from " + productName + ":" + abscenceAmount;
     }
 }

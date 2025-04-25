@@ -22,7 +22,7 @@ class InventoryReport
     @Override
     public String toString()
     {
-        StringBuilder toReturn = new StringBuilder("המלאי נכון לתאריך " + reportDate + " הוא: " + "\n");
+        StringBuilder toReturn = new StringBuilder("the inventory as described as of " + reportDate + " is; " + "\n");
         for (InventoryDesc inventoryDesc : inventoryDescs) {
             toReturn.append(inventoryDesc.toString()).append("\n");
         }

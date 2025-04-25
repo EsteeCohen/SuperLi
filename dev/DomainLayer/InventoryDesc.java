@@ -16,6 +16,6 @@ class InventoryDesc
     @Override
     public String toString()
     {
-        return productName + ":" + totalQuantity;
+        return "    "+productName + ":" + totalQuantity;
     }
 }
