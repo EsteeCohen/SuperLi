@@ -10,7 +10,7 @@ import java.util.Scanner;
 
 public class presentation {
     private Scanner scanner=new Scanner(System.in);
-    private final ServiceFactory serviceFactory=new ServiceFactory();
+    private ServiceFactory serviceFactory=new ServiceFactory();
 
 
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -29,6 +29,14 @@ public class presentation {
     private void run()
     {
         System.out.println("Welcome to the storage/inventory managment system!");
+
+        //allow to initialize default data
+        System.out.println("Do you want to initialize the system with default data? (Y/N):");
+        String initialize=scanner.nextLine().toLowerCase();
+        if(initialize.equals("y"))
+            startUp();
+
+
         System.out.println("pls enter a command, for all commands enter help:");
         String command =scanner.nextLine().toLowerCase();
         while(!command.equals("exit"))
@@ -46,6 +54,7 @@ public class presentation {
     {
         this.scanner=scanner;
         System.out.println("Welcome to the storage/inventory managment system!");
+
         System.out.println("pls enter a command, for all commands enter help:");
         String command =scanner.nextLine().toLowerCase();
         while(!command.equals("exit"))
@@ -110,6 +119,10 @@ public class presentation {
         System.out.println("to get a report about all products that will expire until a provided date:");
         System.out.println("EREPORT 'untilDate'");
         System.out.println();
+
+        System.out.println("to load some default data(note that it will delete all previous data):");
+        System.out.println("STARTUP");
+        System.out.println();
     }
 
     /**
@@ -169,6 +182,10 @@ public class presentation {
             else if(args[0].equals("dreport"))
             {
                 parseDreport(args);
+            }
+            else if(args[0].equals("startup"))
+            {
+                startUp();
             }
             else
             {
@@ -366,4 +383,31 @@ public class presentation {
         System.out.println(serviceFactory.GenerateExpiryReport(LocalDate.parse(args[1],FORMATTER)));
     }
 
+    /**
+     * used to initate some data if needed
+     * @throws Exception if anything goes wrong
+     */
+    private void startUp()
+    {
+        //initiate a new service factory because you cant have the same product twice
+        serviceFactory=new ServiceFactory();
+        try{
+            serviceFactory.AddProduct("milk","diary",Arrays.asList("milk","3%"),"tara",10,"a1","a1");
+            serviceFactory.AddProduct("yogurt","diary",Arrays.asList("yogurt","8%"),"tnuva",15,"a2","a2");
+            serviceFactory.AddProduct("water","drinks",Arrays.asList("water","mineral"),"ein-gedi",7.5,"z5","a3");
+
+            serviceFactory.addSupply("milk",5,LocalDate.parse("05/05/2025",FORMATTER),10,20);
+            serviceFactory.addSupply("milk",5,LocalDate.parse("10/05/2025",FORMATTER),5,15);
+            serviceFactory.addSupply("yogurt",4,LocalDate.parse("03/05/2025",FORMATTER),20,20);
+            serviceFactory.addSupply("yogurt",4,LocalDate.parse("12/05/2025",FORMATTER),10,15);
+            serviceFactory.addSupply("water",2,LocalDate.parse("03/05/2026",FORMATTER),30,20);
+            serviceFactory.addSupply("water",1,LocalDate.parse("23/08/2026",FORMATTER),0,100);
+        }catch(Exception e) {
+            System.out.println("an Error occured during initialization, pls try again later...");
+            e.printStackTrace();
+            System.exit(-1);
+        }
+        System.out.println("initiated");
+
+    }
 }
