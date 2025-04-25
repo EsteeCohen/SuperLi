@@ -14,6 +14,7 @@ public class RegistrationPresentation {
     }
 
     public void registerNewEmployee() {
+        String wageType = "";
         System.out.println("=== Add New Employee ===");
         System.out.print("Name: ");
         String name = scanner.nextLine();
@@ -24,8 +25,19 @@ public class RegistrationPresentation {
         System.out.print("Wage: ");
         int salary = scanner.nextInt();
         scanner.nextLine(); // Clear the buffer
-        System.out.print("Wage Type: ");
-        String wageType = scanner.nextLine();
+        while(true){
+            try{
+            System.out.print("Wage Type: (enter 1 for Hourly, 2 for Monthly): ");
+            int wageTypeChoice = scanner.nextInt();
+            wageType =  wageTypeChoice == 1 ? "Hourly" : "Monthly";
+            break;
+            }
+            catch (Exception e){
+                System.out.println("Invalid input. Please enter 1 for Hourly or 2 for Monthly.");
+                scanner.nextLine(); // Clear the invalid input
+                continue; // Restart the loop to ask for input again
+            }
+        }
         System.out.print("Yearly Sick Days: ");
         int yearlySickDays = scanner.nextInt();
         System.out.print("Yearly Days Off: ");

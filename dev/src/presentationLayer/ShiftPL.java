@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import domainLayer.ShiftDL;
 import domainLayer.Enums.ShiftType;
 import serviceLayer.EmployeeSL;
 import serviceLayer.RoleSL;
@@ -28,4 +29,27 @@ public class ShiftPL {
             employeesAssignment.put(role, employees);
         }
     }
+
+    @Override
+    public String toString() {
+        return "ShiftPL{" +
+                "date=" + date +
+                ", shiftType=" + shiftType +
+                ", employeesAssignment=" + employeesAssignment +
+                '}';
+    }
+
+    public LocalDate getDate() {
+        return date;
+    }
+
+    public ShiftType getShiftType() {
+        return shiftType;
+    }
+
+    public Map<RolePL, List<EmployeePL>> getEmployeesAssignment() {
+        return employeesAssignment;
+    }
+
+
 }

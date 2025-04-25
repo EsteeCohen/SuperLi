@@ -3,7 +3,6 @@ package presentationLayer;
 import java.util.Scanner;
 
 import serviceLayer.EmployeeService;
-import serviceLayer.HRSystemUIService;
 
 public class EmployeeSearchPresentation {
     private EmployeeService employeeService;
@@ -18,6 +17,6 @@ public class EmployeeSearchPresentation {
         System.out.print("Enter employee ID to search: ");
         String id = scanner.nextLine();
 
-        System.out.println(employeeService.getEmployeeById(id).toString());
+        System.out.println(new EmployeePL(employeeService.getEmployeeById(id)).toString());
     }
 }

@@ -85,6 +85,7 @@ public class HRSystemUI {
         System.out.println("4. Create new role");
         System.out.println("5. View and manage shift schedule");
         System.out.println("6. Search employee by ID");
+        System.out.println("7. Update employee details");
         System.out.println("0. Exit");
     }
 
@@ -108,8 +109,9 @@ public class HRSystemUI {
         int choice = getUserChoice();
 
         if (choice == 0) {
-            System.out.println("Exiting the system. Goodbye!");
-            return false;
+            System.out.println("Exit...");
+            start(); // Restart the system
+            return false; // Exit the current loop
         }
         if (employee.getRole().contains(ADMIN_ROLE_NAME)) {
             return handleHRManagerChoice(choice, employee);
@@ -138,15 +140,18 @@ public class HRSystemUI {
                 roleCreation.createNewRole();
                 break;
             case 5:
-                System.out.println("Not implemented yet. :(");
-            // ShiftsTablePresentation shiftsTable = new
-            // ShiftsTablePresentation(shiftService, scanner, assigningService);
-            // shiftsTable.showShiftTable();
-            // shiftsTable.assignEmployeeToShift();
+                ShiftsTablePresentation shiftsTable = new
+                ShiftsTablePresentation(shiftService, scanner, assigningService);
+                shiftsTable.showShiftTable();
+                shiftsTable.assignEmployeeToShift();
             break;
             case 6:
                 EmployeeSearchPresentation employeeSearch = new EmployeeSearchPresentation(employeeService, scanner);
                 employeeSearch.searchEmployee();
+                break;
+            case 7:
+                EmployeeUpdatePresentation employeeUpdate = new EmployeeUpdatePresentation(employeeService, scanner);
+                employeeUpdate.updateEmployeeDetails();
                 break;
             default:
                 System.out.println("Invalid option. Please try again.");

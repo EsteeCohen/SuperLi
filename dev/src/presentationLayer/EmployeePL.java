@@ -51,4 +51,22 @@ public class EmployeePL {
     public String getID() {
         return id;
     }
+
+    @Override
+    public String toString() {
+        return "----------Employee Details:----------\n" + 
+                "Id: " + id + '\n' +
+                "Full Name: " + fullName + '\n' +
+                "Starting Date: " + wordStartingDate + "\n" +
+                "Wage: " + wage + "\n" +
+                "Wage Type: " + wageType + "\n" +
+                "Roles: " + roles + "\n" +
+                "Yearly Sick Days: " + yearlySickDays + "\n" +
+                "Yearly Days Off: " + yearlyDaysOff + "\n" +
+                "-------------------------------------\n";
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
 }

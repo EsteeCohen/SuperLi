@@ -24,7 +24,7 @@ public class AvailabilityForm {
             .toList();
         System.out.println("shifts:");
         for (int i = 0; i < workTimes.size(); i++) {
-            System.out.println((i + 1) + ". " + workTimes.get(i));
+            System.out.println((i + 1) + ". " + workTimes.get(i).toString());
         }
 
         // Get user input for selected work times
@@ -36,10 +36,10 @@ public class AvailabilityForm {
         for (String number : selectedNumbers) {
             int index = Integer.parseInt(number.trim()) - 1;
             if (index >= 0 && index < workTimes.size()) {
-                String selectedTime = workTimes.get(index).toString();
+                String selectedTime = workTimes.get(index).getDate().toString();
                 // Assuming selectedTime contains the shift details in a format that can be parsed
                 LocalDate shiftDate = LocalDate.parse(selectedTime.split(" ")[0]); // Extract date from selectedTime
-                String shiftType = selectedTime.split(" ")[1]; // Extract shift type from selectedTime
+                String shiftType = workTimes.get(index).getShiftType().toString(); // Extract shift type from selectedTime
                 boolean isAvailable = true; // Assuming availability is true by default
                 shiftService.setAvailabilityOfEmployeeToShift(employeeId, shiftDate, shiftType, isAvailable);
             } else {

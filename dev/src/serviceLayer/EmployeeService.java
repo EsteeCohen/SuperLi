@@ -1,5 +1,7 @@
 package serviceLayer;
 
+import java.util.Map;
+
 import domainLayer.EmployeeDL;
 import domainLayer.EmployeeFacade;
 
@@ -38,5 +40,10 @@ public class EmployeeService {
     public void registerAdmin(){
         registerEmployee("Bombardino Crocodilo", "3", "admin", 9999, "Hourly", 1000, 1000);
         assignRoleToEmployee("admin", "HrManager");
+    }
+
+    public void updateEmployeeAttributes(String employeeId, Map<String, Object> attributes){
+        EmployeeDL employee = employeeFacade.getEmployee(employeeId);
+        employee.updateAttributes(attributes);
     }
 }

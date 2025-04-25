@@ -58,6 +58,11 @@ public class ShiftService {
             availability.setAvailability(available);
         }
     }
+
+    public List<EmployeeDL> getAvailableEmployeesForShift(LocalDate date, ShiftType shiftType) {
+        ShiftDL shift = shiftFacade.getShiftByDateAndType(date, shiftType.toString());
+        return availabilityFacade.getAvailabilitiesForShift(shift);
+    }
     
     public void createShiftsForWeek(LocalDate startDate) {
         List<EmployeeDL> employees = employeeFacade.getAllEmployees();
