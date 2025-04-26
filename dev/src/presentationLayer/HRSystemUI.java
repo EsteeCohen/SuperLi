@@ -15,6 +15,7 @@ public class HRSystemUI {
     private AssigningService assigningService;
 
     private final String ADMIN_ROLE_NAME = "HrManager";
+    private final String SHIFT_MNG_ROLE = "Shift Manager";
 
     private final Scanner scanner;
 
@@ -35,8 +36,10 @@ public class HRSystemUI {
     private void Initialize() {
         // Registering the admin
         roleService.createRole(ADMIN_ROLE_NAME);
+        roleService.createRole(SHIFT_MNG_ROLE);
         employeeService.registerAdmin();
         shiftService.createShiftsForNextWeek();
+        assigningService.initializeRequirements();
     }
 
     public void start() {
@@ -70,7 +73,7 @@ public class HRSystemUI {
     }
 
     private void displayMenuForEmployee(EmployeePL employee) {
-        if (employee.getRole().contains(ADMIN_ROLE_NAME)) {
+        if (employee.getRoles().contains(ADMIN_ROLE_NAME)) {
             displayHRManagerMenu();
         } else {
             displayEmployeeMenu();
@@ -113,7 +116,7 @@ public class HRSystemUI {
             start(); // Restart the system
             return false; // Exit the current loop
         }
-        if (employee.getRole().contains(ADMIN_ROLE_NAME)) {
+        if (employee.getRoles().contains(ADMIN_ROLE_NAME)) {
             return handleHRManagerChoice(choice, employee);
         } else {
             return handleEmployeeChoice(choice, employee);
@@ -141,7 +144,7 @@ public class HRSystemUI {
                 break;
             case 5:
                 ShiftsTablePresentation shiftsTable = new
-                ShiftsTablePresentation(shiftService, scanner, assigningService);
+                ShiftsTablePresentation(shiftService, scanner, assigningService, employeeService);
                 shiftsTable.showShiftTable();
                 shiftsTable.assignEmployeeToShift();
             break;
@@ -168,7 +171,7 @@ public class HRSystemUI {
                 break;
             case 2:
                 ShiftsTablePresentation shiftsTable = new ShiftsTablePresentation(shiftService, scanner,
-                        assigningService);
+                        assigningService, employeeService);
                 shiftsTable.showShiftTable();
                 break;
             default:

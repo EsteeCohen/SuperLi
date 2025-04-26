@@ -3,10 +3,12 @@ package domainLayer;
 import domainLayer.Enums.ShiftType;
 import java.time.DayOfWeek;
 import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Map;
 
 public class WeeklyShiftRequirements {
-    private final Dictionary<String, Dictionary<RoleDL, Integer>> weeklyRequirements;
+    private final Map<String, Dictionary<RoleDL, Integer>> weeklyRequirements;
 
     // Singleton 
     private static WeeklyShiftRequirements instance = null;
@@ -18,7 +20,21 @@ public class WeeklyShiftRequirements {
     }
 
     private WeeklyShiftRequirements() {
-        this.weeklyRequirements = new Hashtable<String, Dictionary<RoleDL, Integer>>();
+        this.weeklyRequirements = new HashMap<String, Dictionary<RoleDL, Integer>>();
+        weeklyRequirements.put(DayOfWeek.SUNDAY.toString() + "_" + ShiftType.MORNING, new Hashtable<RoleDL,Integer>());
+        weeklyRequirements.put(DayOfWeek.SUNDAY.toString() + "_" + ShiftType.EVENING, new Hashtable<RoleDL,Integer>());
+        weeklyRequirements.put(DayOfWeek.MONDAY.toString() + "_" + ShiftType.MORNING, new Hashtable<RoleDL,Integer>());
+        weeklyRequirements.put(DayOfWeek.MONDAY.toString() + "_" + ShiftType.EVENING, new Hashtable<RoleDL,Integer>());
+        weeklyRequirements.put(DayOfWeek.TUESDAY.toString() + "_" + ShiftType.MORNING, new Hashtable<RoleDL,Integer>());
+        weeklyRequirements.put(DayOfWeek.TUESDAY.toString() + "_" + ShiftType.EVENING, new Hashtable<RoleDL,Integer>());
+        weeklyRequirements.put(DayOfWeek.WEDNESDAY.toString() + "_" + ShiftType.MORNING, new Hashtable<RoleDL,Integer>());
+        weeklyRequirements.put(DayOfWeek.WEDNESDAY.toString() + "_" + ShiftType.EVENING, new Hashtable<RoleDL,Integer>());
+        weeklyRequirements.put(DayOfWeek.THURSDAY.toString() + "_" + ShiftType.MORNING, new Hashtable<RoleDL,Integer>());
+        weeklyRequirements.put(DayOfWeek.THURSDAY.toString() + "_" + ShiftType.EVENING, new Hashtable<RoleDL,Integer>());
+        weeklyRequirements.put(DayOfWeek.FRIDAY.toString() + "_" + ShiftType.MORNING, new Hashtable<RoleDL,Integer>());
+        weeklyRequirements.put(DayOfWeek.FRIDAY.toString() + "_" + ShiftType.EVENING, new Hashtable<RoleDL,Integer>());
+        weeklyRequirements.put(DayOfWeek.SATURDAY.toString() +  "_" + ShiftType.MORNING, new Hashtable<RoleDL,Integer>());
+        weeklyRequirements.put(DayOfWeek.SATURDAY.toString() + "_" + ShiftType.EVENING, new Hashtable<RoleDL,Integer>());
     }
 
     public void setRequirements(DayOfWeek day, ShiftType shift, RoleDL role, int quantity) {
@@ -42,6 +58,12 @@ public class WeeklyShiftRequirements {
             return weeklyRequirements.get(dayString);
         } else {
             return null; // or return an empty dictionary if preferred
+        }
+    }
+
+    public void setRequirementsToAll(RoleDL role, int quantity){
+        for (String key : weeklyRequirements.keySet()){
+            weeklyRequirements.get(key).put(role, quantity);
         }
     }
 

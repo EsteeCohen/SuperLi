@@ -6,6 +6,7 @@ import domainLayer.EmployeeDL;
 import domainLayer.EmployeeFacade;
 import domainLayer.ShiftDL;
 import domainLayer.ShiftFacade;
+import domainLayer.WeeklyShiftRequirements;
 import domainLayer.Enums.ShiftType;
 
 import java.time.DayOfWeek;
@@ -31,8 +32,21 @@ public class ShiftService {
         throw new UnsupportedOperationException("Unimplemented method 'checkShiftsWithMissingWorkers'");
     }
 
+    public boolean CheckIfThereAreShiftsThatAreNotAssigned() {
+        return shiftFacade.checkIfThereAreShiftsThatAreNotFullyAssigned();
+    }
+
     public List<ShiftSL> getAllShift() {
         List<ShiftDL> allDlShifts  = shiftFacade.getAllShifts();
+        List<ShiftSL> allSlShifts = new ArrayList<>();
+        for (ShiftDL dlShift : allDlShifts) {
+            allSlShifts.add(new ShiftSL(dlShift));
+        }
+        return allSlShifts;
+    }
+
+    public List<ShiftSL> getWeeklyShifts(LocalDate startDate) {
+        List<ShiftDL> allDlShifts = shiftFacade.getWeeklyShifts(startDate);
         List<ShiftSL> allSlShifts = new ArrayList<>();
         for (ShiftDL dlShift : allDlShifts) {
             allSlShifts.add(new ShiftSL(dlShift));

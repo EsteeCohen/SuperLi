@@ -42,7 +42,7 @@ public class EmployeePL {
         this.yearlyDaysOff = employeeSL.getYearlyDaysOff();
     }
 
-    public List<String> getRole() {
+    public List<String> getRoles() {
         return roles.stream()
                 .map(RolePL::getName)
                 .toList();

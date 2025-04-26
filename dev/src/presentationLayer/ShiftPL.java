@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import domainLayer.ShiftDL;
 import domainLayer.Enums.ShiftType;
 import serviceLayer.EmployeeSL;
 import serviceLayer.RoleSL;
@@ -32,11 +31,14 @@ public class ShiftPL {
 
     @Override
     public String toString() {
-        return "ShiftPL{" +
-                "date=" + date +
-                ", shiftType=" + shiftType +
-                ", employeesAssignment=" + employeesAssignment +
-                '}';
+        return "[Date: " + date +
+                ", " + (shiftType == ShiftType.EVENING ? "evening" : "morning") +
+                ", Assigned Employees :" + employeesAssignment +
+                ']';
+    }
+
+    public String toStringForAvailabilityForm(){
+        return "[" + date + " " + (shiftType == ShiftType.EVENING ? "evening" : "morning") + "]";
     }
 
     public LocalDate getDate() {

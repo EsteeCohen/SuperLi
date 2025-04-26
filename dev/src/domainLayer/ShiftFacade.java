@@ -52,4 +52,26 @@ public class ShiftFacade {
     public void setRequirements(DayOfWeek day, ShiftType shift, RoleDL role, int quantity) {
         WeeklyShiftRequirements.getInstance().setRequirements(day, shift, role, quantity);
     }
+
+    public boolean checkIfThereAreShiftsThatAreNotFullyAssigned() {
+        for (ShiftDL shift : shifts.values()) {
+            if (!shift.meetTheRequirements()) {
+                return true; // Found a shift that does not meet the requirements
+            }
+        }
+        return false; // All shifts have at least one assigned employee
+    }
+
+    public List<ShiftDL> getWeeklyShifts(LocalDate startDay) {
+        List<ShiftDL> weeklyShifts = new ArrayList<>();
+        LocalDate endDay = startDay.plusDays(6); 
+
+        for (ShiftDL shift : shifts.values()) {
+            if (!shift.getDate().isBefore(startDay) && !shift.getDate().isAfter(endDay)) {
+                weeklyShifts.add(shift);
+            }
+        }
+
+        return weeklyShifts;
+    }
 }

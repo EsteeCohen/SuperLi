@@ -5,6 +5,7 @@ import domainLayer.EmployeeFacade;
 import domainLayer.RoleDL;
 import domainLayer.RoleFacade;
 import domainLayer.ShiftFacade;
+import domainLayer.WeeklyShiftRequirements;
 import domainLayer.Enums.ShiftType;
 
 import java.time.DayOfWeek;
@@ -51,6 +52,10 @@ public class AssigningService {
             throw new IllegalArgumentException("Role not found");
         }
         shiftFacade.setRequirements(day, shift, roleDL, quantity);
+    }
+
+    public void initializeRequirements(){
+        WeeklyShiftRequirements.getInstance().setRequirementsToAll(roleFacade.getRoleByName("Shift Manager"), 0);
     }
 
 }
