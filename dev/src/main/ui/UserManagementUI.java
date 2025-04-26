@@ -19,7 +19,10 @@ public class UserManagementUI {
         this.userController = userController;
         this.sessionId = sessionId;
     }
-    
+    public String getSessionId() {
+        return sessionId;
+
+    }
     /**
      * התחלת ממשק ניהול משתמשים
      */

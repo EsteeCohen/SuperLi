@@ -31,7 +31,6 @@ public class TransportApp {
         OrderUI orderUI = new OrderUI(orderController,siteController, transportController);
         FleetUI fleetUI = new FleetUI(truckController, driverController,userController);
         SiteUI siteUI = new SiteUI(siteController);
-//        IncidentUI incidentUI = new IncidentUI();
         LoginUI loginUI = new LoginUI(userController);
         String sessionId = loginUI.processLogin();
         UserManagementUI userManagementUI = new UserManagementUI(userController, sessionId);

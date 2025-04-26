@@ -64,36 +64,26 @@ public class MainUI {
      */
     public void start() {
         boolean exit = false;
-    
+
         while (!exit) {
-                // ניסיון התחברות
-            this.sessionId = null;
+            // התחברות למערכת
+//            this.sessionId = loginUI.processLogin();
+            this.sessionId = userManagementUI.getSessionId();
 
-            while (sessionId == null) {
-                sessionId = loginUI.processLogin();
-
-                if (sessionId == null) {
-                    System.out.println("האם לנסות שוב? (כן/לא)");
-                    String retry = getStringInput("בחירתך: ");
-                    if (!retry.equalsIgnoreCase("כן")) {
-                        exit = true;
-                        break;
-                    }
+            // אם ההתחברות נכשלה, נחזור למסך ההתחברות או נסיים
+            if (sessionId == null) {
+                System.out.println("האם לנסות להתחבר שוב? (כן/לא)");
+                String retry = getStringInput("בחירתך: ");
+                if (!retry.equalsIgnoreCase("כן")) {
+                    exit = true;
                 }
-            }
-
-            if (exit) {
-                break; // <<< חייב את זה פה
-            }
-            // אם הגענו לפה — התחברות הצליחה
-            this.currentUser = userController.getCurrentUser(sessionId);
-
-            if (currentUser == null) {
-                System.out.println("שגיאה: המשתמש לא נמצא עבור session זה. מתנתק...");
-                logout();
                 continue;
             }
-    
+
+            // קבלת פרטי המשתמש המחובר
+            this.currentUser = userController.getCurrentUser(sessionId);
+
+            // הפעלת התפריט הראשי
             boolean loggedIn = true;
             while (loggedIn) {
                 displayMainMenu();
