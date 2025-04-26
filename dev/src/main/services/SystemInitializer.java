@@ -17,9 +17,10 @@ public class SystemInitializer {
     private OrderService orderService;
     private ScheduleService scheduleService;
     private IncidentService incidentService;
+    private UserService userService; 
 
     // Constructor
-    public SystemInitializer(DriverService driverService, TruckService truckService, SiteService siteService, TransportService transportService, OrderService orderService, ScheduleService scheduleService, IncidentService incidentService) {
+    public SystemInitializer(DriverService driverService, TruckService truckService, SiteService siteService, TransportService transportService, OrderService orderService, ScheduleService scheduleService, IncidentService incidentService, UserService userService) {
         this.driverService = driverService;
         this.truckService = truckService;
         this.siteService = siteService;
@@ -27,6 +28,7 @@ public class SystemInitializer {
         this.orderService = orderService;
         this.scheduleService = scheduleService;
         this.incidentService = incidentService;
+        this.userService = userService;
     }
 
     // אתחול המערכת
@@ -38,6 +40,15 @@ public class SystemInitializer {
         initializeOrders();
         initializeSchedules();
         initializeIncidents();
+        initializeUsers(); 
+    }
+
+    // אתחול משתמשים
+    private void initializeUsers() {
+        userService.addUser("U001", "admin", "admin123", "מנהל מערכת", UserRole.SYSTEM_ADMIN);
+        userService.addUser("U002", "manager", "manager123", "מנהל הובלות", UserRole.TRANSPORT_MANAGER);
+        userService.addUser("U003", "driver1", "driver123", "נהג מספר 1", UserRole.DRIVER);
+        userService.addUser("U004", "viewer", "viewer123", "צופה", UserRole.VIEWER);
     }
 
 

@@ -39,7 +39,7 @@ public class MainUI {
                 DriverController driverController, SiteController siteController,
                 ScheduleController scheduleController, IncidentController incidentController,
                 LoginUI loginUI, TransportUI transportUI, OrderUI orderUI,
-                FleetUI fleetUI, SiteUI siteUI, ScheduleUI scheduleUI) {
+                FleetUI fleetUI, SiteUI siteUI, ScheduleUI scheduleUI, UserManagementUI userManagementUI) {
         
         this.scanner = new Scanner(System.in);
         
@@ -52,6 +52,7 @@ public class MainUI {
         this.siteController = siteController;
         this.scheduleController = scheduleController;
         this.incidentController = incidentController;
+        this.userManagementUI = userManagementUI;
         
         // הגדרת ממשקי משתמש
         this.loginUI = loginUI;

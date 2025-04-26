@@ -36,11 +36,12 @@ public class TransportApp {
 //        IncidentUI incidentUI = new IncidentUI();
         LoginUI loginUI = new LoginUI(userController);
         ScheduleUI scheduleUI = new ScheduleUI(scheduleController, driverController, transportController);
-        UserManagementUI userManagementUI = new UserManagementUI(userController);
-        MainUI mainUI = new MainUI(userController,transportController,orderController,truckController,driverController,siteController,scheduleController,incidentController,loginUI,transportUI,orderUI,fleetUI,siteUI,scheduleUI);
+        String sessionId = loginUI.processLogin();
+        UserManagementUI userManagementUI = new UserManagementUI(userController, sessionId);
+        MainUI mainUI = new MainUI(userController,transportController,orderController,truckController,driverController,siteController,scheduleController,incidentController,loginUI,transportUI,orderUI,fleetUI,siteUI, scheduleUI, userManagementUI);
 
         // Initialize system with sample data
-        SystemInitializer initializer = new SystemInitializer(driverService, truckService, siteService, transportService, orderService,scheduleService,incidentService);
+        SystemInitializer initializer = new SystemInitializer(driverService, truckService, siteService, transportService, orderService,scheduleService,incidentService, userService);
         initializer.initializeSystem();
 
         // Start application
