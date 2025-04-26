@@ -18,7 +18,7 @@ public class MainUI {
     private FleetUI fleetUI;
     private SiteUI siteUI;
     private ScheduleUI scheduleUI;
-    private IncidentUI incidentUI;
+//    private IncidentUI incidentUI;
     private UserManagementUI userManagementUI;
     
     // בקרים
@@ -39,8 +39,7 @@ public class MainUI {
                 DriverController driverController, SiteController siteController,
                 ScheduleController scheduleController, IncidentController incidentController,
                 LoginUI loginUI, TransportUI transportUI, OrderUI orderUI,
-                FleetUI fleetUI, SiteUI siteUI, ScheduleUI scheduleUI,
-                IncidentUI incidentUI) {
+                FleetUI fleetUI, SiteUI siteUI, ScheduleUI scheduleUI) {
         
         this.scanner = new Scanner(System.in);
         
@@ -61,7 +60,7 @@ public class MainUI {
         this.fleetUI = fleetUI;
         this.siteUI = siteUI;
         this.scheduleUI = scheduleUI;
-        this.incidentUI = incidentUI;
+//        this.incidentUI = incidentUI;
     }
     
     /**

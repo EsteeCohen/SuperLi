@@ -3,7 +3,7 @@ package src.main.entities;
 import src.main.enums.UserRole;
 
 public class User {
-    private String id;
+    private final String id;
     private String username;
     private String password;
     private String fullName;

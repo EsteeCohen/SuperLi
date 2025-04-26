@@ -11,12 +11,12 @@ public class TransportApp {
         DriverService driverService = new DriverService();
         TruckService truckService = new TruckService();
         SiteService siteService = new SiteService();
-        TransportService transportService = new TransportService(truckService, driverService, siteService,null);
-        UserService userService = new UserService();
+        TransportService transportService = new TransportService(truckService, driverService, siteService);
         IncidentService incidentService = new IncidentService(transportService);
         OrderService orderService = new OrderService(siteService, transportService,incidentService);
+        transportService.setOrderService(orderService);
+        UserService userService = new UserService();
         ScheduleService scheduleService = new ScheduleService(driverService,transportService);
-        transportService = new TransportService(truckService, driverService, siteService,orderService);
 
         // Initialize controllers
         DriverController driverController = new DriverController(driverService);
@@ -33,11 +33,11 @@ public class TransportApp {
         OrderUI orderUI = new OrderUI(orderController,siteController, transportController);
         FleetUI fleetUI = new FleetUI(truckController, driverController,userController);
         SiteUI siteUI = new SiteUI(siteController);
-        IncidentUI incidentUI = new IncidentUI();
+//        IncidentUI incidentUI = new IncidentUI();
         LoginUI loginUI = new LoginUI(userController);
         ScheduleUI scheduleUI = new ScheduleUI(scheduleController, driverController, transportController);
-//        UserManagementUI userManagementUI = new UserManagementUI(userControlle)
-        MainUI mainUI = new MainUI(userController,transportController,orderController,truckController,driverController,siteController,scheduleController,incidentController,loginUI,transportUI,orderUI,fleetUI,siteUI,scheduleUI,incidentUI);
+        UserManagementUI userManagementUI = new UserManagementUI(userController);
+        MainUI mainUI = new MainUI(userController,transportController,orderController,truckController,driverController,siteController,scheduleController,incidentController,loginUI,transportUI,orderUI,fleetUI,siteUI,scheduleUI);
 
         // Initialize system with sample data
         SystemInitializer initializer = new SystemInitializer(driverService, truckService, siteService, transportService, orderService,scheduleService,incidentService);

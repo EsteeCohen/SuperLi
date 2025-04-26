@@ -40,6 +40,7 @@ public class SystemInitializer {
         initializeIncidents();
     }
 
+
     // אתחול נהגים
     private void initializeDrivers() {
         // נתוני נהגים מהוראות ההפעלה
@@ -77,40 +78,8 @@ public class SystemInitializer {
         LocalTime time2 = LocalTime.of(9, 30);
         LocalTime time3 = LocalTime.of(10, 0);
         
-//        // קבלת רפרנסים לישויות
-//        Truck truck1 = truckService.getTruckByRegNumber("12-345-67");
-//        Truck truck2 = truckService.getTruckByRegNumber("23-456-78");
-//        Truck truck3 = truckService.getTruckByRegNumber("34-567-89");
-//
-//        Driver driver1 = driverService.getDriverById("234567890");
-//        Driver driver2 = driverService.getDriverById("123456789");
-//        Driver driver3 = driverService.getDriverById("345678901");
-//
-//        Site sourceSite = siteService.getSiteById("SITE001");
-//        Site destinationSite1 = siteService.getSiteById("SITE002");
-//        Site destinationSite2 = siteService.getSiteById("SITE003");
-//        Site destinationSite3 = siteService.getSiteById("SITE004");
-//
-//        // יצירת רשימות יעדים
-//        List<Site> destinations1 = new ArrayList<>();
-//        destinations1.add(destinationSite1);
-//
-//        List<Site> destinations2 = new ArrayList<>();
-//        destinations2.add(destinationSite2);
-//
-//        List<Site> destinations3 = new ArrayList<>();
-//        destinations3.add(destinationSite3);
-//
-//        // יצירת הובלות
-//        Transport transport1 = transportService.createTransport(date1, time1, "12-345-67", "234567890", "SITE001", List.of("SITE002"));
-//
-//        transport1.setStatus(TransportStatus.PLANNING);
-//
-//        Transport transport2 = new Transport( date2, time2, truck2, driver2, sourceSite, destinations2);
-//        transport2.setStatus(TransportStatus.PLANNING);
-//
-//        Transport transport3 = new Transport( date3, time3, truck3, driver3, sourceSite, destinations3);
-//        transport3.setStatus(TransportStatus.PLANNING);
+
+        // יצירת הובלות
         Transport transport1 = transportService.createTransport(
                 date1, time1, "12-345-67", "234567890", "SITE001", List.of("SITE002"));
 

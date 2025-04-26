@@ -18,10 +18,13 @@ public class TransportService {
 
 
     // Constructor
-    public TransportService(TruckService truckService, DriverService driverService, SiteService siteService, OrderService orderService){
+    public TransportService(TruckService truckService, DriverService driverService, SiteService siteService){
         this.truckService = truckService;
         this.driverService = driverService;
         this.siteService = siteService;
+
+    }
+    public void setOrderService(OrderService orderService) {
         this.orderService = orderService;
     }
     // Methods

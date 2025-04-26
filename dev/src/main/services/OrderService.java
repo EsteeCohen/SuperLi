@@ -110,7 +110,7 @@ public class OrderService {
             throw new IllegalArgumentException("can't remove items from this order");
         }
 
-        List<Item> orderItems = order.getItems();
+        List<Item> orderItems = new ArrayList<>(order.getItems());
         double removedWeight = 0;
 
         for (Item itemToRemove : itemsToRemove) {
@@ -139,14 +139,11 @@ public class OrderService {
 
     public boolean cancelOrder(int id){
         Order order = getOrderById(id);
-        if(order.canBeCancelled()) {
-            boolean result = removeOrderFromTruck(id);
-            if (result) {
-                order.setStatus(OrderStatus.CANCELLED);
-                return true;
-            }
-        }
-        return false;
+        if (order == null || !order.canBeCancelled())
+            return false;
+        order.setStatus(OrderStatus.CANCELLED);
+        return true;
+
     }
 }
 

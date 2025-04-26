@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import src.main.entities.*;
 import src.main.enums.*;
+import src.main.services.*;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -12,97 +13,115 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TransportTests {
-
-    private Driver driver;
-    private Truck truck;
-    private Site sourceSite;
-    private Site destination1;
-    private Site destination2;
+    private TransportService transportService;
+    private TruckService truckService;
+    private DriverService driverService;
+    private SiteService siteService;
+    private OrderService orderService;
 
     @BeforeEach
-    public void setup() {
-        driver = new Driver("123", "Dana", "0522215232", LicenseType.C);
-        truck = new Truck("444-55-666", "Volvo", 5000, 10000, LicenseType.C);
-        sourceSite = new Site("S1", "מחסן ראשי", "תל אביב", "0501234567", "רוני", ShippingZone.CENTER);
-        destination1 = new Site("S2", "לקוח א", "חולון", "0501111111", "יוסי", ShippingZone.CENTER);
-        destination2 = new Site("S3", "לקוח ב", "בת ים", "0502222222", "אנה", ShippingZone.CENTER);
+    public void setUp() {
+        truckService = new TruckService();
+        driverService = new DriverService();
+        siteService = new SiteService();
+        transportService = new TransportService(truckService, driverService, siteService);
+        orderService = new OrderService(siteService, transportService, new IncidentService(transportService));
+        transportService.setOrderService(orderService);
+
+        truckService.addTruck("T1", "TruckModel1", 5000, 15000, LicenseType.C);
+        truckService.addTruck("T2", "TruckModel1", 5000, 16000, LicenseType.C);
+        driverService.addDriver("D1", "John Doe", "050-1234567", LicenseType.C);
+        driverService.addDriver("D2", "Jane Smith", "050-7654321", LicenseType.C);
+        siteService.addSite("SRC", "Source Site", "123 Source St.", "050-1111111", "Contact", ShippingZone.NORTH);
+        siteService.addSite("DST", "Destination Site", "456 Destination St.", "050-2222222", "Contact", ShippingZone.SOUTH);
     }
 
     @Test
-    public void testValidTransportCreation() {
-        Transport t = new Transport(LocalDate.now().plusDays(1), LocalTime.now().plusHours(1),
-                truck, driver, sourceSite, List.of(destination1));
-        assertEquals(TransportStatus.PLANNING, t.getStatus());
+    public void testCreateTransport() {
+        Transport transport = transportService.createTransport(LocalDate.now(), LocalTime.now().plusMinutes(10), "T1", "D1", "SRC", List.of("DST"));
+        assertNotNull(transport);
+        assertEquals("T1", transport.getTruck().getRegNumber());
+        assertEquals("D1", transport.getDriver().getId());
+        assertEquals(1, transport.getDestinations().size());
+        assertEquals("DST", transport.getDestinations().get(0).getId());
     }
 
     @Test
-    public void testInvalidPastDateThrowsException() {
-        assertThrows(IllegalArgumentException.class, () ->
-                new Transport(LocalDate.now().minusDays(1), LocalTime.now(), truck, driver, sourceSite, List.of(destination1)));
+    public void testCreateTransport_InvalidTruck() {
+        Transport transport = transportService.createTransport(LocalDate.now(), LocalTime.now().plusHours(1), "InvalidTruck", "D1", "SRC", List.of("DST"));
+        assertNull(transport);
     }
 
     @Test
-    public void testInvalidPastTimeThrowsException() {
+    public void testGetTransportById() {
+        Transport transport = transportService.createTransport(LocalDate.now(), LocalTime.now().plusHours(1), "T1", "D1", "SRC", List.of("DST"));
+        Transport found = transportService.getTransportById(transport.getId());
+        assertNotNull(found);
+        assertEquals(transport.getId(), found.getId());
+    }
+
+    @Test
+    public void testGetTransportsByDate() {
         LocalDate today = LocalDate.now();
-        LocalTime validTime = LocalTime.now().plusHours(2);
-        Transport t = new Transport(today, validTime, truck, driver, sourceSite, List.of(destination1));
-        LocalTime pastTime = LocalTime.now().minusHours(1);
-        assertThrows(IllegalArgumentException.class, () -> t.setTime(pastTime));
-    }
-
-
-    @Test
-    public void testSetTruckToNullThrowsException() {
-        Transport t = new Transport(LocalDate.now().plusDays(1), LocalTime.now().plusHours(1),
-                truck, driver, sourceSite, List.of(destination1));
-        assertThrows(IllegalArgumentException.class, () -> t.setTruck(null));
+        transportService.createTransport(today, LocalTime.now().plusHours(1), "T1", "D1", "SRC", List.of("DST"));
+        List<Transport> transports = transportService.getTransportsByDate(today);
+        assertEquals(1, transports.size());
     }
 
     @Test
-    public void testSetDriverToNullThrowsException() {
-        Transport t = new Transport(LocalDate.now().plusDays(1), LocalTime.now().plusHours(1),
-                truck, driver, sourceSite, List.of(destination1));
-        assertThrows(IllegalArgumentException.class, () -> t.setDriver(null));
+    public void testUpdateTransportStatus() {
+        Transport transport = transportService.createTransport(LocalDate.now(), LocalTime.now().plusHours(1), "T1", "D1", "SRC", List.of("DST"));
+        boolean updated = transportService.updateTransportStatus(transport.getId(), TransportStatus.ACTIVE);
+        assertTrue(updated);
+        assertEquals(TransportStatus.ACTIVE, transport.getStatus());
     }
 
     @Test
-    public void testAddInvalidZoneDestinationFails() {
-        Site badZoneSite = new Site("S9", "ירושלים", "ירושלים", "0500000000", "משה", ShippingZone.JERUSALEM);
-        Transport t = new Transport(LocalDate.now().plusDays(1), LocalTime.now().plusHours(1),
-                truck, driver, sourceSite, List.of(destination1));
-        assertFalse(t.validateSameRegion(List.of(destination1, badZoneSite)));
+    public void testChangeTruck() {
+        Transport transport = transportService.createTransport(LocalDate.now(), LocalTime.now().plusHours(1), "T1", "D1", "SRC", List.of("DST"));
+        boolean changed = transportService.changeTruck(transport.getId(), "T2");
+        assertTrue(changed);
+        assertEquals("T2", transport.getTruck().getRegNumber());
     }
 
     @Test
-    public void testSetStatusUpdatesCorrectly() {
-        Transport t = new Transport(LocalDate.now().plusDays(1), LocalTime.now().plusHours(1),
-                truck, driver, sourceSite, List.of(destination1));
-        t.setStatus(TransportStatus.ACTIVE);
-        assertEquals(TransportStatus.ACTIVE, t.getStatus());
+    public void testChangeTruck_InvalidTransport() {
+        boolean changed = transportService.changeTruck(9999, "T2"); // Invalid transport ID
+        assertFalse(changed);
     }
 
     @Test
-    public void testValidWeightCheck() {
-        Transport t = new Transport(LocalDate.now().plusDays(1), LocalTime.now().plusHours(1),
-                truck, driver, sourceSite, List.of(destination1));
-        t.setCurrentWeight(1000);
-        assertEquals(1000, t.getCurrentWeight());
-        assertTrue(t.isWeightValid(t.getCurrentWeight()));
+    public void testAddDestination() {
+        Transport transport = transportService.createTransport(LocalDate.now(), LocalTime.now().plusHours(1), "T1", "D1", "SRC", List.of("DST"));
+        boolean added = transportService.addDestination(transport.getId(), "DST");
+        assertTrue(added);
+        assertEquals(1, transport.getDestinations().size());
+        assertEquals("DST", transport.getDestinations().get(0).getId());
     }
 
     @Test
-    public void testCannotCancelAfterInProgress() {
-        Transport t = new Transport(LocalDate.now().plusDays(1), LocalTime.now().plusHours(1),
-                truck, driver, sourceSite, List.of(destination1));
-        t.setStatus(TransportStatus.ACTIVE);
-        assertFalse(t.canBeCancelled());
+    public void testRemoveDestination() {
+        Transport transport = transportService.createTransport(LocalDate.now(), LocalTime.now().plusHours(1), "T1", "D1", "SRC", List.of("DST"));
+        boolean removed = transportService.removeDestination(transport.getId(), "DST");
+        assertTrue(removed);
+        assertTrue(transport.getDestinations().isEmpty());
     }
 
     @Test
-    public void testTotalWeightCalculation() {
-        Transport t = new Transport(LocalDate.now().plusDays(1), LocalTime.now().plusHours(1),
-                truck, driver, sourceSite, List.of(destination1));
-        t.setCurrentWeight(2000);
-        assertEquals(7000, t.getTotalWeight()); // 5000 + 2000
+    public void testCancelTransport() {
+        Transport transport = transportService.createTransport(LocalDate.now(), LocalTime.now().plusHours(1), "T1", "D1", "SRC", List.of("DST"));
+        boolean canceled = transportService.cancelTransport(transport.getId());
+        assertTrue(canceled);
+        assertEquals(TransportStatus.CANCELLED, transport.getStatus());
+    }
+
+    @Test
+    public void testCancelTransport_WhenNotCancelable() {
+        Transport transport = transportService.createTransport(LocalDate.now(), LocalTime.now().plusHours(1), "T1", "D1", "SRC", List.of("DST"));
+        transportService.updateTransportStatus(transport.getId(), TransportStatus.ACTIVE);
+        boolean canceled = transportService.cancelTransport(transport.getId());
+        assertFalse(canceled);
+        assertEquals(TransportStatus.ACTIVE, transport.getStatus());
     }
 }
+
