@@ -90,31 +90,13 @@ public class User {
                 }
                 return false;
             
-            case DISPATCHER:
-                // מתכנן מסלולים יכול לתכנן הובלות ולוחות זמנים אבל לא לאשר אותם
-                if (operation.equals("CREATE") || operation.equals("VIEW")) {
-                    return true;
-                }
-                if (operation.equals("UPDATE") && 
-                    (resourceType.equals("TRANSPORT") || resourceType.equals("SCHEDULE"))) {
-                    return true;
-                }
-                return false;
             
             case DRIVER:
                 // נהג יכול לצפות רק בהובלות ולוחות זמנים שלו
                 return operation.equals("VIEW") && 
                        (resourceType.equals("TRANSPORT") || resourceType.equals("SCHEDULE"));
             
-            case WAREHOUSE_MANAGER:
-                // מנהל מחסן יכול לנהל אתרים ולצפות בהובלות
-                if (resourceType.equals("SITE")) {
-                    return true;
-                }
-                if (operation.equals("VIEW") && resourceType.equals("TRANSPORT")) {
-                    return true;
-                }
-                return false;
+            
             
             case VIEWER:
                 // צופה יכול רק לצפות במידע

@@ -14,19 +14,17 @@ public class SystemInitializer {
     private TruckService truckService;
     private SiteService siteService;
     private TransportService transportService;
-    private OrderService orderService;
-    private ScheduleService scheduleService;
+    private OrderService orderService;   
     private IncidentService incidentService;
     private UserService userService; 
 
     // Constructor
-    public SystemInitializer(DriverService driverService, TruckService truckService, SiteService siteService, TransportService transportService, OrderService orderService, ScheduleService scheduleService, IncidentService incidentService, UserService userService) {
+    public SystemInitializer(DriverService driverService, TruckService truckService, SiteService siteService, TransportService transportService, OrderService orderService,  IncidentService incidentService, UserService userService) {
         this.driverService = driverService;
         this.truckService = truckService;
         this.siteService = siteService;
         this.transportService = transportService;
         this.orderService = orderService;
-        this.scheduleService = scheduleService;
         this.incidentService = incidentService;
         this.userService = userService;
     }
@@ -38,7 +36,6 @@ public class SystemInitializer {
         initializeSites();
         initializeTransports();
         initializeOrders();
-        initializeSchedules();
         initializeIncidents();
         initializeUsers(); 
     }
@@ -140,80 +137,6 @@ public class SystemInitializer {
 
     }
 
-    // אתחול לוחות זמנים
-    private void initializeSchedules() {
-        // קבלת נהגים מהשירות
-        Driver driver1 = driverService.getDriverById("234567890");
-        Driver driver2 = driverService.getDriverById("123456789");
-        Driver driver3 = driverService.getDriverById("345678901");
-        
-        // קבלת הובלות מהשירות
-        Transport transport1 = transportService.getTransportById(1);
-        Transport transport2 = transportService.getTransportById(2);
-        Transport transport3 = transportService.getTransportById(3);
-        
-        // יצירת לוחות זמנים
-        DriverSchedule schedule1 = new DriverSchedule("SCH001", driver1, transport1.getDate());
-        schedule1.setStatus(ScheduleStatus.CONFIRMED);
-        
-        DriverSchedule schedule2 = new DriverSchedule("SCH002", driver2, transport2.getDate());
-        schedule2.setStatus(ScheduleStatus.CONFIRMED);
-        
-        DriverSchedule schedule3 = new DriverSchedule("SCH003", driver3, transport3.getDate());
-        schedule3.setStatus(ScheduleStatus.CONFIRMED);
-        
-        // יצירת רשומות בלוח זמנים
-        LocalTime loadingStart1 = transport1.getTime().minusHours(1);
-        LocalTime loadingEnd1 = transport1.getTime();
-        LocalTime transportEnd1 = transport1.getTime().plusHours(4);
-        
-        LocalTime loadingStart2 = transport2.getTime().minusHours(1);
-        LocalTime loadingEnd2 = transport2.getTime();
-        LocalTime transportEnd2 = transport2.getTime().plusHours(3);
-        
-        LocalTime loadingStart3 = transport3.getTime().minusHours(1);
-        LocalTime loadingEnd3 = transport3.getTime();
-        LocalTime transportEnd3 = transport3.getTime().plusHours(5);
-        
-        // הוספת רשומות ללוחות הזמנים
-        // הוספת פעילות העמסה
-        schedule1.addEntry(new ScheduleEntry(
-            "ENT001", loadingStart1, loadingEnd1, transport1, EntryType.LOADING, "העמסת סחורה במחסן המרכזי"
-        ));
-        
-        // הוספת פעילות הובלה
-        schedule1.addEntry(new ScheduleEntry(
-            "ENT002", loadingEnd1, transportEnd1, transport1, EntryType.TRANSPORT, "הובלה למרכז"
-        ));
-        
-        // חזרה על כך לשאר הנהגים
-        schedule2.addEntry(new ScheduleEntry(
-            "ENT003", loadingStart2, loadingEnd2, transport2, EntryType.LOADING, "העמסת סחורה במחסן המרכזי"
-        ));
-        
-        schedule2.addEntry(new ScheduleEntry(
-            "ENT004", loadingEnd2, transportEnd2, transport2, EntryType.TRANSPORT, "הובלה לירושלים"
-        ));
-        
-        schedule3.addEntry(new ScheduleEntry(
-            "ENT005", loadingStart3, loadingEnd3, transport3, EntryType.LOADING, "העמסת סחורה במחסן המרכזי"
-        ));
-        
-        schedule3.addEntry(new ScheduleEntry(
-            "ENT006", loadingEnd3, transportEnd3, transport3, EntryType.TRANSPORT, "הובלה לדרום"
-        ));
-        
-        // הוספת הפסקה לנהג הראשון
-        schedule1.addEntry(new ScheduleEntry(
-            "ENT007", transportEnd1, transportEnd1.plusMinutes(30), null, EntryType.BREAK, "הפסקת צהריים"
-        ));
-        
-        // הוספה למאגר
-        scheduleService.addSchedule(schedule1);
-        scheduleService.addSchedule(schedule2);
-        scheduleService.addSchedule(schedule3);
-    }
-
     // אתחול תקלות
     private void initializeIncidents() {
         // נוסיף תקלה אחת לדוגמה
@@ -222,7 +145,7 @@ public class SystemInitializer {
         // יצירת תקלה
         Incident incident = new Incident(
             "INC001",
-            IncidentType.ROAD_CLOSURE, 
+            IncidentType.OTHER, 
             "חסימה בכביש 1 לירושלים עקב תאונת דרכים",
             transport2
         );

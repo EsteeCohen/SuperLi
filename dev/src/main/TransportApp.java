@@ -16,7 +16,6 @@ public class TransportApp {
         OrderService orderService = new OrderService(siteService, transportService,incidentService);
         transportService.setOrderService(orderService);
         UserService userService = new UserService();
-        ScheduleService scheduleService = new ScheduleService(driverService,transportService);
 
         // Initialize controllers
         DriverController driverController = new DriverController(driverService);
@@ -26,7 +25,6 @@ public class TransportApp {
         OrderController orderController = new OrderController(orderService);
         UserController userController = new UserController(userService);
         IncidentController incidentController = new IncidentController(incidentService);
-        ScheduleController scheduleController = new ScheduleController(scheduleService);
 
         // Initialize UI components
         TransportUI transportUI = new TransportUI(transportController);
@@ -35,13 +33,12 @@ public class TransportApp {
         SiteUI siteUI = new SiteUI(siteController);
 //        IncidentUI incidentUI = new IncidentUI();
         LoginUI loginUI = new LoginUI(userController);
-        ScheduleUI scheduleUI = new ScheduleUI(scheduleController, driverController, transportController);
         String sessionId = loginUI.processLogin();
         UserManagementUI userManagementUI = new UserManagementUI(userController, sessionId);
-        MainUI mainUI = new MainUI(userController,transportController,orderController,truckController,driverController,siteController,scheduleController,incidentController,loginUI,transportUI,orderUI,fleetUI,siteUI, scheduleUI, userManagementUI);
+        MainUI mainUI = new MainUI(userController,transportController,orderController,truckController,driverController,siteController, incidentController,loginUI,transportUI,orderUI,fleetUI,siteUI, userManagementUI);
 
         // Initialize system with sample data
-        SystemInitializer initializer = new SystemInitializer(driverService, truckService, siteService, transportService, orderService,scheduleService,incidentService, userService);
+        SystemInitializer initializer = new SystemInitializer(driverService, truckService, siteService, transportService, orderService, incidentService, userService);
         initializer.initializeSystem();
 
         // Start application

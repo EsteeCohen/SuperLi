@@ -17,7 +17,6 @@ public class MainUI {
     private OrderUI orderUI;
     private FleetUI fleetUI;
     private SiteUI siteUI;
-    private ScheduleUI scheduleUI;
 //    private IncidentUI incidentUI;
     private UserManagementUI userManagementUI;
     
@@ -28,7 +27,6 @@ public class MainUI {
     private TruckController truckController;
     private DriverController driverController;
     private SiteController siteController;
-    private ScheduleController scheduleController;
     private IncidentController incidentController;
     
     /**
@@ -36,10 +34,9 @@ public class MainUI {
      */
     public MainUI(UserController userController, TransportController transportController,
                 OrderController orderController, TruckController truckController,
-                DriverController driverController, SiteController siteController,
-                ScheduleController scheduleController, IncidentController incidentController,
+                DriverController driverController, SiteController siteController, IncidentController incidentController,
                 LoginUI loginUI, TransportUI transportUI, OrderUI orderUI,
-                FleetUI fleetUI, SiteUI siteUI, ScheduleUI scheduleUI, UserManagementUI userManagementUI) {
+                FleetUI fleetUI, SiteUI siteUI, UserManagementUI userManagementUI) {
         
         this.scanner = new Scanner(System.in);
         
@@ -50,7 +47,6 @@ public class MainUI {
         this.truckController = truckController;
         this.driverController = driverController;
         this.siteController = siteController;
-        this.scheduleController = scheduleController;
         this.incidentController = incidentController;
         this.userManagementUI = userManagementUI;
         
@@ -60,7 +56,6 @@ public class MainUI {
         this.orderUI = orderUI;
         this.fleetUI = fleetUI;
         this.siteUI = siteUI;
-        this.scheduleUI = scheduleUI;
 //        this.incidentUI = incidentUI;
     }
     
@@ -69,82 +64,63 @@ public class MainUI {
      */
     public void start() {
         boolean exit = false;
-        
+    
         while (!exit) {
-            // התחברות למערכת
-            this.sessionId = loginUI.processLogin();
-            
-            // אם ההתחברות נכשלה, נחזור למסך ההתחברות או נסיים
-            if (sessionId == null) {
-                System.out.println("האם לנסות להתחבר שוב? (כן/לא)");
-                String retry = getStringInput("בחירתך: ");
-                if (!retry.equalsIgnoreCase("כן")) {
-                    exit = true;
+                // ניסיון התחברות
+            this.sessionId = null;
+
+            while (sessionId == null) {
+                sessionId = loginUI.processLogin();
+
+                if (sessionId == null) {
+                    System.out.println("האם לנסות שוב? (כן/לא)");
+                    String retry = getStringInput("בחירתך: ");
+                    if (!retry.equalsIgnoreCase("כן")) {
+                        exit = true;
+                        break;
+                    }
                 }
+            }
+
+            if (exit) {
+                break; // <<< חייב את זה פה
+            }
+            // אם הגענו לפה — התחברות הצליחה
+            this.currentUser = userController.getCurrentUser(sessionId);
+
+            if (currentUser == null) {
+                System.out.println("שגיאה: המשתמש לא נמצא עבור session זה. מתנתק...");
+                logout();
                 continue;
             }
-            
-            // קבלת פרטי המשתמש המחובר
-            this.currentUser = userController.getCurrentUser(sessionId);
-            
-            // הפעלת התפריט הראשי
+    
             boolean loggedIn = true;
             while (loggedIn) {
                 displayMainMenu();
                 int choice = getIntInput("בחר אפשרות: ");
-                
+    
                 switch (choice) {
                     case 1:
-                        if (hasAccess("TRANSPORT")) {
-                            transportUI.start();
-                        } else {
-                            showAccessDenied();
-                        }
+                        if (hasAccess("TRANSPORT")) transportUI.start();
+                        else showAccessDenied();
                         break;
                     case 2:
-                        if (hasAccess("FLEET")) {
-                            fleetUI.start();
-                        } else {
-                            showAccessDenied();
-                        }
+                        if (hasAccess("FLEET")) fleetUI.start();
+                        else showAccessDenied();
                         break;
                     case 3:
-                        if (hasAccess("SITE")) {
-                            siteUI.start();
-                        } else {
-                            showAccessDenied();
-                        }
+                        if (hasAccess("SITE")) siteUI.start();
+                        else showAccessDenied();
                         break;
                     case 4:
-                        if (hasAccess("ORDER")) {
-                            orderUI.start();
-                        } else {
-                            showAccessDenied();
-                        }
+                        if (hasAccess("ORDER")) orderUI.start();
+                        else showAccessDenied();
                         break;
                     case 5:
-                        if (hasAccess("SCHEDULE")) {
-                            scheduleUI.start();
-                        } else {
-                            showAccessDenied();
-                        }
+                        if (hasAccess("USER_MANAGEMENT")) userManagementUI.start();
+                        else showAccessDenied();
                         break;
-//                    case 6:
-//                        if (hasAccess("INCIDENT")) {
-//                            incidentUI.start();
-//                        } else {
-//                            showAccessDenied();
-//                        }
-//                        break;
-                    case 7:
-                        if (hasAccess("USER_MANAGEMENT")) {
-                            userManagementUI = new UserManagementUI(userController, sessionId);
-                            userManagementUI.start();
-                        } else {
-                            showAccessDenied();
-                        }
-                        break;
-                    case 8:
+                    case 6:
                         showUserProfile();
                         break;
                     case 0:
@@ -155,8 +131,14 @@ public class MainUI {
                         System.out.println("אפשרות לא תקינה, נסה שנית");
                 }
             }
+    
+            System.out.println("האם להתחבר שוב? (כן/לא)");
+            String again = getStringInput("בחירתך: ");
+            if (!again.equalsIgnoreCase("כן")) {
+                exit = true;
+            }
         }
-        
+    
         System.out.println("תודה שהשתמשת במערכת ניהול ההובלות. להתראות!");
     }
     
@@ -184,19 +166,11 @@ public class MainUI {
             System.out.println("4. ניהול הזמנות");
         }
         
-        if (hasAccess("SCHEDULE")) {
-            System.out.println("5. ניהול לוחות זמנים");
-        }
-        
-        if (hasAccess("INCIDENT")) {
-            System.out.println("6. ניהול תקלות");
-        }
-        
         if (hasAccess("USER_MANAGEMENT")) {
-            System.out.println("7. ניהול משתמשים");
+            System.out.println("5. ניהול משתמשים");
         }
         
-        System.out.println("8. הצגת פרופיל משתמש");
+        System.out.println("6. הצגת פרופיל משתמש");
         System.out.println("0. התנתקות");
     }
     
