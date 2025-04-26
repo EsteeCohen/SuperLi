@@ -74,11 +74,6 @@ public class Driver {
         if (this == o) return true;
         if (!(o instanceof Driver)) return false;
         return id.equals(((Driver) o).id); //id is unique
-//        Driver that = (Driver) o;
-//
-//        if (!id.equals(that.id)) return false;
-//        if (!name.equals(that.name)) return false;
-//        if (!phone.equals(that.phone)) return false;
-//        return licenseType == that.licenseType;
+
     }
 }
