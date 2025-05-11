@@ -1,6 +1,6 @@
 package ServiceLayer;
 
-import DomainLayer.ProductFacade;
+import DomainLayer.Inventory.ProductFacade;
 
 import java.time.LocalDate;
 import java.util.List;

@@ -1,5 +1,9 @@
 package ServiceLayer;
-import DomainLayer.*;
+import DomainLayer.Inventory.ProductFacade;
+import DomainLayer.Inventory.ReportFacade;
+import DomainLayer.OrderController;
+import DomainLayer.Supplier.SystemController;
+
 
 import java.time.LocalDate;
 import java.util.List;
@@ -11,14 +15,18 @@ public class ServiceFactory {
 
     private final ProductFacade productFacade;
     private final ReportFacade reportFacade;
+    private final SystemController systemController;
     private final ProductService productService;
     private final ReportService reportService;
+    private final SupplierSystemService supplierSystemService;
     public ServiceFactory()
     {
         productFacade=new ProductFacade();
         reportFacade=new ReportFacade(productFacade);
         productService=new ProductService(productFacade);
         reportService=new ReportService(reportFacade);
+        systemController=SystemController.getInstance();
+        supplierSystemService=SupplierSystemService.getInstance(SystemController.getInstance(), productFacade,reportFacade);
     }
 
     public String GenerateExpiryReport(LocalDate until) {

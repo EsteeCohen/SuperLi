@@ -5,11 +5,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import DomainLayer.OrderController;
+import ServiceLayer.ServiceFactory;
+
 public class ProductFacade
 {
     private final Map<String, List<Product>> productsByCategory=new HashMap<>();
     private final Map<String, Product> productsByName=new HashMap<>();
 
+    private OrderController singleton = OrderController.getInstance();
     /**
      * adds a new product to the system
      * @param productName the name of the new product

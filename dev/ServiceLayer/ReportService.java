@@ -1,6 +1,6 @@
 package ServiceLayer;
 
-import DomainLayer.ReportFacade;
+import DomainLayer.Inventory.ReportFacade;
 
 import java.time.LocalDate;
 import java.util.List;
