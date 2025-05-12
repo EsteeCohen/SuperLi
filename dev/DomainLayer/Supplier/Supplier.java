@@ -1,5 +1,8 @@
 package DomainLayer.Supplier;
 
+import DomainLayer.TimeController;
+
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -125,4 +128,45 @@ public abstract class Supplier {
         }
         return -1;
     }
+
+    public Product findProductByName(String productName) {
+        for (Product product : productCatalog.values()) {
+            if (product.getProductName().equalsIgnoreCase(productName)) {
+                return product;
+            }
+        }
+        return null;
+    }
+
+
+    public Map<String, Object> getBestPriceAndAgreementForProductName(String productName, int quantity) {
+        double bestPrice = Double.MAX_VALUE;
+        int bestAgreementId = -1;
+        LocalDate today = TimeController.getInstance().getDate();
+
+        Product matchedProduct = findProductByName(productName); // שימוש בפונקציה החדשה
+
+        if (matchedProduct == null) {
+            return new HashMap<>(); // אין לספק את המוצר הזה
+        }
+
+        for (Agreement agreement : agreements) {
+            if (agreement.getValidFrom().isAfter(today) || agreement.getValidTo().isBefore(today))
+                continue;
+
+            double price = agreement.calculatePriceWithDiscount(matchedProduct, quantity);
+            if (price < bestPrice) {
+                bestPrice = price;
+                bestAgreementId = agreement.getAgreementId();
+            }
+        }
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("price", bestPrice);
+        result.put("agreementId", bestAgreementId);
+
+        return result;
+    }
+
+
 }

@@ -546,4 +546,8 @@ public class SystemController {
     }
 
 
+    public List<Supplier> getAllSupplierObjects() {
+        return new ArrayList<>(suppliers.values());
+    }
+
 }

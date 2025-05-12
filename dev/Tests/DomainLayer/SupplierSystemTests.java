@@ -5,8 +5,8 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import src.DomainLayer.*;
-import src.ServiceLayer.SupplierSystemService;
+import DomainLayer.Supplier.*;
+import ServiceLayer.SupplierSystemService;
 
 import java.time.LocalDate;
 import java.util.*;

@@ -2,12 +2,16 @@ package DomainLayer;
 
 import DomainLayer.Inventory.ProductFacade;
 import DomainLayer.Inventory.ReportFacade;
+import DomainLayer.Supplier.Product;
+import DomainLayer.Supplier.Supplier;
+import DomainLayer.Supplier.SystemController;
 import ServiceLayer.SupplierSystemService;
 import DomainLayer.Supplier.Order;
 
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -15,8 +19,7 @@ public class OrderController
 {
     /*Dependencies injected via constructor*/
     private final TimeController timeController;
-
-    private final SupplierSystemService supplierService;
+    private final SystemController systemController;
     private final ProductFacade productFacade;
     private final ReportFacade reportFacade;
     private List<Order> orders;
@@ -30,9 +33,9 @@ public class OrderController
         return instance;
     }
     private OrderController() {
-        this.supplierService = SupplierSystemService.getInstance();
         this.productFacade = ProductFacade.getInstance();
         this.reportFacade = ReportFacade.getInstance();
+        this.systemController = SystemController.getInstance();
         this.orders = new ArrayList<Order>();
         this.timeController = TimeController.getInstance();
 
@@ -62,7 +65,38 @@ public class OrderController
      * @param requiredQuantity units to order
      * @return supplierId      identifier of the chosen supplier
      */
-    public String chooseBestSupplier(String productName, int requiredQuantity);
+    public Map<String, Object> chooseBestSupplierAndAgreement(String productName, int requiredQuantity) {
+        Map<String, Object> result = new HashMap<>();
+        double bestPrice = Double.MAX_VALUE;
+        String bestSupplierId = null;
+        int bestAgreementId = -1;
+
+        for (Supplier supplier : systemController.getAllSupplierObjects()) {
+            Map<String, Object> supplierData = supplier.getBestPriceAndAgreementForProductName(productName, requiredQuantity);
+
+            if (supplierData.isEmpty() ||
+                    !supplierData.containsKey("price") ||
+                    !supplierData.containsKey("agreementId")) {
+                continue;
+            }
+
+            double supplierPrice = (double) supplierData.get("price");
+            int agreementId = (int) supplierData.get("agreementId");
+
+            if (agreementId != -1 && supplierPrice < bestPrice) {
+                bestPrice = supplierPrice;
+                bestSupplierId = supplier.getSupplierId();
+                bestAgreementId = agreementId;
+            }
+        }
+
+        if (bestSupplierId != null && bestAgreementId != -1) {
+            result.put("supplierId", bestSupplierId);
+            result.put("agreementId", bestAgreementId);
+        }
+
+        return result;
+    }
 
     /**
      * Notify the system that a previously issued order has

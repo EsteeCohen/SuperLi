@@ -107,6 +107,7 @@ public class Agreement {
         if (quantity <= 0) return 0;
 
         Map<Integer, Integer> discounts = getDiscountForProduct(product.getCatalogNumber());
+        if (discounts == null || discounts.isEmpty()) return -1;
         double discount = 0.0;
 
         for (Map.Entry<Integer, Integer> entry : discounts.entrySet()) {
