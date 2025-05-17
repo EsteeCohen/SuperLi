@@ -28,7 +28,7 @@ public class TransportUI {
 
         while (!exit) {
             displayMenu();
-            int choice = getIntInput("בחר אפשרות: ");
+            int choice = getIntInput("Select an option: ");
 
             switch (choice) {
                 case 1:
@@ -68,37 +68,37 @@ public class TransportUI {
                     removeDestination();
                     break;
                 case 0:
-                    System.out.println("חוזר לתפריט הראשי...");
+                    System.out.println("Returning to main menu...");
                     exit = true;
                     break;
                 default:
-                    System.out.println("⚠ בחירה לא תקינה, נסה שוב.");
+                    System.out.println("⚠ Invalid selection, please try again.");
             }
         }
     }
 
     private void displayMenu() {
-        System.out.println("\n===== ניהול הובלות =====");
-        System.out.println("1. יצירת הובלה חדשה");
-        System.out.println("2. צפייה בהובלה");
-        System.out.println("3. צפייה בכל ההובלות");
-        System.out.println("4. צפייה לפי תאריך");
-        System.out.println("5. צפייה לפי סטטוס");
-        System.out.println("6. צפייה לפי אזור שילוח");
-        System.out.println("7. עדכון סטטוס");
-        System.out.println("8. ביטול הובלה");
-        System.out.println("9. שינוי נהג");
-        System.out.println("10. שינוי משאית");
-        System.out.println("11. הוספת יעד");
-        System.out.println("12. הסרת יעד");
-        System.out.println("0. חזרה");
+        System.out.println("\n===== Transport Management =====");
+        System.out.println("1. Create New Transport");
+        System.out.println("2. View Transport");
+        System.out.println("3. View All Transports");
+        System.out.println("4. View by Date");
+        System.out.println("5. View by Status");
+        System.out.println("6. View by Shipping Zone");
+        System.out.println("7. Update Status");
+        System.out.println("8. Cancel Transport");
+        System.out.println("9. Change Driver");
+        System.out.println("10. Change Truck");
+        System.out.println("11. Add Destination");
+        System.out.println("12. Remove Destination");
+        System.out.println("0. Return");
     }
 
     // Input helpers
     private int getIntInput(String prompt) {
         System.out.print(prompt);
         while (!scanner.hasNextInt()) {
-            System.out.println("⚠ אנא הזן מספר תקין.");
+            System.out.println("⚠ Please enter a valid number.");
             System.out.print(prompt);
             scanner.next();
         }
@@ -113,76 +113,76 @@ public class TransportUI {
     }
 
     private void createTransport() {
-        // 1. תאריך
-        String dateStr = getStringInput("הזן תאריך (yyyy-MM-dd): ");
+        // 1. Date
+        String dateStr = getStringInput("Enter date (yyyy-MM-dd): ");
         LocalDate date;
         try {
             date = LocalDate.parse(dateStr);
             if (date.isBefore(LocalDate.now())) {
-                System.out.println("⚠ לא ניתן לבחור תאריך מהעבר.");
+                System.out.println("⚠ Cannot select a date in the past.");
                 return;
             }
         } catch (Exception e) {
-            System.out.println("⚠ פורמט תאריך שגוי.");
+            System.out.println("⚠ Invalid date format.");
             return;
         }
 
-        // 2. שעה
-        String timeStr = getStringInput("הזן שעה (HH:mm): ");
+        // 2. Time
+        String timeStr = getStringInput("Enter time (HH:mm): ");
         LocalTime time;
         try {
             time = LocalTime.parse(timeStr);
         } catch (Exception e) {
-            System.out.println("⚠ פורמט שעה שגוי.");
+            System.out.println("⚠ Invalid time format.");
             return;
         }
 
-        // 3. משאית
-        String truckId = getStringInput("הזן מספר רישוי של משאית: ");
+        // 3. Truck
+        String truckId = getStringInput("Enter truck license number: ");
 
-        // 4. נהג
-        String driverId = getStringInput("הזן מזהה נהג: ");
+        // 4. Driver
+        String driverId = getStringInput("Enter driver ID: ");
 
-        // 5. אתר מקור
-        String sourceSiteId = getStringInput("הזן מזהה אתר מקור: ");
+        // 5. Source site
+        String sourceSiteId = getStringInput("Enter source site ID: ");
 
-        // 6. יעדים
+        // 6. Destinations
         List<String> destinationIds = new ArrayList<>();
         boolean more = true;
         while (more) {
-            String destId = getStringInput("הזן מזהה אתר יעד: ");
+            String destId = getStringInput("Enter destination site ID: ");
             destinationIds.add(destId);
 
-            String answer = getStringInput("להוסיף יעד נוסף? (כן/לא): ");
-            more = answer.equalsIgnoreCase("כן");
+            String answer = getStringInput("Add another destination? (yes/no): ");
+            more = answer.equalsIgnoreCase("yes");
         }
 
-        // יצירת ההובלה
+        // Create transport
         Transport transport = transportController.createTransport(date, time, truckId, driverId, sourceSiteId, destinationIds);
         if (transport != null) {
-            System.out.println(" ההובלה נוצרה בהצלחה.");
+            System.out.println("Transport created successfully.");
         }
         else {
-            System.out.println(" שגיאה ביצירת ההובלה.");
+            System.out.println("Error creating transport.");
         }
     }
 
     private void viewTransport() {
-        int id = getIntInput("הזן מזהה הובלה: ");
+        int id = getIntInput("Enter transport ID: ");
         Transport t = transportController.getTransportById(id);
         if (t != null) {
             System.out.println(t);
         } else {
-            System.out.println(" הובלה לא נמצאה.");
+            System.out.println("Transport not found.");
         }
     }
 
     private void viewAllTransports() {
         List<Transport> transports = transportController.getAllTransports();
         if (transports.isEmpty()) {
-            System.out.println(" אין הובלות במערכת.");
+            System.out.println("No transports in the system.");
         } else {
-            System.out.println("\n--- רשימת כל ההובלות ---");
+            System.out.println("\n--- List of all transports ---");
             for (Transport t : transports) {
                 System.out.println(t);
                 System.out.println("------------------------");
@@ -191,203 +191,214 @@ public class TransportUI {
     }
 
     private void viewTransportsByDate() {
-        String dateStr = getStringInput("הזן תאריך (yyyy-MM-dd): ");
+        String dateStr = getStringInput("Enter date (yyyy-MM-dd): ");
         LocalDate date;
         try {
             date = LocalDate.parse(dateStr);
             List<Transport> transports = transportController.getTransportsByDate(date);
             if (transports.isEmpty()) {
-                System.out.println(" אין הובלות בתאריך זה.");
+                System.out.println("No transports on this date.");
             } else {
-                System.out.println(" הובלות בתאריך " + date + ":");
+                System.out.println("\n--- Transports on " + date + " ---");
                 for (Transport t : transports) {
                     System.out.println(t);
-                    System.out.println("---------------------");
+                    System.out.println("------------------------");
                 }
             }
         } catch (Exception e) {
-            System.out.println(" פורמט תאריך שגוי.");
+            System.out.println("⚠ Invalid date format.");
         }
     }
 
     private void viewTransportsByStatus() {
-        System.out.println("בחר סטטוס:");
-        System.out.println("1. PLANNING");
-        System.out.println("2. ACTIVE");
-        System.out.println("3. COMPLETED");
-        System.out.println("4. CANCELLED");
-
-        int choice = getIntInput("בחירתך: ");
-        TransportStatus status;
-        switch (choice) {
-            case 1: status = TransportStatus.PLANNING; break;
-            case 2: status = TransportStatus.ACTIVE; break;
-            case 3: status = TransportStatus.COMPLETED; break;
-            case 4: status = TransportStatus.CANCELLED; break;
-            default:
-                System.out.println(" בחירה לא תקינה.");
-                return;
+        System.out.println("Select status:");
+        for (int i = 0; i < TransportStatus.values().length; i++) {
+            System.out.println((i + 1) + ". " + TransportStatus.values()[i]);
         }
-
+        
+        int statusChoice = getIntInput("Your choice: ");
+        if (statusChoice < 1 || statusChoice > TransportStatus.values().length) {
+            System.out.println("⚠ Invalid status selection.");
+            return;
+        }
+        
+        TransportStatus status = TransportStatus.values()[statusChoice - 1];
         List<Transport> transports = transportController.getTransportsByStatus(status);
+        
         if (transports.isEmpty()) {
-            System.out.println(" אין הובלות בסטטוס זה.");
+            System.out.println("No transports with status " + status);
         } else {
-            transports.forEach(t -> {
+            System.out.println("\n--- Transports with status " + status + " ---");
+            for (Transport t : transports) {
                 System.out.println(t);
-                System.out.println("----------------");
-            });
+                System.out.println("------------------------");
+            }
         }
     }
 
     private void viewTransportsByZone() {
-        System.out.println("בחר אזור שילוח:");
-        System.out.println("1. NORTH");
-        System.out.println("2. CENTER");
-        System.out.println("3. SOUTH");
-        System.out.println("4. JERUSALEM");
-
-        int choice = getIntInput("בחירתך: ");
-        ShippingZone zone;
-        switch (choice) {
-            case 1: zone = ShippingZone.NORTH; break;
-            case 2: zone = ShippingZone.CENTER; break;
-            case 3: zone = ShippingZone.SOUTH; break;
-            case 4: zone = ShippingZone.JERUSALEM; break;
-            default:
-                System.out.println("בחירה לא תקינה.");
-                return;
+        System.out.println("Select shipping zone:");
+        for (int i = 0; i < ShippingZone.values().length; i++) {
+            System.out.println((i + 1) + ". " + ShippingZone.values()[i]);
         }
-
+        
+        int zoneChoice = getIntInput("Your choice: ");
+        if (zoneChoice < 1 || zoneChoice > ShippingZone.values().length) {
+            System.out.println("⚠ Invalid zone selection.");
+            return;
+        }
+        
+        ShippingZone zone = ShippingZone.values()[zoneChoice - 1];
         List<Transport> transports = transportController.getTransportsByZone(zone);
+        
         if (transports.isEmpty()) {
-            System.out.println("אין הובלות באזור זה.");
+            System.out.println("No transports in zone " + zone);
         } else {
-            transports.forEach(t -> {
+            System.out.println("\n--- Transports in zone " + zone + " ---");
+            for (Transport t : transports) {
                 System.out.println(t);
-                System.out.println("----------------");
-            });
+                System.out.println("------------------------");
+            }
         }
     }
 
     private void updateTransportsStatus() {
-        int id = getIntInput("הזן מזהה הובלה: ");
-        Transport transport = transportController.getTransportById(id);
-        if (transport == null) {
-            System.out.println(" הובלה לא נמצאה.");
+        int id = getIntInput("Enter transport ID: ");
+        Transport t = transportController.getTransportById(id);
+        
+        if (t == null) {
+            System.out.println("Transport not found.");
             return;
         }
-
-        System.out.println("סטטוס נוכחי: " + transport.getStatus());
-        System.out.println("בחר סטטוס חדש:");
-        System.out.println("1. PLANNING");
-        System.out.println("2. ACTIVE");
-        System.out.println("3. COMPLETED");
-        System.out.println("4. CANCELLED");
-
-        int choice = getIntInput("בחירתך: ");
-        TransportStatus newStatus;
-        switch (choice) {
-            case 1: newStatus = TransportStatus.PLANNING; break;
-            case 2: newStatus = TransportStatus.ACTIVE; break;
-            case 3: newStatus = TransportStatus.COMPLETED; break;
-            case 4: newStatus = TransportStatus.CANCELLED; break;
-            default:
-                System.out.println(" בחירה לא תקינה.");
-                return;
+        
+        System.out.println("Current status: " + t.getStatus());
+        System.out.println("Select new status:");
+        
+        TransportStatus[] availableStatuses = t.getStatus().getNextPossibleStatuses();
+        
+        if (availableStatuses.length == 0) {
+            System.out.println("No status changes available for this transport.");
+            return;
         }
-
-        boolean updated = transportController.updateTransportStatus(id, newStatus);
-        System.out.println(updated ? " סטטוס עודכן בהצלחה." : " שגיאה בעדכון הסטטוס.");
+        
+        for (int i = 0; i < availableStatuses.length; i++) {
+            System.out.println((i + 1) + ". " + availableStatuses[i]);
+        }
+        
+        int statusChoice = getIntInput("Your choice: ");
+        if (statusChoice < 1 || statusChoice > availableStatuses.length) {
+            System.out.println("⚠ Invalid status selection.");
+            return;
+        }
+        
+        TransportStatus newStatus = availableStatuses[statusChoice - 1];
+        boolean success = transportController.updateTransportStatus(id, newStatus);
+        
+        if (success) {
+            System.out.println("Status updated successfully.");
+        } else {
+            System.out.println("Error updating status.");
+        }
     }
 
     private void changeDriver() {
-        int transportId = getIntInput("הזן מזהה הובלה: ");
-        Transport transport = transportController.getTransportById(transportId);
-        if (transport == null) {
-            System.out.println(" הובלה לא נמצאה.");
-            return;
+        int transportId = getIntInput("Enter transport ID: ");
+        String newDriverId = getStringInput("Enter new driver ID: ");
+        
+        boolean success = transportController.changeDriver(transportId, newDriverId);
+        if (success) {
+            System.out.println("Driver changed successfully.");
+        } else {
+            System.out.println("Error changing driver. Either the transport or driver does not exist, or the transport is not in a suitable status for modification.");
         }
-
-        String driverId = getStringInput("הזן מזהה נהג חדש: ");
-
-        boolean success = transportController.changeDriver(transportId, driverId);
-        System.out.println(success ? " הנהג עודכן בהצלחה." : " לא ניתן לעדכן את הנהג (אין רישיון מתאים או שהנהג אינו פנוי).");
     }
 
     private void changeTruck() {
-        int transportId = getIntInput("הזן מזהה הובלה: ");
-        Transport transport = transportController.getTransportById(transportId);
-        if (transport == null) {
-            System.out.println(" הובלה לא נמצאה.");
-            return;
+        int transportId = getIntInput("Enter transport ID: ");
+        String newTruckId = getStringInput("Enter new truck license number: ");
+        
+        boolean success = transportController.changeTruck(transportId, newTruckId);
+        if (success) {
+            System.out.println("Truck changed successfully.");
+        } else {
+            System.out.println("Error changing truck. Either the transport or truck does not exist, or the transport is not in a suitable status for modification.");
         }
-
-        String truckId = getStringInput("הזן מספר רישוי של משאית חדשה: ");
-
-        boolean success = transportController.changeTruck(transportId, truckId);
-        System.out.println(success ? " המשאית עודכנה בהצלחה." : " לא ניתן לעדכן את המשאית (ייתכן שאינה קיימת או שאינה פנויה).");
     }
 
     private void addDestination() {
-        int transportId = getIntInput("הזן מזהה הובלה: ");
-        Transport transport = transportController.getTransportById(transportId);
-        if (transport == null) {
-            System.out.println(" הובלה לא נמצאה.");
-            return;
-        }
-
-        String siteId = getStringInput("הזן מזהה אתר יעד חדש שאותו תרצה להוסיף: ");
-
+        int transportId = getIntInput("Enter transport ID: ");
+        String siteId = getStringInput("Enter destination site ID to add: ");
+        
         boolean success = transportController.addDestination(transportId, siteId);
-        System.out.println(success ? " יעד נוסף להובלה בהצלחה." : " לא ניתן להוסיף את היעד (אולי אזור שונה או כבר קיים).");
+        if (success) {
+            System.out.println("Destination added successfully.");
+        } else {
+            System.out.println("Error adding destination. Either the transport or site does not exist, or the transport is not in a suitable status for modification.");
+        }
     }
 
     private void removeDestination() {
-        int transportId = getIntInput("הזן מזהה הובלה: ");
-        Transport transport = transportController.getTransportById(transportId);
-        if (transport == null) {
-            System.out.println(" הובלה לא נמצאה.");
+        int transportId = getIntInput("Enter transport ID: ");
+        Transport t = transportController.getTransportById(transportId);
+        
+        if (t == null) {
+            System.out.println("Transport not found.");
             return;
         }
-
-        List<Site> destinations = transport.getDestinations();
-        if (destinations.isEmpty()) {
-            System.out.println(" אין יעדים בהובלה זו.");
+        
+        List<Site> destinations = t.getDestinations();
+        if (destinations == null || destinations.isEmpty()) {
+            System.out.println("This transport has no destinations to remove.");
             return;
         }
-
-        System.out.println("יעדים בהובלה:");
+        
+        System.out.println("Current destinations:");
         for (int i = 0; i < destinations.size(); i++) {
-            System.out.println((i + 1) + ". " + destinations.get(i).getName() + " (מזהה: " + destinations.get(i).getId() + ")");
+            System.out.println((i + 1) + ". " + destinations.get(i).getName() + " (ID: " + destinations.get(i).getId() + ")");
         }
-
-        int index = getIntInput("בחר יעד להסרה: ") - 1;
-        if (index < 0 || index >= destinations.size()) {
-            System.out.println(" בחירה לא תקינה.");
+        
+        int destChoice = getIntInput("Select destination to remove (number): ");
+        if (destChoice < 1 || destChoice > destinations.size()) {
+            System.out.println("⚠ Invalid selection.");
             return;
         }
-
-        String siteId = destinations.get(index).getId();
-        boolean removed = transportController.removeDestination(transportId, siteId);
-        System.out.println(removed ? " היעד הוסר בהצלחה." : " שגיאה בהסרת היעד.");
+        
+        String siteId = destinations.get(destChoice - 1).getId();
+        boolean success = transportController.removeDestination(transportId, siteId);
+        
+        if (success) {
+            System.out.println("Destination removed successfully.");
+        } else {
+            System.out.println("Error removing destination. The transport may not be in a suitable status for modification.");
+        }
     }
 
     private void cancelTransport() {
-        int transportId = getIntInput("הזן מזהה הובלה לביטול: ");
-        Transport transport = transportController.getTransportById(transportId);
-        if (transport == null) {
-            System.out.println(" הובלה לא נמצאה.");
+        int id = getIntInput("Enter transport ID to cancel: ");
+        Transport t = transportController.getTransportById(id);
+        
+        if (t == null) {
+            System.out.println("Transport not found.");
             return;
         }
-
-        if (!transport.canBeCancelled()) {
-            System.out.println(" לא ניתן לבטל הובלה שאינה במצב PLANNING.");
+        
+        if (t.getStatus() == TransportStatus.CANCELLED || t.getStatus() == TransportStatus.COMPLETED) {
+            System.out.println("Cannot cancel a transport that is already " + t.getStatus());
             return;
         }
-
-        boolean cancelled = transportController.cancelTransport(transportId);
-        System.out.println(cancelled ? " ההובלה בוטלה בהצלחה." : " שגיאה בביטול ההובלה.");
+        
+        System.out.println("Are you sure you want to cancel transport #" + id + "? (yes/no)");
+        String confirmation = getStringInput("Confirm: ");
+        
+        if (confirmation.equalsIgnoreCase("yes")) {
+            boolean success = transportController.cancelTransport(id);
+            if (success) {
+                System.out.println("Transport cancelled successfully.");
+            } else {
+                System.out.println("Error cancelling transport.");
+            }
+        } else {
+            System.out.println("Cancellation aborted.");
+        }
     }
-
 }

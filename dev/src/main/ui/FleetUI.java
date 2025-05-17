@@ -17,7 +17,7 @@ public class FleetUI {
     private UserController userController;
     private String sessionId;
     
-    //בנאי לממשק ניהול צי רכב
+    // Fleet Management UI constructor
     public FleetUI(TruckController truckController, DriverController driverController, UserController userController) {
         this.scanner = new Scanner(System.in);
         this.truckController = truckController;
@@ -25,7 +25,7 @@ public class FleetUI {
         this.userController = userController;
     }
     
-    //התחלת ממשק ניהול צי רכב
+    // Start Fleet Management interface
     public void start() {
 //        this.sessionId = sessionId;
         
@@ -33,61 +33,61 @@ public class FleetUI {
         
         while (!exit) {
             displayMainMenu();
-            int choice = getIntInput("בחר אפשרות: ");
+            int choice = getIntInput("Select an option: ");
             
             switch (choice) {
                 case 1:
                     if (canManageTrucks()) {
                         truckMenu();
                     } else {
-                        showAccessDenied("לניהול משאיות");
+                        showAccessDenied("to manage trucks");
                     }
                     break;
                 case 2:
                     if (canManageDrivers()) {
                         driverMenu();
                     } else {
-                        showAccessDenied("לניהול נהגים");
+                        showAccessDenied("to manage drivers");
                     }
                     break;
                 case 0:
                     exit = true;
                     break;
                 default:
-                    System.out.println("אפשרות לא תקינה, נסה שנית");
+                    System.out.println("Invalid option, please try again");
             }
         }
     }
     
-    //הצגת תפריט ראשי של ניהול צי רכב
+    // Display main Fleet Management menu
     private void displayMainMenu() {
-        System.out.println("\n=== ניהול צי רכב ===");
-        System.out.println("1. ניהול משאיות");
-        System.out.println("2. ניהול נהגים");
-        System.out.println("0. חזרה לתפריט הראשי");
+        System.out.println("\n=== Fleet Management ===");
+        System.out.println("1. Truck Management");
+        System.out.println("2. Driver Management");
+        System.out.println("0. Return to Main Menu");
     }
     
-    //הצגת תפריט ניהול משאיות
+    // Display Truck Management menu
     private void truckMenu() {
         boolean exit = false;
         
         while (!exit) {
-            System.out.println("\n=== ניהול משאיות ===");
-            System.out.println("1. הוספת משאית חדשה");
-            System.out.println("2. צפייה במשאית");
-            System.out.println("3. צפייה בכל המשאיות");
-            System.out.println("4. חיפוש משאיות לפי סוג רישיון");
-            System.out.println("5. חיפוש משאיות לפי קיבולת");
-            System.out.println("0. חזרה לתפריט הקודם");
+            System.out.println("\n=== Truck Management ===");
+            System.out.println("1. Add New Truck");
+            System.out.println("2. View Truck");
+            System.out.println("3. View All Trucks");
+            System.out.println("4. Search Trucks by License Type");
+            System.out.println("5. Search Trucks by Capacity");
+            System.out.println("0. Return to Previous Menu");
             
-            int choice = getIntInput("בחר אפשרות: ");
+            int choice = getIntInput("Select an option: ");
             
             switch (choice) {
                 case 1:
                     if (userController.isAuthorized(sessionId, "CREATE", "TRUCK")) {
                         addNewTruck();
                     } else {
-                        showAccessDenied("להוספת משאית");
+                        showAccessDenied("to add a truck");
                     }
                     break;
                 case 2:
@@ -106,31 +106,31 @@ public class FleetUI {
                     exit = true;
                     break;
                 default:
-                    System.out.println("אפשרות לא תקינה, נסה שנית");
+                    System.out.println("Invalid option, please try again");
             }
         }
     }
     
-    //הצגת תפריט ניהול נהגים
+    // Display Driver Management menu
     private void driverMenu() {
         boolean exit = false;
         
         while (!exit) {
-            System.out.println("\n=== ניהול נהגים ===");
-            System.out.println("1. הוספת נהג חדש");
-            System.out.println("2. צפייה בנהג");
-            System.out.println("3. צפייה בכל הנהגים");
-            System.out.println("4. חיפוש נהגים לפי סוג רישיון");
-            System.out.println("0. חזרה לתפריט הקודם");
+            System.out.println("\n=== Driver Management ===");
+            System.out.println("1. Add New Driver");
+            System.out.println("2. View Driver");
+            System.out.println("3. View All Drivers");
+            System.out.println("4. Search Drivers by License Type");
+            System.out.println("0. Return to Previous Menu");
             
-            int choice = getIntInput("בחר אפשרות: ");
+            int choice = getIntInput("Select an option: ");
             
             switch (choice) {
                 case 1:
                     if (userController.isAuthorized(sessionId, "CREATE", "DRIVER")) {
                         addNewDriver();
                     } else {
-                        showAccessDenied("להוספת נהג");
+                        showAccessDenied("to add a driver");
                     }
                     break;
                 case 2:
@@ -146,30 +146,30 @@ public class FleetUI {
                     exit = true;
                     break;
                 default:
-                    System.out.println("אפשרות לא תקינה, נסה שנית");
+                    System.out.println("Invalid option, please try again");
             }
         }
     }
     
-    //הוספת משאית חדשה
+    // Add a new truck
     private void addNewTruck() {
-        System.out.println("\n=== הוספת משאית חדשה ===");
+        System.out.println("\n=== Add New Truck ===");
         
-        String regNumber = getStringInput("הזן מספר רישוי: ");
-        String model = getStringInput("הזן דגם: ");
+        String regNumber = getStringInput("Enter registration number: ");
+        String model = getStringInput("Enter model: ");
         
-        double emptyWeight = getDoubleInput("הזן משקל נטו (בק\"ג): ");
-        double maxWeight = getDoubleInput("הזן משקל מקסימלי מותר (בק\"ג): ");
+        double emptyWeight = getDoubleInput("Enter empty weight (kg): ");
+        double maxWeight = getDoubleInput("Enter maximum allowed weight (kg): ");
         
-// ------------- חסרה המרה למחרוזת!!! ---------------
+// ------------- Missing string conversion!!! ---------------
 
-        System.out.println("בחר סוג רישיון נדרש:");
-        System.out.println("1. C1 - רישיון למשאיות עד 12 טון");
-        System.out.println("2. C - רישיון למשאיות עד 15 טון");
-        System.out.println("3. CE - רישיון לרכב מחובר/מורכב");
-        System.out.println("4. C1E - רישיון למשאיות קלות עם גרור");
+        System.out.println("Select required license type:");
+        System.out.println("1. C1 - License for trucks up to 12 tons");
+        System.out.println("2. C - License for trucks up to 15 tons");
+        System.out.println("3. CE - License for articulated/combined vehicles");
+        System.out.println("4. C1E - License for light trucks with trailer");
         
-        int licenseChoice = getIntInput("בחירתך: ");
+        int licenseChoice = getIntInput("Your choice: ");
         String licenseType;
         
         switch (licenseChoice) {
@@ -186,42 +186,42 @@ public class FleetUI {
                 licenseType = "C1E";
                 break;
             default:
-                System.out.println("בחירה לא תקינה. מגדיר כברירת מחדל: C");
+                System.out.println("Invalid selection. Setting default: C");
                 licenseType = "C";
         }
         
         Truck newTruck = truckController.addTruck(regNumber, model, ""+emptyWeight, ""+maxWeight, licenseType);
         
         if (newTruck != null) {
-            // הוספת המשאית למערכת הצליחה
-            System.out.println("המשאית נוספה בהצלחה!");
+            // Truck added successfully
+            System.out.println("Truck added successfully!");
         } else {
-            System.out.println("שגיאה בהוספת המשאית. ייתכן שמספר הרישוי כבר קיים במערכת.");
+            System.out.println("Error adding truck. Registration number may already exist in the system.");
         }
     }
     
-    //צפייה במשאית ספציפית
+    // View a specific truck
     private void viewTruck() {
-        System.out.println("\n=== צפייה במשאית ===");
-        String regNumber = getStringInput("הזן מספר רישוי: ");
+        System.out.println("\n=== View Truck ===");
+        String regNumber = getStringInput("Enter truck registration number: ");
         
         Truck truck = truckController.getTruckByRegNumber(regNumber);
         
         if (truck != null) {
             displayTruckDetails(truck);
         } else {
-            System.out.println("משאית לא נמצאה במערכת.");
+            System.out.println("Truck not found in the system.");
         }
     }
     
-    //צפייה בכל המשאיות
+    // View all trucks
     private void viewAllTrucks() {
-        System.out.println("\n=== רשימת כל המשאיות ===");
+        System.out.println("\n=== List of All Trucks ===");
         
         List<Truck> trucks = truckController.getAllTrucks();
         
         if (trucks.isEmpty()) {
-            System.out.println("אין משאיות במערכת.");
+            System.out.println("No trucks in the system.");
             return;
         }
         
@@ -231,17 +231,16 @@ public class FleetUI {
         }
     }
     
-    //חיפוש משאיות לפי סוג רישיון
+    // Search trucks by license type
     private void searchTrucksByLicenseType() {
-        System.out.println("\n=== חיפוש משאיות לפי סוג רישיון ===");
+        System.out.println("\n=== Search Trucks by License Type ===");
+        System.out.println("Select license type:");
+        System.out.println("1. C1 - License for trucks up to 12 tons");
+        System.out.println("2. C - License for trucks up to 15 tons");
+        System.out.println("3. CE - License for articulated/combined vehicles");
+        System.out.println("4. C1E - License for light trucks with trailer");
         
-        System.out.println("בחר סוג רישיון:");
-        System.out.println("1. C1 - רישיון למשאיות עד 12 טון");
-        System.out.println("2. C - רישיון למשאיות עד 15 טון");
-        System.out.println("3. CE - רישיון לרכב מחובר/מורכב");
-        System.out.println("4. C1E - רישיון למשאיות קלות עם גרור");
-        
-        int licenseChoice = getIntInput("בחירתך: ");
+        int licenseChoice = getIntInput("Your choice: ");
         String licenseType;
         
         switch (licenseChoice) {
@@ -258,61 +257,58 @@ public class FleetUI {
                 licenseType = "C1E";
                 break;
             default:
-                System.out.println("בחירה לא תקינה. מציג משאיות עם רישיון C כברירת מחדל.");
+                System.out.println("Invalid selection. Setting default: C");
                 licenseType = "C";
         }
         
         List<Truck> trucks = truckController.getTrucksByLicenseType(licenseType);
         
         if (trucks.isEmpty()) {
-            System.out.println("אין משאיות עם סוג רישיון זה.");
+            System.out.println("No trucks with license type " + licenseType);
             return;
         }
         
-        System.out.println("משאיות עם רישיון " + licenseType + ":");
+        System.out.println("Trucks with license type " + licenseType + ":");
         for (Truck truck : trucks) {
             displayTruckDetails(truck);
             System.out.println("--------------------");
         }
     }
     
-    //חיפוש משאיות לפי קיבולת
+    // Search trucks by cargo capacity
     private void searchTrucksByCapacity() {
-        System.out.println("\n=== חיפוש משאיות לפי קיבולת ===");
+        System.out.println("\n=== Search Trucks by Capacity ===");
+        double minCapacity = getDoubleInput("Enter minimum cargo capacity (kg): ");
         
-        double minCapacity = getDoubleInput("הזן קיבולת מינימלית (בק\"ג): ");
-
-        // ------------- חסרה המרה למחרוזת!!! ---------------
-        
-        List<Truck> trucks = truckController.getTrucksWithCapacityForWeight(""+minCapacity);
+        List<Truck> trucks = truckController.getTrucksByMinCapacity(minCapacity);
         
         if (trucks.isEmpty()) {
-            System.out.println("אין משאיות עם קיבולת מעל " + minCapacity + " ק\"ג.");
+            System.out.println("No trucks with capacity greater than " + minCapacity + " kg");
             return;
         }
         
-        System.out.println("משאיות עם קיבולת מעל " + minCapacity + " ק\"ג:");
+        System.out.println("Trucks with capacity greater than " + minCapacity + " kg:");
         for (Truck truck : trucks) {
             displayTruckDetails(truck);
             System.out.println("--------------------");
         }
     }
     
-    // הוספת נהג חדש
+    // Add a new driver
     private void addNewDriver() {
-        System.out.println("\n=== הוספת נהג חדש ===");
+        System.out.println("\n=== Add New Driver ===");
         
-        String id = getStringInput("הזן ת\"ז: ");
-        String name = getStringInput("הזן שם: ");
-        String phone = getStringInput("הזן מספר טלפון: ");
+        String id = getStringInput("Enter driver ID: ");
+        String name = getStringInput("Enter full name: ");
+        String phone = getStringInput("Enter phone number: ");
         
-        System.out.println("בחר סוג רישיון:");
-        System.out.println("1. C1 - רישיון למשאיות עד 12 טון");
-        System.out.println("2. C - רישיון למשאיות עד 15 טון");
-        System.out.println("3. CE - רישיון לרכב מחובר/מורכב");
-        System.out.println("4. C1E - רישיון למשאיות קלות עם גרור");
+        System.out.println("Select license type:");
+        System.out.println("1. C1 - License for trucks up to 12 tons");
+        System.out.println("2. C - License for trucks up to 15 tons");
+        System.out.println("3. CE - License for articulated/combined vehicles");
+        System.out.println("4. C1E - License for light trucks with trailer");
         
-        int licenseChoice = getIntInput("בחירתך: ");
+        int licenseChoice = getIntInput("Your choice: ");
         String licenseType;
         
         switch (licenseChoice) {
@@ -329,42 +325,41 @@ public class FleetUI {
                 licenseType = "C1E";
                 break;
             default:
-                System.out.println("בחירה לא תקינה. מגדיר כברירת מחדל: C");
+                System.out.println("Invalid selection. Setting default: C");
                 licenseType = "C";
         }
         
         Driver newDriver = driverController.addDriver(id, name, phone, licenseType);
         
         if (newDriver != null) {
-            // הוספת הנהג למערכת הצליחה
-            System.out.println("הנהג נוסף בהצלחה!");
+            System.out.println("Driver added successfully!");
         } else {
-            System.out.println("שגיאה בהוספת הנהג. ייתכן שת\"ז כבר קיימת במערכת.");
+            System.out.println("Error adding driver. ID may already exist in the system.");
         }
     }
     
-    //צפייה בנהג ספציפי
+    // View a specific driver
     private void viewDriver() {
-        System.out.println("\n=== צפייה בנהג ===");
-        String id = getStringInput("הזן ת\"ז: ");
+        System.out.println("\n=== View Driver ===");
+        String id = getStringInput("Enter driver ID: ");
         
         Driver driver = driverController.getDriverById(id);
         
         if (driver != null) {
             displayDriverDetails(driver);
         } else {
-            System.out.println("נהג לא נמצא במערכת.");
+            System.out.println("Driver not found in the system.");
         }
     }
     
-    //צפייה בכל הנהגים
+    // View all drivers
     private void viewAllDrivers() {
-        System.out.println("\n=== רשימת כל הנהגים ===");
+        System.out.println("\n=== List of All Drivers ===");
         
         List<Driver> drivers = driverController.getAllDrivers();
         
         if (drivers.isEmpty()) {
-            System.out.println("אין נהגים במערכת.");
+            System.out.println("No drivers in the system.");
             return;
         }
         
@@ -374,17 +369,16 @@ public class FleetUI {
         }
     }
     
-    //חיפוש נהגים לפי סוג רישיון
+    // Search drivers by license type
     private void searchDriversByLicenseType() {
-        System.out.println("\n=== חיפוש נהגים לפי סוג רישיון ===");
+        System.out.println("\n=== Search Drivers by License Type ===");
+        System.out.println("Select license type:");
+        System.out.println("1. C1 - License for trucks up to 12 tons");
+        System.out.println("2. C - License for trucks up to 15 tons");
+        System.out.println("3. CE - License for articulated/combined vehicles");
+        System.out.println("4. C1E - License for light trucks with trailer");
         
-        System.out.println("בחר סוג רישיון:");
-        System.out.println("1. C1 - רישיון למשאיות עד 12 טון");
-        System.out.println("2. C - רישיון למשאיות עד 15 טון");
-        System.out.println("3. CE - רישיון לרכב מחובר/מורכב");
-        System.out.println("4. C1E - רישיון למשאיות קלות עם גרור");
-        
-        int licenseChoice = getIntInput("בחירתך: ");
+        int licenseChoice = getIntInput("Your choice: ");
         String licenseType;
         
         switch (licenseChoice) {
@@ -401,89 +395,88 @@ public class FleetUI {
                 licenseType = "C1E";
                 break;
             default:
-                System.out.println("בחירה לא תקינה. מציג נהגים עם רישיון C כברירת מחדל.");
+                System.out.println("Invalid selection. Setting default: C");
                 licenseType = "C";
         }
         
         List<Driver> drivers = driverController.getDriversByLicenseType(licenseType);
         
         if (drivers.isEmpty()) {
-            System.out.println("אין נהגים עם סוג רישיון זה.");
+            System.out.println("No drivers with license type " + licenseType);
             return;
         }
         
-        System.out.println("נהגים עם רישיון " + licenseType + ":");
+        System.out.println("Drivers with license type " + licenseType + ":");
         for (Driver driver : drivers) {
             displayDriverDetails(driver);
             System.out.println("--------------------");
         }
     }
     
-    //הצגת פרטי משאית
+    // Display truck details
     private void displayTruckDetails(Truck truck) {
-        System.out.println("מספר רישוי: " + truck.getRegNumber());
-        System.out.println("דגם: " + truck.getModel());
-        System.out.println("משקל נטו: " + truck.getEmptyWeight() + " ק\"ג");
-        System.out.println("משקל מקסימלי: " + truck.getMaxWeight() + " ק\"ג");
-        System.out.println("סוג רישיון נדרש: " + truck.getLicenseType());
+        System.out.println("Registration Number: " + truck.getRegNumber());
+        System.out.println("Model: " + truck.getModel());
+        System.out.println("Empty Weight: " + truck.getEmptyWeight() + " kg");
+        System.out.println("Maximum Weight: " + truck.getMaxWeight() + " kg");
+        System.out.println("Required License: " + truck.getRequiredLicense());
     }
     
-    //הצגת פרטי נהג
+    // Display driver details
     private void displayDriverDetails(Driver driver) {
-        System.out.println("ת\"ז: " + driver.getId());
-        System.out.println("שם: " + driver.getName());
-        System.out.println("טלפון: " + driver.getPhone());
-        System.out.println("סוג רישיון: " + driver.getLicenseType());
+        System.out.println("ID: " + driver.getId());
+        System.out.println("Name: " + driver.getName());
+        System.out.println("Phone: " + driver.getPhone());
+        System.out.println("License Type: " + driver.getLicenseType());
     }
     
-    //בדיקת הרשאה לניהול משאיות
+    // Check if user can manage trucks
     private boolean canManageTrucks() {
-        return userController.isAuthorized(sessionId, "VIEW", "TRUCK");
+        return userController == null || userController.isAuthorized(sessionId, "VIEW", "TRUCK");
     }
     
-    //בדיקת הרשאה לניהול נהגים
+    // Check if user can manage drivers
     private boolean canManageDrivers() {
-        return userController.isAuthorized(sessionId, "VIEW", "DRIVER");
+        return userController == null || userController.isAuthorized(sessionId, "VIEW", "DRIVER");
     }
     
-    //הצגת הודעת חוסר הרשאה
+    // Show access denied message
     private void showAccessDenied(String action) {
-        System.out.println("\nאין לך הרשאה " + action + ".");
-        System.out.println("אנא פנה למנהל המערכת אם הינך זקוק להרשאה זו.");
-        System.out.println("\nלחץ Enter כדי להמשיך");
+        System.out.println("Access denied. You do not have permission " + action + ".");
+        System.out.println("Please contact a system administrator if you need this access.");
+        System.out.println("\nPress Enter to continue...");
         scanner.nextLine();
     }
     
-    //קבלת קלט מספרי מהמשתמש
+    // Get integer input from user
     private int getIntInput(String prompt) {
         System.out.print(prompt);
         while (!scanner.hasNextInt()) {
-            System.out.println("אנא הזן מספר תקין.");
+            System.out.println("Please enter a valid number.");
             System.out.print(prompt);
             scanner.next();
         }
         int input = scanner.nextInt();
-        scanner.nextLine(); // ניקוי ה-buffer
+        scanner.nextLine(); // Clean buffer
         return input;
     }
     
-    //קבלת קלט מספר עשרוני מהמשתמש
+    // Get double input from user
     private double getDoubleInput(String prompt) {
         System.out.print(prompt);
         while (!scanner.hasNextDouble()) {
-            System.out.println("אנא הזן מספר תקין.");
+            System.out.println("Please enter a valid number.");
             System.out.print(prompt);
             scanner.next();
         }
         double input = scanner.nextDouble();
-        scanner.nextLine(); // ניקוי ה-buffer
+        scanner.nextLine(); // Clean buffer
         return input;
     }
     
-    //קבלת קלט טקסט מהמשתמש
+    // Get string input from user
     private String getStringInput(String prompt) {
         System.out.print(prompt);
         return scanner.nextLine();
     }
-
 }

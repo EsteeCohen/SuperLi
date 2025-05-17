@@ -10,7 +10,7 @@ public class LoginUI {
     private UserController userController;
     
     /**
-     * בנאי לממשק התחברות
+     * Login UI constructor
      */
     public LoginUI(UserController userController) {
         this.scanner = new Scanner(System.in);
@@ -18,16 +18,16 @@ public class LoginUI {
     }
     
     /**
-     * הצגת מסך התחברות
+     * Display login screen
      */
     public void displayLoginScreen() {
-        System.out.println("\n=== מערכת ניהול הובלות - התחברות ===");
-        System.out.println("אנא הזן את פרטי ההתחברות שלך:");
+        System.out.println("\n=== Transport Management System - Login ===");
+        System.out.println("Please enter your login details:");
     }
     
     /**
-     * טיפול בתהליך ההתחברות
-     * @return מזהה הפעלה ומידע על המשתמש המחובר, או null אם ההתחברות נכשלה
+     * Handle login process
+     * @return Session ID and information about the logged-in user, or null if login failed
      */
     public String processLogin() {
         displayLoginScreen();
@@ -36,24 +36,24 @@ public class LoginUI {
         final int MAX_ATTEMPTS = 3;
         
         while (attempts < MAX_ATTEMPTS) {
-            String username = getStringInput("שם משתמש: ");
-            String password = getStringInput("סיסמה: ");
+            String username = getStringInput("Username: ");
+            String password = getStringInput("Password: ");
             
             String sessionId = userController.login(username, password);
             
             if (sessionId != null) {
                 User user = userController.getCurrentUser(sessionId);
-                System.out.println("\nברוך הבא, " + user.getFullName() + "!");
-                System.out.println("תפקיד: " + user.getRole());
+                System.out.println("\nWelcome, " + user.getFullName() + "!");
+                System.out.println("Role: " + user.getRole());
                 return sessionId;
             } else {
                 attempts++;
-                System.out.println("התחברות נכשלה. שם משתמש או סיסמה שגויים.");
+                System.out.println("Login failed. Username or password incorrect.");
                 
                 if (attempts < MAX_ATTEMPTS) {
-                    System.out.println("נסיונות נותרים: " + (MAX_ATTEMPTS - attempts));
+                    System.out.println("Remaining attempts: " + (MAX_ATTEMPTS - attempts));
                 } else {
-                    System.out.println("מספר נסיונות ההתחברות עבר את המותר. נסה שוב מאוחר יותר.");
+                    System.out.println("Maximum login attempts exceeded. Please try again later.");
                     return null;
                 }
             }
@@ -63,18 +63,18 @@ public class LoginUI {
     }
     
     /**
-     * טיפול בהתנתקות
+     * Handle logout
      */
     public void logout(String sessionId) {
         if (userController.logout(sessionId)) {
-            System.out.println("התנתקת מהמערכת בהצלחה.");
+            System.out.println("You have successfully logged out of the system.");
         } else {
-            System.out.println("שגיאה בתהליך ההתנתקות.");
+            System.out.println("Error during logout process.");
         }
     }
     
     /**
-     * קבלת קלט טקסט מהמשתמש
+     * Get text input from user
      */
     private String getStringInput(String prompt) {
         System.out.print(prompt);

@@ -12,7 +12,7 @@ public class UserManagementUI {
     private String sessionId;
     
     /**
-     * בנאי לממשק ניהול משתמשים
+     * User Management UI constructor
      */
     public UserManagementUI(UserController userController, String sessionId) {
         this.scanner = new Scanner(System.in);
@@ -24,12 +24,12 @@ public class UserManagementUI {
 
     }
     /**
-     * התחלת ממשק ניהול משתמשים
+     * Start User Management interface
      */
     public void start() {
-        // בדיקת הרשאה לניהול משתמשים
+        // Check permission to manage users
         if (!userController.isAuthorized(sessionId, "MANAGE", "USER")) {
-            System.out.println("אין לך הרשאה לנהל משתמשים במערכת.");
+            System.out.println("You do not have permission to manage users in the system.");
             return;
         }
         
@@ -37,7 +37,7 @@ public class UserManagementUI {
         
         while (!exit) {
             displayMenu();
-            int choice = getIntInput("בחר אפשרות: ");
+            int choice = getIntInput("Select an option: ");
             
             switch (choice) {
                 case 1:
@@ -62,106 +62,106 @@ public class UserManagementUI {
                     exit = true;
                     break;
                 default:
-                    System.out.println("אפשרות לא תקינה, נסה שנית");
+                    System.out.println("Invalid option, please try again");
             }
         }
     }
     
     /**
-     * הצגת תפריט ניהול משתמשים
+     * Display User Management menu
      */
     private void displayMenu() {
-        System.out.println("\n=== ניהול משתמשים ===");
-        System.out.println("1. הוספת משתמש חדש");
-        System.out.println("2. צפייה במשתמש");
-        System.out.println("3. עדכון משתמש");
-        System.out.println("4. השבתת משתמש");
-        System.out.println("5. צפייה בכל המשתמשים");
-        System.out.println("6. צפייה במשתמשים לפי תפקיד");
-        System.out.println("0. חזרה לתפריט הראשי");
+        System.out.println("\n=== User Management ===");
+        System.out.println("1. Add New User");
+        System.out.println("2. View User");
+        System.out.println("3. Update User");
+        System.out.println("4. Deactivate User");
+        System.out.println("5. View All Users");
+        System.out.println("6. View Users by Role");
+        System.out.println("0. Return to Main Menu");
     }
     
     /**
-     * הוספת משתמש חדש
+     * Add a new user
      */
     private void addNewUser() {
-        System.out.println("\n=== הוספת משתמש חדש ===");
+        System.out.println("\n=== Add New User ===");
         
-        String id = getStringInput("הזן מזהה משתמש: ");
-        String username = getStringInput("הזן שם משתמש: ");
-        String password = getStringInput("הזן סיסמה: ");
-        String fullName = getStringInput("הזן שם מלא: ");
+        String id = getStringInput("Enter user ID: ");
+        String username = getStringInput("Enter username: ");
+        String password = getStringInput("Enter password: ");
+        String fullName = getStringInput("Enter full name: ");
         
-        System.out.println("בחר תפקיד:");
+        System.out.println("Select role:");
         displayRoles();
         
-        int roleChoice = getIntInput("בחירתך: ");
+        int roleChoice = getIntInput("Your choice: ");
         String role = getRoleByChoice(roleChoice);
         
         if (role == null) {
-            System.out.println("בחירת תפקיד לא תקינה.");
+            System.out.println("Invalid role selection.");
             return;
         }
         
         boolean success = userController.addUser(id, username, password, fullName, role);
         
         if (success) {
-            System.out.println("המשתמש נוסף בהצלחה!");
+            System.out.println("User added successfully!");
         } else {
-            System.out.println("שגיאה בהוספת המשתמש. ייתכן ששם המשתמש או המזהה כבר קיימים במערכת.");
+            System.out.println("Error adding user. Username or ID may already exist in the system.");
         }
     }
     
     /**
-     * צפייה במשתמש ספציפי
+     * View a specific user
      */
     private void viewUser() {
-        System.out.println("\n=== צפייה במשתמש ===");
-        String userId = getStringInput("הזן מזהה משתמש: ");
+        System.out.println("\n=== View User ===");
+        String userId = getStringInput("Enter user ID: ");
         
         User user = userController.getUserById(sessionId, userId);
         
         if (user != null) {
             displayUserDetails(user);
         } else {
-            System.out.println("משתמש לא נמצא או שאין לך הרשאה לצפות במשתמש זה.");
+            System.out.println("User not found or you don't have permission to view this user.");
         }
     }
     
     /**
-     * עדכון פרטי משתמש
+     * Update user details
      */
     private void updateUser() {
-        System.out.println("\n=== עדכון משתמש ===");
-        String userId = getStringInput("הזן מזהה משתמש: ");
+        System.out.println("\n=== Update User ===");
+        String userId = getStringInput("Enter user ID: ");
         
         User user = userController.getUserById(sessionId, userId);
         
         if (user == null) {
-            System.out.println("משתמש לא נמצא או שאין לך הרשאה לעדכן משתמש זה.");
+            System.out.println("User not found or you don't have permission to update this user.");
             return;
         }
         
         displayUserDetails(user);
         
-        System.out.println("\nהזן את הפרטים החדשים (השאר ריק כדי לא לשנות):");
+        System.out.println("\nEnter new details (leave blank to keep current values):");
         
-        String username = getStringInput("שם משתמש [" + user.getUsername() + "]: ");
+        String username = getStringInput("Username [" + user.getUsername() + "]: ");
         if (username.isEmpty()) {
             username = user.getUsername();
         }
         
-        String password = getStringInput("סיסמה חדשה (השאר ריק כדי לא לשנות): ");
+        String password = getStringInput("New password (leave blank to keep current): ");
         
-        String fullName = getStringInput("שם מלא [" + user.getFullName() + "]: ");
+        String fullName = getStringInput("Full name [" + user.getFullName() + "]: ");
         if (fullName.isEmpty()) {
             fullName = user.getFullName();
         }
         
-        System.out.println("בחר תפקיד [" + user.getRole() + "]:");
+        System.out.println("Select role [" + user.getRole() + "]:");
         displayRoles();
         
-        String input = getStringInput("בחירתך (השאר ריק כדי לא לשנות): ");
+        String input = getStringInput("Your choice (leave blank to keep current): ");
         String role;
         
         if (input.isEmpty()) {
@@ -171,11 +171,11 @@ public class UserManagementUI {
                 int roleChoice = Integer.parseInt(input);
                 role = getRoleByChoice(roleChoice);
                 if (role == null) {
-                    System.out.println("בחירת תפקיד לא תקינה. התפקיד לא ישתנה.");
+                    System.out.println("Invalid role selection. Role will not be changed.");
                     role = user.getRole().toString();
                 }
             } catch (NumberFormatException e) {
-                System.out.println("קלט לא תקין. התפקיד לא ישתנה.");
+                System.out.println("Invalid input. Role will not be changed.");
                 role = user.getRole().toString();
             }
         }
@@ -183,64 +183,64 @@ public class UserManagementUI {
         boolean success = userController.updateUser(userId, username, password, fullName, role);
         
         if (success) {
-            System.out.println("המשתמש עודכן בהצלחה!");
+            System.out.println("User updated successfully!");
         } else {
-            System.out.println("שגיאה בעדכון המשתמש. ייתכן ששם המשתמש כבר קיים במערכת.");
+            System.out.println("Error updating user. Username may already exist in the system.");
         }
     }
     
     /**
-     * השבתת משתמש
+     * Deactivate a user
      */
     private void deactivateUser() {
-        System.out.println("\n=== השבתת משתמש ===");
-        String userId = getStringInput("הזן מזהה משתמש להשבתה: ");
+        System.out.println("\n=== Deactivate User ===");
+        String userId = getStringInput("Enter user ID to deactivate: ");
         
         User user = userController.getUserById(sessionId, userId);
         
         if (user == null) {
-            System.out.println("משתמש לא נמצא או שאין לך הרשאה להשבית משתמש זה.");
+            System.out.println("User not found or you don't have permission to deactivate this user.");
             return;
         }
         
         if (!user.isActive()) {
-            System.out.println("המשתמש כבר מושבת.");
+            System.out.println("The user is already deactivated.");
             return;
         }
         
-        // מניעת השבתה עצמית
+        // Prevent self-deactivation
         User currentUser = userController.getCurrentUser(sessionId);
         if (currentUser.getId().equals(userId)) {
-            System.out.println("לא ניתן להשבית את חשבונך הנוכחי.");
+            System.out.println("You cannot deactivate your current account.");
             return;
         }
         
-        System.out.println("האם אתה בטוח שברצונך להשבית את המשתמש " + user.getFullName() + "? (כן/לא)");
-        String confirmation = getStringInput("אישור: ");
+        System.out.println("Are you sure you want to deactivate user " + user.getFullName() + "? (yes/no)");
+        String confirmation = getStringInput("Confirm: ");
         
-        if (confirmation.equalsIgnoreCase("כן")) {
+        if (confirmation.equalsIgnoreCase("yes")) {
             boolean success = userController.deactivateUser(userId);
             
             if (success) {
-                System.out.println("המשתמש הושבת בהצלחה!");
+                System.out.println("User deactivated successfully!");
             } else {
-                System.out.println("שגיאה בהשבתת המשתמש.");
+                System.out.println("Error deactivating user.");
             }
         } else {
-            System.out.println("פעולת ההשבתה בוטלה.");
+            System.out.println("Deactivation cancelled.");
         }
     }
     
     /**
-     * צפייה בכל המשתמשים
+     * View all users
      */
     private void viewAllUsers() {
-        System.out.println("\n=== רשימת כל המשתמשים ===");
+        System.out.println("\n=== List of All Users ===");
         
         List<User> users = userController.getAllUsers(sessionId);
         
         if (users == null || users.isEmpty()) {
-            System.out.println("אין משתמשים במערכת או שאין לך הרשאה לצפות ברשימת המשתמשים.");
+            System.out.println("No users in the system or you don't have permission to view the user list.");
             return;
         }
         
@@ -251,30 +251,30 @@ public class UserManagementUI {
     }
     
     /**
-     * צפייה במשתמשים לפי תפקיד
+     * View users by role
      */
     private void viewUsersByRole() {
-        System.out.println("\n=== צפייה במשתמשים לפי תפקיד ===");
+        System.out.println("\n=== View Users by Role ===");
         
-        System.out.println("בחר תפקיד:");
+        System.out.println("Select role:");
         displayRoles();
         
-        int roleChoice = getIntInput("בחירתך: ");
+        int roleChoice = getIntInput("Your choice: ");
         String role = getRoleByChoice(roleChoice);
         
         if (role == null) {
-            System.out.println("בחירת תפקיד לא תקינה.");
+            System.out.println("Invalid role selection.");
             return;
         }
         
         List<User> users = userController.getUsersByRole(sessionId, role);
         
         if (users == null || users.isEmpty()) {
-            System.out.println("אין משתמשים בתפקיד זה או שאין לך הרשאה לצפות ברשימה.");
+            System.out.println("No users in this role or you don't have permission to view the list.");
             return;
         }
         
-        System.out.println("משתמשים בתפקיד " + role + ":");
+        System.out.println("Users in role " + role + ":");
         for (User user : users) {
             displayUserDetails(user);
             System.out.println("--------------------");
@@ -282,30 +282,30 @@ public class UserManagementUI {
     }
     
     /**
-     * הצגת פרטי משתמש
+     * Display user details
      */
     private void displayUserDetails(User user) {
-        System.out.println("מזהה: " + user.getId());
-        System.out.println("שם משתמש: " + user.getUsername());
-        System.out.println("שם מלא: " + user.getFullName());
-        System.out.println("תפקיד: " + user.getRole());
-        System.out.println("סטטוס: " + (user.isActive() ? "פעיל" : "מושבת"));
+        System.out.println("ID: " + user.getId());
+        System.out.println("Username: " + user.getUsername());
+        System.out.println("Full Name: " + user.getFullName());
+        System.out.println("Role: " + user.getRole());
+        System.out.println("Status: " + (user.isActive() ? "Active" : "Deactivated"));
     }
     
     /**
-     * הצגת התפקידים האפשריים
+     * Display available roles
      */
     private void displayRoles() {
-        System.out.println("1. מנהל מערכת (SYSTEM_ADMIN)");
-        System.out.println("2. מנהל הובלות (TRANSPORT_MANAGER)");
-        System.out.println("3. מתכנן מסלולים (DISPATCHER)");
-        System.out.println("4. נהג (DRIVER)");
-        System.out.println("5. מנהל מחסן (WAREHOUSE_MANAGER)");
-        System.out.println("6. צופה (VIEWER)");
+        System.out.println("1. System Administrator (SYSTEM_ADMIN)");
+        System.out.println("2. Transport Manager (TRANSPORT_MANAGER)");
+        System.out.println("3. Dispatcher (DISPATCHER)");
+        System.out.println("4. Driver (DRIVER)");
+        System.out.println("5. Warehouse Manager (WAREHOUSE_MANAGER)");
+        System.out.println("6. Viewer (VIEWER)");
     }
     
     /**
-     * המרת בחירת תפקיד למחרוזת תפקיד
+     * Convert role choice to role string
      */
     private String getRoleByChoice(int choice) {
         switch (choice) {
@@ -327,22 +327,22 @@ public class UserManagementUI {
     }
     
     /**
-     * קבלת קלט מספרי מהמשתמש
+     * Get numeric input from user
      */
     private int getIntInput(String prompt) {
         System.out.print(prompt);
         while (!scanner.hasNextInt()) {
-            System.out.println("אנא הזן מספר תקין.");
+            System.out.println("Please enter a valid number.");
             System.out.print(prompt);
             scanner.next();
         }
         int input = scanner.nextInt();
-        scanner.nextLine(); // ניקוי ה-buffer
+        scanner.nextLine(); // Clear the buffer
         return input;
     }
     
     /**
-     * קבלת קלט טקסט מהמשתמש
+     * Get text input from user
      */
     private String getStringInput(String prompt) {
         System.out.print(prompt);

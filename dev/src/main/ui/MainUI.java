@@ -11,7 +11,7 @@ public class MainUI {
     private String sessionId;
     private User currentUser;
     
-    // ממשקי משתמש
+    // User interfaces
     private LoginUI loginUI;
     private TransportUI transportUI;
     private OrderUI orderUI;
@@ -20,7 +20,7 @@ public class MainUI {
 //    private IncidentUI incidentUI;
     private UserManagementUI userManagementUI;
     
-    // בקרים
+    // Controllers
     private UserController userController;
     private TransportController transportController;
     private OrderController orderController;
@@ -30,7 +30,7 @@ public class MainUI {
     private IncidentController incidentController;
     
     /**
-     * בנאי לממשק הראשי
+     * Main UI constructor
      */
     public MainUI(UserController userController, TransportController transportController,
                 OrderController orderController, TruckController truckController,
@@ -40,7 +40,7 @@ public class MainUI {
         
         this.scanner = new Scanner(System.in);
         
-        // הגדרת בקרים
+        // Define controllers
         this.userController = userController;
         this.transportController = transportController;
         this.orderController = orderController;
@@ -50,7 +50,7 @@ public class MainUI {
         this.incidentController = incidentController;
         this.userManagementUI = userManagementUI;
         
-        // הגדרת ממשקי משתמש
+        // Define user interfaces
         this.loginUI = loginUI;
         this.transportUI = transportUI;
         this.orderUI = orderUI;
@@ -60,34 +60,34 @@ public class MainUI {
     }
     
     /**
-     * התחלת המערכת
+     * Start the system
      */
     public void start() {
         boolean exit = false;
 
         while (!exit) {
-            // התחברות למערכת
+            // Login to system
 //            this.sessionId = loginUI.processLogin();
             this.sessionId = userManagementUI.getSessionId();
 
-            // אם ההתחברות נכשלה, נחזור למסך ההתחברות או נסיים
+            // If login fails, return to login screen or exit
             if (sessionId == null) {
-                System.out.println("האם לנסות להתחבר שוב? (כן/לא)");
-                String retry = getStringInput("בחירתך: ");
-                if (!retry.equalsIgnoreCase("כן")) {
+                System.out.println("Do you want to try logging in again? (yes/no)");
+                String retry = getStringInput("Your choice: ");
+                if (!retry.equalsIgnoreCase("yes")) {
                     exit = true;
                 }
                 continue;
             }
 
-            // קבלת פרטי המשתמש המחובר
+            // Get logged-in user details
             this.currentUser = userController.getCurrentUser(sessionId);
 
-            // הפעלת התפריט הראשי
+            // Run main menu
             boolean loggedIn = true;
             while (loggedIn) {
                 displayMainMenu();
-                int choice = getIntInput("בחר אפשרות: ");
+                int choice = getIntInput("Select an option: ");
     
                 switch (choice) {
                     case 1:
@@ -118,54 +118,54 @@ public class MainUI {
                         loggedIn = false;
                         break;
                     default:
-                        System.out.println("אפשרות לא תקינה, נסה שנית");
+                        System.out.println("Invalid option, please try again");
                 }
             }
     
-            System.out.println("האם להתחבר שוב? (כן/לא)");
-            String again = getStringInput("בחירתך: ");
-            if (!again.equalsIgnoreCase("כן")) {
+            System.out.println("Do you want to log in again? (yes/no)");
+            String again = getStringInput("Your choice: ");
+            if (!again.equalsIgnoreCase("yes")) {
                 exit = true;
             }
         }
     
-        System.out.println("תודה שהשתמשת במערכת ניהול ההובלות. להתראות!");
+        System.out.println("Thank you for using the Transport Management System. Goodbye!");
     }
     
     /**
-     * הצגת התפריט הראשי בהתאם להרשאות המשתמש
+     * Display main menu according to user permissions
      */
     private void displayMainMenu() {
-        System.out.println("\n=== מערכת ניהול הובלות - תפריט ראשי ===");
-        System.out.println("שלום, " + currentUser.getFullName() + " (" + currentUser.getRole() + ")");
+        System.out.println("\n=== Transport Management System - Main Menu ===");
+        System.out.println("Hello, " + currentUser.getFullName() + " (" + currentUser.getRole() + ")");
         System.out.println("--------------------------------------");
         
         if (hasAccess("TRANSPORT")) {
-            System.out.println("1. ניהול הובלות");
+            System.out.println("1. Transport Management");
         }
         
         if (hasAccess("FLEET")) {
-            System.out.println("2. ניהול נהגים ומשאיות");
+            System.out.println("2. Driver and Truck Management");
         }
         
         if (hasAccess("SITE")) {
-            System.out.println("3. ניהול אתרים");
+            System.out.println("3. Site Management");
         }
         
         if (hasAccess("ORDER")) {
-            System.out.println("4. ניהול הזמנות");
+            System.out.println("4. Order Management");
         }
         
         if (hasAccess("USER_MANAGEMENT")) {
-            System.out.println("5. ניהול משתמשים");
+            System.out.println("5. User Management");
         }
         
-        System.out.println("6. הצגת פרופיל משתמש");
-        System.out.println("0. התנתקות");
+        System.out.println("6. View User Profile");
+        System.out.println("0. Logout");
     }
     
     /**
-     * בדיקת הרשאה למודול מסוים
+     * Check permission for specific module
      */
     private boolean hasAccess(String module) {
         switch (module) {
@@ -190,59 +190,59 @@ public class MainUI {
     }
     
     /**
-     * הצגת פרופיל המשתמש הנוכחי
+     * Display current user profile
      */
     private void showUserProfile() {
-        System.out.println("\n=== פרופיל משתמש ===");
-        System.out.println("מזהה: " + currentUser.getId());
-        System.out.println("שם משתמש: " + currentUser.getUsername());
-        System.out.println("שם מלא: " + currentUser.getFullName());
-        System.out.println("תפקיד: " + currentUser.getRole());
+        System.out.println("\n=== User Profile ===");
+        System.out.println("ID: " + currentUser.getId());
+        System.out.println("Username: " + currentUser.getUsername());
+        System.out.println("Full Name: " + currentUser.getFullName());
+        System.out.println("Role: " + currentUser.getRole());
         
-        // הצגת הרשאות הגישה
-        System.out.println("\n=== הרשאות גישה ===");
+        // Display access permissions
+        System.out.println("\n=== Access Permissions ===");
         if (currentUser.getRole() == UserRole.SYSTEM_ADMIN) {
-            System.out.println("- הרשאה מלאה לכל המודולים");
+            System.out.println("- Full access to all modules");
         } else {
             if (hasAccess("TRANSPORT")) {
-                System.out.println("- גישה למודול הובלות");
+                System.out.println("- Access to Transport module");
             }
             if (hasAccess("FLEET")) {
-                System.out.println("- גישה למודול נהגים ומשאיות");
+                System.out.println("- Access to Driver and Truck module");
             }
             if (hasAccess("SITE")) {
-                System.out.println("- גישה למודול אתרים");
+                System.out.println("- Access to Site module");
             }
             if (hasAccess("ORDER")) {
-                System.out.println("- גישה למודול הזמנות");
+                System.out.println("- Access to Order module");
             }
             if (hasAccess("SCHEDULE")) {
-                System.out.println("- גישה למודול לוחות זמנים");
+                System.out.println("- Access to Schedule module");
             }
             if (hasAccess("INCIDENT")) {
-                System.out.println("- גישה למודול תקלות");
+                System.out.println("- Access to Incident module");
             }
             if (hasAccess("USER_MANAGEMENT")) {
-                System.out.println("- גישה לניהול משתמשים");
+                System.out.println("- Access to User Management");
             }
         }
         
-        System.out.println("\nלחץ Enter כדי לחזור לתפריט הראשי");
+        System.out.println("\nPress Enter to return to the main menu");
         scanner.nextLine();
     }
     
     /**
-     * הצגת הודעת חוסר הרשאה
+     * Display access denied message
      */
     private void showAccessDenied() {
-        System.out.println("\nאין לך הרשאה לגשת למודול זה.");
-        System.out.println("אנא פנה למנהל המערכת אם הינך זקוק לגישה.");
-        System.out.println("\nלחץ Enter כדי להמשיך");
+        System.out.println("\nYou do not have permission to access this module.");
+        System.out.println("Please contact the system administrator if you need access.");
+        System.out.println("\nPress Enter to continue");
         scanner.nextLine();
     }
     
     /**
-     * התנתקות מהמערכת
+     * Logout from the system
      */
     private void logout() {
         loginUI.logout(sessionId);
@@ -251,26 +251,25 @@ public class MainUI {
     }
     
     /**
-     * קבלת קלט מספרי מהמשתמש
+     * Get integer input from user
      */
     private int getIntInput(String prompt) {
-        System.out.print(prompt);
-        while (!scanner.hasNextInt()) {
-            System.out.println("אנא הזן מספר תקין.");
-            System.out.print(prompt);
-            scanner.next();
+        while (true) {
+            try {
+                System.out.print(prompt);
+                String input = scanner.nextLine();
+                return Integer.parseInt(input);
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter a valid number.");
+            }
         }
-        int input = scanner.nextInt();
-        scanner.nextLine(); // ניקוי ה-buffer
-        return input;
     }
     
     /**
-     * קבלת קלט טקסט מהמשתמש
+     * Get string input from user
      */
     private String getStringInput(String prompt) {
         System.out.print(prompt);
         return scanner.nextLine();
     }
-
 }

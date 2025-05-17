@@ -20,25 +20,21 @@ public class OrderUI {
     private SiteController siteController;
     private TransportController transportController;
 
-
-
     // Constructor
     public OrderUI(OrderController orderController, SiteController siteController, TransportController transportController) {
         this.scanner = new Scanner(System.in);
         this.orderController = orderController;
         this.siteController = siteController;
         this.transportController = transportController;
-
     }
     
     // Methods
-
     public void start() {
         boolean exit = false;
 
         while (!exit) {
             displayMenu();
-            int choice = getIntInput("בחר אפשרות: ");
+            int choice = getIntInput("Select an option: ");
 
             switch (choice) {
                 case 1:
@@ -69,111 +65,111 @@ public class OrderUI {
                     exit = true;
                     break;
                 default:
-                    System.out.println("אפשרות לא תקינה, נסה שנית");
+                    System.out.println("Invalid option, please try again");
             }
         }
     }
 
     private void displayMenu() {
-        System.out.println("\n=== ניהול הזמנות ===");
-        System.out.println("1. יצירת הזמנה חדשה");
-        System.out.println("2. צפייה בהזמנה");
-        System.out.println("3. צפייה בכל ההזמנות");
-        System.out.println("4. ביטול הזמנה");
-        System.out.println("5. צפייה בהזמנות לפי תאריך");
-        System.out.println("6. צפייה בהזמנות לפי סטטוס");
-        System.out.println("7. עדכון סטטוס של הזמנה");
-        System.out.println("8. הוספת הזמנה להובלה");
-        System.out.println("0. חזרה");
+        System.out.println("\n=== Order Management ===");
+        System.out.println("1. Create New Order");
+        System.out.println("2. View Order");
+        System.out.println("3. View All Orders");
+        System.out.println("4. Cancel Order");
+        System.out.println("5. View Orders by Date");
+        System.out.println("6. View Orders by Status");
+        System.out.println("7. Update Order Status");
+        System.out.println("8. Add Order to Transport");
+        System.out.println("0. Return");
     }
 
     private int getIntInput(String prompt) {
         System.out.print(prompt);
         while (!scanner.hasNextInt()) {
-            System.out.println("אנא הזן מספר תקין.");
+            System.out.println("Please enter a valid number.");
             System.out.print(prompt);
             scanner.next();
         }
         int input = scanner.nextInt();
-        scanner.nextLine(); // ניקוי ה-buffer
+        scanner.nextLine(); // Clean buffer
         return input;
     }
 
     public void createNewOrder() {
-        System.out.println("\n=== יצירת הזמנה חדשה ===");
+        System.out.println("\n=== Create New Order ===");
 
-        // קבלת תאריך
-        String dateStr = getStringInput("הזן תאריך הזמנה (yyyy-MM-dd): ");
+        // Get date
+        String dateStr = getStringInput("Enter order date (yyyy-MM-dd): ");
         LocalDate date;
         try {
             date = LocalDate.parse(dateStr);
             if (date.isBefore(LocalDate.now())) {
-                System.out.println("לא ניתן לבחור תאריך מהעבר.");
+                System.out.println("Cannot select a date in the past.");
                 return;
             }
         } catch (Exception e) {
-            System.out.println("פורמט תאריך שגוי.");
+            System.out.println("Invalid date format.");
             return;
         }
 
-        // בחירת אתר
+        // Select site
         List<Site> sites = siteController.getAllSites();
         if (sites.isEmpty()) {
-            System.out.println("אין אתרים במערכת. לא ניתן ליצור הזמנה.");
+            System.out.println("No sites in the system. Cannot create an order.");
             return;
         }
-        System.out.println("בחר אתר:");
+        System.out.println("Select site:");
         for (int i = 0; i < sites.size(); i++) {
             System.out.println((i + 1) + ". " + sites.get(i).getName());
         }
 
-        int siteChoice = getIntInput("בחירתך: ") - 1;
+        int siteChoice = getIntInput("Your choice: ") - 1;
         if (siteChoice < 0 || siteChoice >= sites.size()) {
-            System.out.println("בחירה לא תקינה.");
+            System.out.println("Invalid selection.");
             return;
         }
 
         Site selectedSite = sites.get(siteChoice);
 
-        // הזנת פריטים
+        // Enter items
         List<Item> items = new java.util.ArrayList<>();
         boolean addMore = true;
         int itemId = 1;
 
         while (addMore) {
-            System.out.println("\n--- פריט #" + itemId + " ---");
-            String name = getStringInput("שם הפריט: ");
-            int quantity = getIntInput("כמות: ");
-            double weight = getDoubleInput("משקל ליחידה (בק\"ג): ");
+            System.out.println("\n--- Item #" + itemId + " ---");
+            String name = getStringInput("Item name: ");
+            int quantity = getIntInput("Quantity: ");
+            double weight = getDoubleInput("Weight per unit (kg): ");
 
             items.add(new Item(itemId++, name, quantity, weight));
 
-            String more = getStringInput("להוסיף פריט נוסף? (כן/לא): ");
-            addMore = more.equalsIgnoreCase("כן");
+            String more = getStringInput("Add another item? (yes/no): ");
+            addMore = more.equalsIgnoreCase("yes");
         }
 
         Order newOrder = orderController.createOrder(date, selectedSite.getId(), items);
         if (newOrder != null) {
-            System.out.println("הזמנה נוצרה בהצלחה! מזהה: " + newOrder.getId());
+            System.out.println("Order created successfully! ID: " + newOrder.getId());
         } else {
-            System.out.println("שגיאה ביצירת ההזמנה.");
+            System.out.println("Error creating order.");
         }
     }
 
     private void viewOrder() {
-        int id = getIntInput("הכנס מזהה הזמנה: ");
+        int id = getIntInput("Enter order ID: ");
         Order order = orderController.getOrderById(id);
         if (order != null) {
             System.out.println(order);
         } else {
-            System.out.println("ההזמנה לא נמצאה.");
+            System.out.println("Order not found.");
         }
     }
 
     private void viewAllOrders() {
         List<Order> orders = orderController.getAllOrders();
         if (orders.isEmpty()) {
-            System.out.println("אין הזמנות במערכת.");
+            System.out.println("No orders in the system.");
         } else {
             for (Order order : orders) {
                 System.out.println(order);
@@ -183,215 +179,207 @@ public class OrderUI {
     }
 
     private void cancelOrder() {
-        int id = getIntInput("הכנס מזהה הזמנה לביטול: ");
+        int id = getIntInput("Enter order ID to cancel: ");
         boolean success = orderController.cancelOrder(id);
         if (success) {
-            System.out.println("ההזמנה בוטלה בהצלחה.");
+            System.out.println("Order cancelled successfully.");
         } else {
-            System.out.println("לא ניתן לבטל את ההזמנה.");
+            System.out.println("Cannot cancel the order.");
         }
     }
 
     private double getDoubleInput(String prompt) {
         System.out.print(prompt);
         while (!scanner.hasNextDouble()) {
-            System.out.println("אנא הזן מספר תקין.");
+            System.out.println("Please enter a valid number.");
             System.out.print(prompt);
             scanner.next();
         }
         double input = scanner.nextDouble();
-        scanner.nextLine(); // ניקוי ה-buffer
+        scanner.nextLine(); // Clean buffer
         return input;
     }
 
     public void updateOrderStatus() {
-        int id = getIntInput("הכנס מזהה הזמנה: ");
+        int id = getIntInput("Enter order ID: ");
         Order order = orderController.getOrderById(id);
-
+        
         if (order == null) {
-            System.out.println("הזמנה לא נמצאה.");
+            System.out.println("Order not found.");
             return;
         }
-
-        System.out.println("סטטוס נוכחי: " + order.getStatus());
-        System.out.println("בחר סטטוס חדש:");
-        System.out.println("1. CREATED");
-        System.out.println("2. IN_PROGRESS");
-        System.out.println("3. COMPLETED");
-        System.out.println("4. CANCELLED");
-
-        int choice = getIntInput("בחירתך: ");
-        OrderStatus newStatus;
-        switch (choice) {
-            case 1: newStatus = OrderStatus.CREATED; break;
-            case 2: newStatus = OrderStatus.IN_PROGRESS; break;
-            case 3: newStatus = OrderStatus.DONE; break;
-            case 4: newStatus = OrderStatus.CANCELLED; break;
-            default:
-                System.out.println("בחירה לא תקינה.");
-                return;
+        
+        System.out.println("Current status: " + order.getStatus());
+        System.out.println("Select new status:");
+        
+        for (int i = 0; i < OrderStatus.values().length; i++) {
+            System.out.println((i + 1) + ". " + OrderStatus.values()[i]);
         }
-
-        boolean success = orderController.updateOrderStatus(id, newStatus);
-        System.out.println(success ? "הסטטוס עודכן בהצלחה." : "שגיאה בעדכון הסטטוס.");
+        
+        int statusChoice = getIntInput("Your choice: ");
+        if (statusChoice < 1 || statusChoice > OrderStatus.values().length) {
+            System.out.println("Invalid selection.");
+            return;
+        }
+        
+        OrderStatus newStatus = OrderStatus.values()[statusChoice - 1];
+        boolean updated = orderController.updateOrderStatus(id, newStatus);
+        
+        if (updated) {
+            System.out.println("Status updated successfully.");
+        } else {
+            System.out.println("Error updating status.");
+        }
     }
-
+    
     public void assignTransportToOrder() {
-        int orderId = getIntInput("הכנס מזהה הזמנה: ");
-        int transportId = getIntInput("הכנס מזהה הובלה לשיוך: ");
-
-        boolean success = orderController.assignTransportToOrder(orderId, transportId);
-
-        while(!success) {
-            System.out.println("בעקבות המשקל לא ניתן לשייך את ההזמנה להובלה. בחר פתרון רצוי: ");
-            System.out.println("1. הורדת פריטים מההזמנה");
-            System.out.println("2. החלפת משאית להובלה");
-            System.out.println("3. הורדת יעד מההובלה");
-
-            int choice = getIntInput("בחירתך: ");
-            switch (choice) {
-                case 1:
-                    removeItemsInOrder(orderId,transportId);
-                    break;
-                case 2:
-                    changeTruckByChoice(transportId);
-                    break;
-                case 3:
-                    removeDestinationByChoice(transportId);
-                    break;
-                default:
-                    System.out.println("בחירה לא תקינה.");
-                    return;
-            }
-            success = orderController.assignTransportToOrder(orderId, transportId);
+        int orderId = getIntInput("Enter order ID: ");
+        Order order = orderController.getOrderById(orderId);
+        
+        if (order == null) {
+            System.out.println("Order not found.");
+            return;
         }
-
-        System.out.println("ההובלה שויכה להזמנה בהצלחה.");
+        
+        if (order.getStatus() == OrderStatus.CANCELLED || order.getStatus() == OrderStatus.DELIVERED) {
+            System.out.println("Cannot assign a " + order.getStatus() + " order to transport.");
+            return;
+        }
+        
+        int transportId = getIntInput("Enter transport ID: ");
+        boolean success = orderController.assignOrderToTransport(orderId, transportId);
+        
+        if (success) {
+            System.out.println("Order assigned to transport successfully.");
+        } else {
+            System.out.println("Error assigning order to transport.");
+        }
     }
 
     private void changeTruckByChoice(int transportId) {
-        String truckId = getStringInput("הזן מספר רישוי של משאית חלופית: ");
-        boolean changed = transportController.changeTruck(transportId, truckId);
-        System.out.println(changed ? "המשאית הוחלפה בהצלחה." : "שגיאה בהחלפת המשאית.");
+        String truckId = getStringInput("Enter new truck license number: ");
+        transportController.changeTruck(transportId, truckId);
     }
 
     private void removeDestinationByChoice(int transportId) {
+        // Get destinations from transport
         List<Site> destinations = transportController.getTransportById(transportId).getDestinations();
+        
         if (destinations.isEmpty()) {
-            System.out.println("אין יעדים בהובלה.");
+            System.out.println("This transport has no destinations to remove.");
             return;
         }
-
-        System.out.println("יעדים בהובלה:");
+        
+        System.out.println("Select destination to remove:");
         for (int i = 0; i < destinations.size(); i++) {
             System.out.println((i + 1) + ". " + destinations.get(i).getName());
         }
-
-        int index = getIntInput("בחר יעד להסרה: ") - 1;
-        if (index < 0 || index >= destinations.size()) {
-            System.out.println("בחירה לא תקינה.");
+        
+        int choice = getIntInput("Your choice: ") - 1;
+        if (choice < 0 || choice >= destinations.size()) {
+            System.out.println("Invalid selection.");
             return;
         }
-
-        String siteId = destinations.get(index).getId();
-        boolean removed = transportController.removeDestination(transportId, siteId);
-        System.out.println(removed ? "היעד הוסר." : "שגיאה בהסרת היעד.");
+        
+        transportController.removeDestination(transportId, destinations.get(choice).getId());
     }
 
     public void viewOrdersByDate() {
-        String input = getStringInput("הכנס תאריך (yyyy-MM-dd): ");
+        String dateStr = getStringInput("Enter date (yyyy-MM-dd): ");
+        LocalDate date;
         try {
-            LocalDate date = LocalDate.parse(input);
-            List<Order> orders = orderController.getOrdersByDate(date);
-            if (orders.isEmpty()) {
-                System.out.println("אין הזמנות בתאריך זה.");
-            } else {
-                orders.forEach(order -> {
-                    System.out.println(order);
-                    System.out.println("----------------");
-                });
-            }
+            date = LocalDate.parse(dateStr);
         } catch (Exception e) {
-            System.out.println("פורמט תאריך שגוי.");
+            System.out.println("Invalid date format.");
+            return;
+        }
+        
+        List<Order> orders = orderController.getOrdersByDate(date);
+        
+        if (orders.isEmpty()) {
+            System.out.println("No orders on this date.");
+        } else {
+            for (Order order : orders) {
+                System.out.println(order);
+                System.out.println("---------------------");
+            }
         }
     }
 
     public void viewOrdersByStatus() {
-        System.out.println("בחר סטטוס:");
-        System.out.println("1. CREATED");
-        System.out.println("2. IN_PROGRESS");
-        System.out.println("3. COMPLETED");
-        System.out.println("4. CANCELLED");
-
-        int choice = getIntInput("בחירתך: ");
-        OrderStatus status;
-        switch (choice) {
-            case 1: status = OrderStatus.CREATED; break;
-            case 2: status = OrderStatus.IN_PROGRESS; break;
-            case 3: status = OrderStatus.DONE; break;
-            case 4: status = OrderStatus.CANCELLED; break;
-            default:
-                System.out.println("בחירה לא תקינה.");
-                return;
+        System.out.println("Select status:");
+        for (int i = 0; i < OrderStatus.values().length; i++) {
+            System.out.println((i + 1) + ". " + OrderStatus.values()[i]);
         }
-
+        
+        int statusChoice = getIntInput("Your choice: ");
+        if (statusChoice < 1 || statusChoice > OrderStatus.values().length) {
+            System.out.println("Invalid selection.");
+            return;
+        }
+        
+        OrderStatus status = OrderStatus.values()[statusChoice - 1];
         List<Order> orders = orderController.getOrdersByStatus(status);
+        
         if (orders.isEmpty()) {
-            System.out.println("אין הזמנות בסטטוס זה.");
+            System.out.println("No orders with status " + status);
         } else {
-            orders.forEach(order -> {
+            System.out.println("Orders with status " + status + ":");
+            for (Order order : orders) {
                 System.out.println(order);
-                System.out.println("----------------");
-            });
+                System.out.println("---------------------");
+            }
         }
     }
-
 
     public void removeItemsInOrder(int orderId, int transportId) {
         Order order = orderController.getOrderById(orderId);
+        
         if (order == null) {
-            System.out.println("ההזמנה לא נמצאה.");
+            System.out.println("Order not found.");
             return;
         }
-
-        List<Item> items = new ArrayList<>(order.getItems());
+        
+        List<Item> items = order.getItems();
         if (items.isEmpty()) {
-            System.out.println("אין פריטים בהזמנה.");
+            System.out.println("This order has no items.");
             return;
         }
-
-        List<Item> itemsToRemove = new ArrayList<>();
-
-        boolean done = false;
-        while (!done && !items.isEmpty()) {
-            System.out.println("\nפריטים בהזמנה:");
-            for (int i = 0; i < items.size(); i++) {
-                System.out.println((i + 1) + ". " + items.get(i));
-            }
-
-            int index = getIntInput("בחר מספר פריט להסרה: ") - 1;
-            if (index < 0 || index >= items.size()) {
-                System.out.println("בחירה לא תקינה.");
-                continue;
-            }
-
-            Item selected = items.get(index);
-            itemsToRemove.add(selected);
-            items.remove(index);
-
-            String more = getStringInput("להסיר פריט נוסף? (כן/לא): ");
-            done = !more.equalsIgnoreCase("כן");
+        
+        System.out.println("Select items to remove from transport (enter numbers separated by commas):");
+        for (int i = 0; i < items.size(); i++) {
+            Item item = items.get(i);
+            System.out.println((i + 1) + ". " + item.getName() + " (Quantity: " + item.getQuantity() + ")");
         }
-
-        if (itemsToRemove.isEmpty()) {
-            System.out.println("לא נבחרו פריטים להסרה.");
+        
+        String input = getStringInput("Your selections: ");
+        String[] selections = input.split(",");
+        List<Integer> selectedItems = new ArrayList<>();
+        
+        for (String selection : selections) {
+            try {
+                int index = Integer.parseInt(selection.trim()) - 1;
+                if (index >= 0 && index < items.size()) {
+                    selectedItems.add(items.get(index).getId());
+                }
+            } catch (NumberFormatException e) {
+                // Ignore invalid input
+            }
+        }
+        
+        if (selectedItems.isEmpty()) {
+            System.out.println("No valid items selected.");
             return;
         }
-
-        boolean removed = orderController.removeItems(orderId, transportId, itemsToRemove);
-        System.out.println(removed ? "הפריטים הוסרו מההזמנה." : "שגיאה בהסרת הפריטים.");
+        
+        boolean success = orderController.removeItemsFromTransport(orderId, transportId, selectedItems);
+        
+        if (success) {
+            System.out.println("Items removed from transport successfully.");
+        } else {
+            System.out.println("Error removing items from transport.");
+        }
     }
-
 
     private String getStringInput(String prompt) {
         System.out.print(prompt);

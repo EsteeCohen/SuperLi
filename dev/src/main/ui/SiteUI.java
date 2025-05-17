@@ -11,7 +11,7 @@ public class SiteUI {
     private SiteController siteController;
 
     /**
-     * בנאי לממשק ניהול אתרים
+     * Site Management UI constructor
      */
     public SiteUI(SiteController siteController) {
         this.scanner = new Scanner(System.in);
@@ -19,14 +19,14 @@ public class SiteUI {
     }
 
     /**
-     * התחלת ממשק ניהול אתרים
+     * Start Site Management interface
      */
     public void start() {
         boolean exit = false;
         
         while (!exit) {
             displayMenu();
-            int choice = getIntInput("בחר אפשרות: ");
+            int choice = getIntInput("Select an option: ");
             
             switch (choice) {
                 case 1:
@@ -45,42 +45,42 @@ public class SiteUI {
                     exit = true;
                     break;
                 default:
-                    System.out.println("אפשרות לא תקינה, נסה שנית");
+                    System.out.println("Invalid option, please try again");
             }
         }
     }
 
     /**
-     * הצגת תפריט ניהול אתרים
+     * Display Site Management menu
      */
     private void displayMenu() {
-        System.out.println("\n=== ניהול אתרים ===");
-        System.out.println("1. הוספת אתר חדש");
-        System.out.println("2. צפייה באתר");
-        System.out.println("3. צפייה בכל האתרים");
-        System.out.println("4. חיפוש אתרים לפי אזור");
-        System.out.println("0. חזרה לתפריט הראשי");
+        System.out.println("\n=== Site Management ===");
+        System.out.println("1. Add New Site");
+        System.out.println("2. View Site");
+        System.out.println("3. View All Sites");
+        System.out.println("4. Search Sites by Zone");
+        System.out.println("0. Return to Main Menu");
     }
 
     /**
-     * הוספת אתר חדש
+     * Add a new site
      */
     private void addNewSite() {
-        System.out.println("\n=== הוספת אתר חדש ===");
+        System.out.println("\n=== Add New Site ===");
         
-        String id = getStringInput("הזן מזהה אתר: ");
-        String name = getStringInput("הזן שם אתר: ");
-        String address = getStringInput("הזן כתובת: ");
-        String contactPhone = getStringInput("הזן טלפון איש קשר: ");
-        String contactName = getStringInput("הזן שם איש קשר: ");
+        String id = getStringInput("Enter site ID: ");
+        String name = getStringInput("Enter site name: ");
+        String address = getStringInput("Enter address: ");
+        String contactPhone = getStringInput("Enter contact phone: ");
+        String contactName = getStringInput("Enter contact name: ");
         
-        System.out.println("בחר אזור שילוח:");
-        System.out.println("1. צפון");
-        System.out.println("2. מרכז");
-        System.out.println("3. דרום");
-        System.out.println("4. ירושלים");
+        System.out.println("Select shipping zone:");
+        System.out.println("1. North");
+        System.out.println("2. Center");
+        System.out.println("3. South");
+        System.out.println("4. Jerusalem");
         
-        int zoneChoice = getIntInput("בחירתך: ");
+        int zoneChoice = getIntInput("Your choice: ");
         String zone;
         
         switch (zoneChoice) {
@@ -97,45 +97,45 @@ public class SiteUI {
                 zone = "JERUSALEM";
                 break;
             default:
-                System.out.println("בחירה לא תקינה. מגדיר כברירת מחדל: מרכז");
+                System.out.println("Invalid selection. Setting default: Center");
                 zone = "CENTER";
         }
         
         Site site = siteController.addSite(id, name, address, contactPhone, contactName, zone);
         
         if (site != null) {
-            System.out.println("האתר נוסף בהצלחה!");
+            System.out.println("Site added successfully!");
         } else {
-            System.out.println("שגיאה בהוספת האתר. ייתכן שהמזהה כבר קיים במערכת.");
+            System.out.println("Error adding site. ID may already exist in the system.");
         }
     }
 
     /**
-     * צפייה באתר ספציפי
+     * View a specific site
      */
     private void viewSite() {
-        System.out.println("\n=== צפייה באתר ===");
-        String id = getStringInput("הזן מזהה אתר: ");
+        System.out.println("\n=== View Site ===");
+        String id = getStringInput("Enter site ID: ");
         
         Site site = siteController.getSiteById(id);
         
         if (site != null) {
             displaySiteDetails(site);
         } else {
-            System.out.println("אתר לא נמצא במערכת.");
+            System.out.println("Site not found in the system.");
         }
     }
 
     /**
-     * צפייה בכל האתרים
+     * View all sites
      */
     private void viewAllSites() {
-        System.out.println("\n=== רשימת כל האתרים ===");
+        System.out.println("\n=== List of All Sites ===");
         
         List<Site> sites = siteController.getAllSites();
         
         if (sites.isEmpty()) {
-            System.out.println("אין אתרים במערכת.");
+            System.out.println("No sites in the system.");
             return;
         }
         
@@ -146,17 +146,17 @@ public class SiteUI {
     }
 
     /**
-     * חיפוש אתרים לפי אזור שילוח
+     * Search sites by shipping zone
      */
     private void searchSitesByZone() {
-        System.out.println("\n=== חיפוש אתרים לפי אזור ===");
-        System.out.println("בחר אזור שילוח:");
-        System.out.println("1. צפון");
-        System.out.println("2. מרכז");
-        System.out.println("3. דרום");
-        System.out.println("4. ירושלים");
+        System.out.println("\n=== Search Sites by Zone ===");
+        System.out.println("Select shipping zone:");
+        System.out.println("1. North");
+        System.out.println("2. Center");
+        System.out.println("3. South");
+        System.out.println("4. Jerusalem");
         
-        int zoneChoice = getIntInput("בחירתך: ");
+        int zoneChoice = getIntInput("Your choice: ");
         String zone;
         
         switch (zoneChoice) {
@@ -173,18 +173,18 @@ public class SiteUI {
                 zone = "JERUSALEM";
                 break;
             default:
-                System.out.println("בחירה לא תקינה. מציג אתרים באזור המרכז כברירת מחדל.");
+                System.out.println("Invalid selection. Showing Center zone sites as default.");
                 zone = "CENTER";
         }
         
         List<Site> sites = siteController.getSitesByZone(zone);
         
         if (sites.isEmpty()) {
-            System.out.println("אין אתרים באזור זה.");
+            System.out.println("No sites in this zone.");
             return;
         }
         
-        System.out.println("אתרים באזור " + zone + ":");
+        System.out.println("Sites in zone " + zone + ":");
         for (Site site : sites) {
             displaySiteDetails(site);
             System.out.println("--------------------");
@@ -192,34 +192,34 @@ public class SiteUI {
     }
 
     /**
-     * הצגת פרטי אתר
+     * Display site details
      */
     private void displaySiteDetails(Site site) {
-        System.out.println("מזהה: " + site.getId());
-        System.out.println("שם: " + site.getName());
-        System.out.println("כתובת: " + site.getAddress());
-        System.out.println("טלפון איש קשר: " + site.getContactPhone());
-        System.out.println("שם איש קשר: " + site.getContactName());
-        System.out.println("אזור שילוח: " + site.getShippingZone());
+        System.out.println("ID: " + site.getId());
+        System.out.println("Name: " + site.getName());
+        System.out.println("Address: " + site.getAddress());
+        System.out.println("Contact Phone: " + site.getContactPhone());
+        System.out.println("Contact Name: " + site.getContactName());
+        System.out.println("Shipping Zone: " + site.getShippingZone());
     }
 
     /**
-     * קבלת קלט מספרי מהמשתמש
+     * Get integer input from user
      */
     private int getIntInput(String prompt) {
         System.out.print(prompt);
         while (!scanner.hasNextInt()) {
-            System.out.println("אנא הזן מספר תקין.");
+            System.out.println("Please enter a valid number.");
             System.out.print(prompt);
             scanner.next();
         }
         int input = scanner.nextInt();
-        scanner.nextLine(); // ניקוי ה-buffer
+        scanner.nextLine(); // Clean buffer
         return input;
     }
 
     /**
-     * קבלת קלט טקסט מהמשתמש
+     * Get string input from user
      */
     private String getStringInput(String prompt) {
         System.out.print(prompt);
