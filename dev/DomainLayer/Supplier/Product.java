@@ -96,4 +96,8 @@ public class Product {
                 expirationDate != null ? expirationDate.toString() : "N/A"
         );
     }
+
+    public Object getUnits() {
+        return units;
+    }
 }

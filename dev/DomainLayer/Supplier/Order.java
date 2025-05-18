@@ -117,4 +117,11 @@ public class Order {
     }
 
 
+    public ContactPerson getContactPerson() {
+        return contactPerson;
+    }
+
+    public Agreement getAgreement() {
+        return agreement;
+    }
 }
