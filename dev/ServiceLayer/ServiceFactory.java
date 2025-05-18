@@ -18,15 +18,16 @@ public class ServiceFactory {
     private final SystemController systemController;
     private final ProductService productService;
     private final ReportService reportService;
-    private final SupplierSystemService supplierSystemService;
     public ServiceFactory()
     {
-        productFacade=new ProductFacade();
-        reportFacade=new ReportFacade(productFacade);
+        ProductFacade.flush();
+        ReportFacade.flush();
+        productFacade=ProductFacade.getInstance();
+        reportFacade=ReportFacade.getInstance();
         productService=new ProductService(productFacade);
         reportService=new ReportService(reportFacade);
         systemController=SystemController.getInstance();
-        supplierSystemService=SupplierSystemService.getInstance(SystemController.getInstance(), productFacade,reportFacade);
+
     }
 
     public String GenerateExpiryReport(LocalDate until) {

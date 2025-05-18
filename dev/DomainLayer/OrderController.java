@@ -15,8 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class OrderController
-{
+public class OrderController {
     /*Dependencies injected via constructor*/
     private final TimeController timeController;
     private final SystemController systemController;
@@ -27,11 +26,12 @@ public class OrderController
 
     private static OrderController instance;
 
-    public static OrderController getInstance(){
-        if(instance == null)
+    public static OrderController getInstance() {
+        if (instance == null)
             instance = new OrderController();
         return instance;
     }
+
     private OrderController() {
         this.productFacade = ProductFacade.getInstance();
         this.reportFacade = ReportFacade.getInstance();
@@ -47,12 +47,11 @@ public class OrderController
      * Declare that a specific product is below its minimum
      * stock level (manual or automatic trigger).
      *
-     * @param productName   logical product key in inventory
-     * @param missingUnits  how many units are required to restore
-     *                      stock to the defined minimum
+     * @param productName  logical product key in inventory
+     * @param missingUnits how many units are required to restore
+     *                     stock to the defined minimum
      */
-    public void reportStockShortage(String productName, int missingUnits)
-    {
+    public void reportStockShortage(String productName, int missingUnits) {
 
     }
 
@@ -102,10 +101,11 @@ public class OrderController
      * Notify the system that a previously issued order has
      * physically arrived.
      *
-     * @param orderId            system‑wide order identifier
-     * @param actualArrivalDate  real arrival date at warehouse
+     * @param orderId           system‑wide order identifier
+     * @param actualArrivalDate real arrival date at warehouse
      */
-    public void confirmOrderArrival(int orderId, LocalDate actualArrivalDate);
+    public void confirmOrderArrival(int orderId, LocalDate actualArrivalDate) {
+    }
 
     /**
      * Retrieve every order whose scheduled supply date equals
@@ -114,7 +114,9 @@ public class OrderController
      * @param date a calendar day to check
      * @return list of Order domain entities
      */
-    public List<Order> getOrdersArrivingOn(LocalDate date);
+    public List<Order> getOrdersArrivingOn(LocalDate date) {
+        return null;
+    }
 
     /*------------------------------------------------------
      *  Suggested additional capabilities
@@ -126,14 +128,16 @@ public class OrderController
      * its minimum level.  Aggregates shortages discovered in
      * the latest Abscence/Damage/Expiry reports.
      */
-    public void createAutomaticShortageOrders();
+    public void createAutomaticShortageOrders() {
+    }
 
     /**
      * Generate or refresh standing (periodic) orders one day
      * before each supplier’s fixed delivery day, ensuring that
      * projected stock after the delivery will be above minimum.
      */
-    public void updatePeriodicOrders();
+    public void updatePeriodicOrders() {
+    }
 
     /**
      * Recalculate inventory quantities and release updated
@@ -141,7 +145,10 @@ public class OrderController
      *
      * @param orderId id of the delivered order
      */
-    public void reconcileStockAfterArrival(int orderId);
+    public void reconcileStockAfterArrival(int orderId)
+    {
+
+    }
 
     /**
      * Helper used internally to build the item‑quantity map
@@ -150,7 +157,10 @@ public class OrderController
      * @param shortages map<productName, missingUnits>
      * @return Map<catalogNumber, quantityPerCatalog>
      */
-    private Map<String,Integer> mapShortagesToCatalog(Map<String,Integer> shortages);
+    private Map<String,Integer> mapShortagesToCatalog(Map<String,Integer> shortages)
+    {
+        return null;
+    }
 }
 
 

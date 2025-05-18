@@ -11,11 +11,21 @@ public class ReportFacade
     AbscenceReport abscenceReport;
 
     ProductFacade pf;
-
-    public ReportFacade(ProductFacade pf)
+    private static ReportFacade instance=null;
+    private ReportFacade()
     {
-        this.pf=pf;
+        this.pf=ProductFacade.getInstance();
 
+    }
+    public static ReportFacade getInstance()
+    {
+        if(instance==null)
+            instance=new ReportFacade();
+        return instance;
+    }
+    public static void flush()
+    {
+        instance=new ReportFacade();
     }
 
     public void GenerateExpiryReport(LocalDate until)
