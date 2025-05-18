@@ -12,8 +12,23 @@ public class ProductFacade
 {
     private final Map<String, List<Product>> productsByCategory=new HashMap<>();
     private final Map<String, Product> productsByName=new HashMap<>();
-
-    private OrderController singleton = OrderController.getInstance();
+    private static ProductFacade instance=null;
+    OrderController singleton = OrderController.getInstance();
+    //singelton getter
+    public static ProductFacade getInstance()
+    {
+        if(instance==null)
+            instance=new ProductFacade();
+        return instance;
+    }
+    //in order to load new data, we want to flush out the previous data
+    public static void flush()
+    {
+        instance=new ProductFacade();
+    }
+    private ProductFacade()
+    {
+    }
     /**
      * adds a new product to the system
      * @param productName the name of the new product

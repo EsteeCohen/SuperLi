@@ -1,5 +1,7 @@
 package DomainLayer.Inventory;
-import java.time.DayOfWeek;
+import DomainLayer.TimeController;
+
+import java.sql.Time;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -115,7 +117,7 @@ class Product {
         int totalSales = updateQuantities(supplyID, storeQuantity, storageQuantity);
 
         //document sells?
-        if (discount != null && discount.getEndDate().isBefore(LocalDate.now()))//discount ended
+        if (discount != null && discount.getEndDate().isBefore(TimeController.getDate()))//discount ended
             discount = null;
         if (totalSales == 0)
             return;//if just moved, no need to for updates
