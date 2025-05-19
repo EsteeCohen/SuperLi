@@ -2,11 +2,10 @@ package DomainLayer;
 
 import DomainLayer.Inventory.ProductFacade;
 import DomainLayer.Inventory.ReportFacade;
-import DomainLayer.Supplier.Product;
-import DomainLayer.Supplier.Supplier;
-import DomainLayer.Supplier.SystemController;
+import DomainLayer.Supplier.*;
+import DomainLayer.Supplier.Enums.STATUS;
 import ServiceLayer.SupplierSystemService;
-import DomainLayer.Supplier.Order;
+import org.junit.jupiter.api.parallel.Execution;
 
 
 import java.time.LocalDate;
@@ -17,11 +16,11 @@ import java.util.Map;
 
 public class OrderController {
     /*Dependencies injected via constructor*/
-    private final TimeController timeController;
     private final SystemController systemController;
     private final ProductFacade productFacade;
     private final ReportFacade reportFacade;
     private List<Order> orders;
+    private int nextOrderId;
 
 
     private static OrderController instance;
@@ -37,7 +36,7 @@ public class OrderController {
         this.reportFacade = ReportFacade.getInstance();
         this.systemController = SystemController.getInstance();
         this.orders = new ArrayList<Order>();
-        this.timeController = TimeController.getInstance();
+        this.nextOrderId = 0;
 
 
     }
@@ -52,9 +51,27 @@ public class OrderController {
      *                     stock to the defined minimum
      */
     public void reportStockShortage(String productName, int missingUnits) {
-
+        Map<String, Object> supplierANDAgreement = chooseBestSupplierAndAgreement(productName, missingUnits);
+        if (supplierANDAgreement.isEmpty()) {
+            return;
+        }
+        String supplierId = supplierANDAgreement.get("supplierId").toString();
+        int agreementId = (int) supplierANDAgreement.get("agreementId");
+        Order order = checkOpenOrder(supplierId, agreementId);
+        if (order == null) {
+            createAutomaticShortageOrders(supplierId, agreementId, productName, missingUnits);
+        } else {
+            updatePeriodicOrders(order, productName, missingUnits);
+        }
     }
-
+    public Order checkOpenOrder(String supplierName, int agreement){
+        for(Order order : orders){
+            if(order.getSupplierId().equals(supplierName) && order.getAgreement().getAgreementId() == agreement){
+                return order;
+            }
+        }
+        return null;
+    }
     /**
      * Decide which supplier can satisfy the requested quantity
      * for the given product at the best total price, according to
@@ -101,10 +118,31 @@ public class OrderController {
      * Notify the system that a previously issued order has
      * physically arrived.
      *
-     * @param orderId           system‑wide order identifier
      * @param actualArrivalDate real arrival date at warehouse
      */
-    public void confirmOrderArrival(int orderId, LocalDate actualArrivalDate) {
+    public void confirmOrderArrival(LocalDate actualArrivalDate) {
+        try {
+            List<Order> ordersArrival = getOrdersArrivingOn(actualArrivalDate);
+            if (orders.isEmpty()) return;
+            for (Order order : ordersArrival) {
+                Supplier supplier = systemController.getSupplierObjectById(order.getSupplierId());
+                Map<String, Integer> items = order.getItems();
+                Agreement agreement = supplier.getAgreements().get(order.getAgreement().getAgreementId());
+
+                for (Map.Entry<String, Integer> item : items.entrySet()) {
+                    Product product = supplier.getProductNameByCatalogNumber(item.getKey());
+                    String productName = product.getProductName();
+                    double cost = agreement.calculatePriceWithDiscount(product, item.getValue());
+                    LocalDate expirationDate = order.getSupplyDate().plusDays(7);
+                    productFacade.addSupply(productName, cost, expirationDate, 0, item.getValue());
+
+                }
+                order.setStatus(STATUS.DELIVERED);
+                orders.remove(order);
+            }
+        } catch (Exception e) {
+            System.out.println (e.toString());
+        }
     }
 
     /**
@@ -115,6 +153,12 @@ public class OrderController {
      * @return list of Order domain entities
      */
     public List<Order> getOrdersArrivingOn(LocalDate date) {
+        List<Order> result = new ArrayList<>();
+        for (Order order : orders) {
+            if (order.getSupplyDate().equals(date)) {
+                result.add(order);
+            }
+        }
         return null;
     }
 
@@ -128,15 +172,51 @@ public class OrderController {
      * its minimum level.  Aggregates shortages discovered in
      * the latest Abscence/Damage/Expiry reports.
      */
-    public void createAutomaticShortageOrders() {
+    public void createAutomaticShortageOrders(String supplierId, int agreementId, String productName, int requiredQuantity) {
+        LocalDate orderDate = LocalDate.now();
+        Supplier supplier = systemController.getSupplierObjectById(supplierId);
+        if (supplier == null) return;
+        LocalDate supplyDate = supplier.getClosestSupplyDate(orderDate);
+
+        int orderId = nextOrderId++;
+        Agreement agreement = supplier.getAgreements().get(agreementId);
+        Map<String, Integer> items = new HashMap<>();
+        String catalogNumber = supplier.findProductByName(productName).getCatalogNumber();
+        items.put(catalogNumber, requiredQuantity);
+        double totalPrice = getTotalPrice(supplier, items, agreementId);
+        ContactPerson contactPerson = supplier.getContactPersons().get(0);
+        STATUS status = STATUS.IN_PROCESS;
+        Order newOrder = new Order(orderId, supplierId, orderDate, contactPerson, agreement, supplyDate, items, status, totalPrice);
+        orders.add(newOrder);
+
+
     }
+
+
+    public double getTotalPrice(Supplier supplier, Map<String, Integer> items, int agreementIndex) {
+        if (supplier == null) return -1;
+
+        if (agreementIndex < 0 || agreementIndex >= supplier.getAgreements().size()) return -1;
+        Agreement agreement = supplier.getAgreements().get(agreementIndex);
+
+        Map<String, Product> supplierProducts = supplier.getProductCatalog();
+
+        return agreement.calculateTotalPrice(items, supplierProducts);
+    }
+
 
     /**
      * Generate or refresh standing (periodic) orders one day
      * before each supplier’s fixed delivery day, ensuring that
      * projected stock after the delivery will be above minimum.
      */
-    public void updatePeriodicOrders() {
+    public void updatePeriodicOrders(Order order, String productName, int requiredQuantity) {
+        Map<String, Integer> items = new HashMap<>();
+        Supplier supplier = systemController.getSupplierObjectById(order.getSupplierId());
+        if (supplier == null) return;
+        String catalogNumber = supplier.findProductByName(productName).getCatalogNumber();
+        items.put(catalogNumber, requiredQuantity);
+        order.setItems(items);
     }
 
     /**

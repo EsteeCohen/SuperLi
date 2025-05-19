@@ -8,20 +8,9 @@ import java.time.LocalDate;
  */
 public class TimeController
 {
-    private static TimeController instance;
-    private static LocalDate date;
+    private static LocalDate date=LocalDate.now();
+    private static OrderController orderController = OrderController.getInstance();
 
-    public static TimeController getInstance()
-    {
-        if (instance == null)
-            instance = new TimeController();
-        return instance;
-    }
-
-    private TimeController()
-    {
-        this.date = LocalDate.now();
-    }
 
     /**
      * move the current date a number of days into he future
@@ -35,5 +24,13 @@ public class TimeController
     public static LocalDate getDate()
     {
         return date;
+    }
+    public static void NextDay()
+    {
+        date = date.plusDays(1);
+        System.out.println("The date is now: "+date);
+        orderController.confirmOrderArrival(getDate());
+        //להוסיף בדיקה עבור כל ההזמנות הפתוחות הגיעו
+
     }
 }
