@@ -7,50 +7,77 @@ import java.util.Scanner;
 
 import serviceLayer.ShiftService;
 
-public class AvailabilityForm {
+public class AvailabilityForm extends Form {
     private ShiftService shiftService;
     private Scanner scanner;
 
     public AvailabilityForm(Scanner scanner, ShiftService shiftService) {
+        super("Availability Form");
         this.shiftService = shiftService;
         this.scanner = scanner;
     }
 
     public void showAvailabilityForm(String employeeId) {
-        System.out.println("=== availability form ===");
-
-        // Calculate the date of the next Sunday
         LocalDate today = LocalDate.now();
         LocalDate nextSunday = today.plusDays(7 - today.getDayOfWeek().getValue() % 7);
 
-        // Fetch and display the list of work times starting from next Sunday
         ArrayList<ShiftPL> workTimes = new ArrayList<>(shiftService.getWeeklyShifts(nextSunday).stream()
             .map(shiftSL -> new ShiftPL(shiftSL))
             .toList());
         workTimes.sort(Comparator.comparing(ShiftPL::getDate, Comparator.naturalOrder()));
-        System.out.println("shifts:");
+
+        if (workTimes.isEmpty()) {
+            System.out.println("No shifts available.");
+            return;
+        }
+
+        printShiftsList(workTimes);
+
+        String input = getSelectedShiftsInput(workTimes);
+        if (input == null) return;
+
+        boolean anyValid = processSelectedShifts(input, workTimes, employeeId);
+
+        if (anyValid) {
+            System.out.println("Availability has been set successfully!");
+        } else {
+            System.out.println("No valid shifts selected. Availability not updated.");
+        }
+    }
+
+    private void printShiftsList(ArrayList<ShiftPL> workTimes) {
+        System.out.println("Shifts:");
         for (int i = 0; i < workTimes.size(); i++) {
             System.out.println((i + 1) + ". " + workTimes.get(i).toStringForAvailabilityForm());
         }
+    }
 
-        // Get user input for selected work times
-        System.out.println("choose your work times: (numbers separated by space)");
-        String input = scanner.nextLine();
-        String[] selectedNumbers = input.split(" ");
-
-        // Convert selected numbers to work times
-        for (String number : selectedNumbers) {
-            int index = Integer.parseInt(number.trim()) - 1;
-            if (index >= 0 && index < workTimes.size()) {
-                LocalDate shiftDate = workTimes.get(index).getDate();
-                String shiftType = workTimes.get(index).getShiftType().toString();
-                boolean isAvailable = true; // Assuming availability is true by default
-                shiftService.setAvailabilityOfEmployeeToShift(employeeId, shiftDate, shiftType, isAvailable);
-            } else {
-                System.out.println("incorrect number " + number);
+    private boolean processSelectedShifts(String input, ArrayList<ShiftPL> workTimes, String employeeId) {
+        boolean anyValid = false;
+        for (String number : parseInputNumbers(input)) {
+            try {
+                int selectedIndex = Integer.parseInt(number) - 1;
+                if (selectedIndex >= 0 && selectedIndex < workTimes.size()) {
+                    LocalDate shiftDate = workTimes.get(selectedIndex).getDate();
+                    String shiftType = workTimes.get(selectedIndex).getShiftType().toString();
+                    shiftService.setAvailabilityOfEmployeeToShift(employeeId, shiftDate, shiftType, true);
+                    anyValid = true;
+                } else {
+                    System.out.println("Incorrect number: " + number);
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input: " + number);
             }
         }
+        return anyValid;
+    }
 
-        System.out.println("Availability has been set successfully!");
+    private String[] parseInputNumbers(String input) {
+        return input.trim().split("\\s+");
+    }
+
+    private String getSelectedShiftsInput(ArrayList<ShiftPL> workTimes) {
+        System.out.println("Choose your work times: (numbers separated by space, or type 'q' to cancel)");
+        return UserInputManager.getUserInputOrCancel(scanner, "Operation cancelled.", "q");
     }
 }

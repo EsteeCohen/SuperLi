@@ -20,17 +20,15 @@ public class HRSystemUI {
     private final Scanner scanner;
 
     public HRSystemUI() {
-        // Initialize the services using the factory
         Factory factory = new Factory();
         this.roleService = factory.getRoleService();
         this.shiftService = factory.getShiftService();
         this.employeeService = factory.getEmployeeService();
         this.assigningService = factory.getAssigningService();
-        
-        // Initialize the scanner for user input
+
         this.scanner = new Scanner(System.in);
 
-        Initialize(); // Initialize the system (register admin, create shifts, etc.)
+        Initialize();
     }
 
     private void Initialize() {
@@ -56,20 +54,19 @@ public class HRSystemUI {
     }
 
     private EmployeePL login() {
-
-        System.out.print("Enter your ID: ");
-        String id = scanner.nextLine();
-        System.out.print("Enter your password: ");
-        String password = scanner.nextLine();
-        try {
-            EmployeePL employee = new EmployeePL(employeeService.login(id, password));
-            System.out.println("Login successful!");
-            return employee; // החזרת העובד המחובר
-        } catch (NullPointerException e) {
-            System.out.println("Login failed! Please check your ID and password.");
-            return login(); // Try to login again if failed
+        while (true) {
+            String id = UserInputManager.promptForString(scanner, "Enter your ID (or 'q' to cancel): ", "Login cancelled.", "q");
+            if (id == null) return null;
+            String password = UserInputManager.promptForString(scanner, "Enter your password (or 'q' to cancel): ", "Login cancelled.", "q");
+            if (password == null) return null;
+            try {
+                EmployeePL employee = new EmployeePL(employeeService.login(id, password));
+                System.out.println("Login successful!");
+                return employee;
+            } catch (NullPointerException e) {
+                System.out.println("Login failed! Please check your ID and password.");
+            }
         }
-
     }
 
     private void displayMenuForEmployee(EmployeePL employee) {
@@ -100,9 +97,11 @@ public class HRSystemUI {
     }
 
     private int getUserChoice() {
+        String input = UserInputManager.getUserInput(scanner);
         try {
-            return Integer.parseInt(scanner.nextLine());
+            return Integer.parseInt(input);
         } catch (NumberFormatException e) {
+            System.out.println("Invalid input. Please enter a number.");
             return -1;
         }
     }
@@ -113,7 +112,6 @@ public class HRSystemUI {
 
         if (choice == 0) {
             System.out.println("Exit...");
-            start(); // Restart the system
             return false; // Exit the current loop
         }
         if (employee.getRoles().contains(ADMIN_ROLE_NAME)) {
@@ -134,8 +132,7 @@ public class HRSystemUI {
                 availabilityForm.showAvailabilityForm(employee.getID());
                 break;
             case 3:
-                RoleAssignmentPresentation roleAssignment = new RoleAssignmentPresentation(employeeService, roleService,
-                        scanner);
+                RoleAssignmentPresentation roleAssignment = new RoleAssignmentPresentation(employeeService, roleService, scanner);
                 roleAssignment.assignRoleToEmployee();
                 break;
             case 4:
@@ -143,11 +140,10 @@ public class HRSystemUI {
                 roleCreation.createNewRole();
                 break;
             case 5:
-                ShiftsTablePresentation shiftsTable = new
-                ShiftsTablePresentation(shiftService, scanner, assigningService, employeeService);
+                ShiftsTablePresentation shiftsTable = new ShiftsTablePresentation(shiftService, scanner, assigningService, employeeService);
                 shiftsTable.showShiftTable();
                 shiftsTable.assignEmployeeToShift();
-            break;
+                break;
             case 6:
                 EmployeeSearchPresentation employeeSearch = new EmployeeSearchPresentation(employeeService, scanner);
                 employeeSearch.searchEmployee();
@@ -170,8 +166,7 @@ public class HRSystemUI {
                 availabilityForm.showAvailabilityForm(employee.getID());
                 break;
             case 2:
-                ShiftsTablePresentation shiftsTable = new ShiftsTablePresentation(shiftService, scanner,
-                        assigningService, employeeService);
+                ShiftsTablePresentation shiftsTable = new ShiftsTablePresentation(shiftService, scanner, assigningService, employeeService);
                 shiftsTable.showShiftTable();
                 break;
             default:

@@ -1,12 +1,12 @@
 package presentationLayer;
 
-public enum WageType {
+public enum WageTypePL {
     HOURLY('H'),
     GLOBAL('G');
 
     private final char code;
 
-    private WageType(char code) {
+    private WageTypePL(char code) {
         this.code = code;
     }
 
@@ -14,8 +14,8 @@ public enum WageType {
         return code;
     }
 
-    public static WageType fromChar(char code) {
-        for (WageType wageType : WageType.values()) {
+    public static WageTypePL fromChar(char code) {
+        for (WageTypePL wageType : WageTypePL.values()) {
             if (wageType.getCode() == code) {
                 return wageType;
             }

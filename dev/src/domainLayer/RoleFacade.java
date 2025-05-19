@@ -12,11 +12,13 @@ public class RoleFacade{
     }
 
 
-    public void add(String roleName) {
+    public boolean add(String roleName) {
         RoleDL role = new RoleDL(roleName);
         if (!roles.containsKey(role.getName())) {
             roles.put(role.getName(), role);
+            return true;
         }
+        return false;
     }
 
     public RoleDL getRoleByName(String name) {

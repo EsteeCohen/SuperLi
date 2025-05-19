@@ -16,8 +16,8 @@ public class RoleService {
                 .toList();
     }
 
-    public void createRole(String roleName) {
-       roleFacade.add(roleName);
+    public boolean createRole(String roleName) {
+       return roleFacade.add(roleName);
     }
 
     public void deleteRole(String name) {

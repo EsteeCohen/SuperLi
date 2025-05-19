@@ -9,7 +9,7 @@ import serviceLayer.AssigningService;
 import serviceLayer.EmployeeService;
 import serviceLayer.ShiftService;
 
-public class ShiftsTablePresentation {
+public class ShiftsTablePresentation extends Form {
     private ShiftService shiftService;
     private EmployeeService employeeService;
     private AssigningService assigningService;
@@ -17,6 +17,7 @@ public class ShiftsTablePresentation {
     private ArrayList<ShiftPL> shifts;
 
     public ShiftsTablePresentation(ShiftService service, Scanner scanner, AssigningService assigningService, EmployeeService employeeService) {
+        super("Weekly Shift Table");
         this.assigningService = assigningService;
         this.employeeService = employeeService;
         this.shiftService = service;
@@ -28,8 +29,6 @@ public class ShiftsTablePresentation {
     }
 
     public void showShiftTable() {
-        System.out.println("=== Weekly Shift Table ===");
-
         if (shifts.isEmpty()) {
             System.out.println("No shifts available.");
             return;
@@ -51,43 +50,67 @@ public class ShiftsTablePresentation {
         }
     }
 
-   // we need to get the shift date and time from the shift number
-
     public void assignEmployeeToShift() {
         boolean assignMore = true;
 
         while (assignMore) {
-            System.out.print("Enter shift number: ");
-            int shiftNumber = scanner.nextInt();
-            scanner.nextLine(); // Consume the newline character
-            ShiftPL selectedShift = shifts.get(shiftNumber - 1); // Assuming shiftNumber is 1-based index
-            System.out.print("Enter employee ID: ");
-            String employeeId = scanner.nextLine();
-            EmployeePL employee =new EmployeePL(employeeService.getEmployeeById(employeeId));
+            Integer shiftIndex = UserInputManager.promptForIndexFromList(
+                scanner,"Enter shift number (or 'q' to cancel): ",
+                shifts.size(),
+                "Assignment cancelled.",
+                "q"
+            );
+            if (shiftIndex == null) return;
+            ShiftPL selectedShift = shifts.get(shiftIndex);
+
+            String employeeId = UserInputManager.promptForString(
+                scanner,
+                "Enter employee ID (or 'q' to cancel): ",
+                "Assignment cancelled.",
+                "q"
+            );
+            if (employeeId == null) return;
+
+            EmployeePL employee = new EmployeePL(employeeService.getEmployeeById(employeeId));
             List<String> roles = employee.getRoles();
-            System.out.println("Available roles for the employee: ");
+            if (roles.isEmpty()) {
+                System.out.println("This employee has no roles.");
+                continue;
+            }
+
+            System.out.println("Available roles for the employee:");
             for (int i = 0; i < roles.size(); i++) {
                 System.out.println((i + 1) + ". " + roles.get(i));
             }
-            System.out.print("Enter employee role of the List: ");
-            String roleName = roles.get(scanner.nextInt() - 1);
-            scanner.nextLine(); // Consume the newline character
+
+            Integer roleIndex = UserInputManager.promptForIndexFromList(
+                scanner,
+                "Enter employee role number (or 'q' to cancel): ",
+                roles.size(),
+                "Assignment cancelled.",
+                "q"
+            );
+            if (roleIndex == null) return;
+            String roleName = roles.get(roleIndex);
 
             // Assign the employee to the shift
-            assigningService.assignToShift(employeeId, selectedShift.getDate(), selectedShift.getShiftType().toString(), roleName); // we need to get the shift date and time from the shift number
+            assigningService.assignToShift(employeeId, selectedShift.getDate(), selectedShift.getShiftType().toString(), roleName);
             System.out.println("Employee assigned to shift successfully!");
 
-            System.out.print("Assign more? (yes/no): ");
-            String response = scanner.nextLine().trim().toLowerCase();
-            if (response.equals("no")) {
+            String response = UserInputManager.promptForString(
+                scanner,
+                "Assign more? (yes/no): ",
+                "",
+                "q"
+            );
+            if (response == null || response.equalsIgnoreCase("no")) {
                 assignMore = false;
                 System.out.println("Assignment process ended.");
-            } else if (!response.equals("yes")) {
+            } else if (!response.equalsIgnoreCase("yes")) {
                 System.out.println("Invalid input. Please enter 'yes' or 'no'.");
             }
         }
 
-        // Check if there are shifts with missing workers
         hasShiftsWithMissingWorkers();
     }
 

@@ -7,39 +7,52 @@ import serviceLayer.EmployeeService;
 import serviceLayer.RoleSL;
 import serviceLayer.RoleService;
 
-public class RoleAssignmentPresentation {
+public class RoleAssignmentPresentation extends Form {
     private RoleService roleService;
     private EmployeeService employeeService;
     private Scanner scanner;
 
-    public RoleAssignmentPresentation(EmployeeService employeeService ,RoleService service, Scanner scanner) {
+    public RoleAssignmentPresentation(EmployeeService employeeService, RoleService service, Scanner scanner) {
+        super("Assign Role to Employee");
         this.roleService = service;
         this.employeeService = employeeService;
         this.scanner = scanner;
     }
 
     public void assignRoleToEmployee() {
-        System.out.print("Enter employee ID: ");
-        String employeeId = scanner.nextLine();
+        String employeeId = promptForEmployeeId();
+        if (employeeId == null) return;
+
         List<String> roles = roleService.getAllRoles().stream()
                                         .map(RoleSL::getName)
                                         .toList();
+        if (roles.isEmpty()) {
+            System.out.println("No roles available.");
+            return;
+        }
+
+        printRolesList(roles);
+
+        Integer roleIndex = promptForRoleIndex(roles.size());
+        if (roleIndex == null) return;
+
+        String selectedRole = roles.get(roleIndex);
+        employeeService.assignRoleToEmployee(employeeId, selectedRole);
+        System.out.println("The role has been assigned to the employee.");
+    }
+
+    private void printRolesList(List<String> roles) {
         System.out.println("Available roles:");
         for (int i = 0; i < roles.size(); i++) {
             System.out.println((i + 1) + ". " + roles.get(i));
         }
+    }
 
-        // Get user input for role selection
-        System.out.print("Enter the number of the role: ");
-        int roleNumber = scanner.nextInt();
-        scanner.nextLine(); // Clear the buffer
+    private String promptForEmployeeId() {
+        return UserInputManager.promptForString(scanner, "Enter employee ID (or 'q' to cancel): ", "Assignment cancelled.", "q");
+    }
 
-        if (roleNumber > 0 && roleNumber <= roles.size()) {
-            String selectedRole = roles.get(roleNumber - 1);
-            employeeService.assignRoleToEmployee(employeeId, selectedRole);
-            System.out.println("The role has been assigned to the employee.");
-        } else {
-            System.out.println("Invalid role number.");
-        }
+    private Integer promptForRoleIndex(int rolesCount) {
+        return UserInputManager.promptForIndexFromList(scanner, "Enter the number of the role (or 'q' to cancel): ", rolesCount, "Assignment cancelled.", "q");
     }
 }

@@ -12,7 +12,7 @@ public class EmployeePL {
     private final String fullName;
     private final LocalDate wordStartingDate;
     private final int wage;
-    private final WageType wageType;
+    private final WageTypePL wageType;
     private final List<RolePL> roles;
     private final int yearlySickDays;
     private final int yearlyDaysOff;
@@ -22,7 +22,7 @@ public class EmployeePL {
         this.fullName = fullName;
         this.wordStartingDate = wordStartingDate;
         this.wage = wage;
-        this.wageType = WageType.fromChar(wageTypeChar);
+        this.wageType = WageTypePL.fromChar(wageTypeChar);
         this.roles = new ArrayList<>();
         this.yearlySickDays = yearlySickDays;
         this.yearlyDaysOff = yearlyDaysOff;
@@ -33,7 +33,7 @@ public class EmployeePL {
         this.fullName = employeeSL.getFullName();
         this.wordStartingDate = employeeSL.getWordStartingDate();
         this.wage = employeeSL.getWage();
-        this.wageType = WageType.valueOf(employeeSL.getWageType().name());
+        this.wageType = WageTypePL.valueOf(employeeSL.getWageType().name());
         this.roles = new ArrayList<>();
         for (RoleSL roleSL : employeeSL.getRoles()) {
             this.roles.add(new RolePL(roleSL));
