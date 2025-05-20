@@ -2,11 +2,10 @@ package DataAccessLayer.interfacesDAO;
 import DomainLayer.Inventory.Product;
 
 import java.util.List;
-//product: name, shelfQuantity, storageQuantity, shelfLocation, storageLocation,
-//         latestsSales?, minQuantity?, sellPrice, latestSupplyId?, category, discount
+//product: name, category, [subCategories], manufacturer, shelfLocation, storageLocation, minQuantity, sellPrice, category, discount
 public interface InventoryProductDAO {
     void create(String category, String ProductName);
-    List<String> read(String ProductName);
-    List<String> readAll();
+    Product read(String ProductName);
+    List<Product> readAll();
     void update(Product product);
 }

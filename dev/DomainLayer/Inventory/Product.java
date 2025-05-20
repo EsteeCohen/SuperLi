@@ -263,12 +263,32 @@ public class Product {
         private int storageQuantity;
 
 
-        Supply(int supplyID, double cost, LocalDate expirationDate, int shelfQuantity, int storageQuantity) {
+        private Supply(int supplyID, double cost, LocalDate expirationDate, int shelfQuantity, int storageQuantity) {
             this.supplyID = supplyID;
             this.cost = cost;
             this.expirationDate = expirationDate;
             this.shelfQuantity = shelfQuantity;
             this.storageQuantity = storageQuantity;
+        }
+
+        public double getCost() {
+            return cost;
+        }
+
+        public int getSupplyID() {
+            return supplyID;
+        }
+
+        public int getShelfQuantity() {
+            return shelfQuantity;
+        }
+
+        public int getStorageQuantity() {
+            return storageQuantity;
+        }
+
+        public LocalDate getExpirationDate() {
+            return expirationDate;
         }
     }
 }
