@@ -98,13 +98,14 @@ public class SupplierSystemUI {
         System.out.println("11. Update agreement");
         System.out.println("12. Remove agreement");
         System.out.println("13. View agreements by supplier");
-        //System.out.println("14. Insert order");
-        System.out.println("14. Update order status");
-        System.out.println("15. View all orders");
-        System.out.println("16. View order by ID");
-        System.out.println("17. View orders by status");
-        System.out.println("18. View orders by supplier");
-        System.out.println("19. View supplier details By supplier ID");
+        System.out.println("14. Insert order");
+        System.out.println("15. Update order status");
+        System.out.println("16. View all orders");
+        System.out.println("17. View order by ID");
+        System.out.println("18. View orders by status");
+        System.out.println("19. View orders by supplier");
+        System.out.println("20. View supplier details By supplier ID");
+        System.out.println("21. Create periodic order");
         System.out.println("0. Exit");
         System.out.println("press -1 for the next day");
 
@@ -208,22 +209,28 @@ public class SupplierSystemUI {
                 viewAgreementsBySupplier();
                 break;
             case 14:
-                updateOrderStatus();
+                insertOrder();
                 break;
             case 15:
-                viewAllOrders();
+                updateOrderStatus();
                 break;
             case 16:
-                viewOrderById();
+                viewAllOrders();
                 break;
             case 17:
-                viewOrdersByStatus();
+                viewOrderById();
                 break;
             case 18:
-                viewOrdersBySupplier();
+                viewOrdersByStatus();
                 break;
             case 19:
+                viewOrdersBySupplier();
+                break;
+            case 20:
                 viewSupplierByID();
+                break;
+            case 21:
+                createPeriodicOrder();
                 break;
             default:
                 System.out.println("Invalid option. Please try again.");
@@ -604,7 +611,62 @@ public class SupplierSystemUI {
             System.out.println(p);
         }
     }
-/*
+
+    private void createPeriodicOrder(){
+        System.out.println("\n--- Add Periodic Order ---");
+
+        String supplierId = getSupplierIdFromUser();
+        if (supplierId.equals("")) return;
+
+        int agreementIndex = selectAgreement(supplierId);
+        if (agreementIndex < 0) return;
+
+        // Step 3: Show products and collect items for order
+        List<String> productsList = supplierSystem.getProductsByAgreement(supplierId, agreementIndex);
+
+        if (productsList.isEmpty()) {
+            System.out.println("No products found for this agreement. Operation cancelled.");
+            return;
+        }
+
+        // Display available products
+        System.out.println("\n--- Available Products ---");
+        for (int i = 0; i < productsList.size(); i++) {
+            System.out.println(i + " - " + productsList.get(i));
+        }
+
+        Map<String, Integer> productsToOrder = new HashMap<>();
+        while (true) {
+            System.out.print("Enter product name to add to the order (leave empty to finish): ");
+            String productName = scanner.nextLine().trim();
+            if (productName.isEmpty()) break;
+            boolean productFound = supplierSystem.isProductNameExistsInAgreement(supplierId, agreementIndex, productName);
+            if (!productFound) {
+                System.out.println("Product not found. Try again.");
+                continue;
+            }
+            System.out.print("Enter quantity for this product: ");
+            int quantity;
+            try {
+                quantity = Integer.parseInt(scanner.nextLine().trim());
+                if (quantity <= 0) {
+                    System.out.println("Quantity must be positive.");
+                    continue;
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid quantity.");
+                continue;
+            }
+            productsToOrder.put(productName, quantity);
+        }
+        if (productsToOrder.isEmpty()) {
+            System.out.println("No products selected. Operation cancelled.");
+            return;
+        }
+        supplierSystem.addPeriodicOrders(supplierId, agreementIndex, productsToOrder);
+        System.out.println("Periodic order has been created successfully.");
+    }
+
     // order-related methods:
     private void insertOrder() {
         System.out.println("\n--- Insert Existing Order ---");
@@ -670,7 +732,7 @@ public class SupplierSystemUI {
             System.out.println("Failed to create order. Please check your input.");
         }
 
-    }*/
+    }
 
     private int selectAgreement(String supplierId) {
         System.out.println("\n--- Enter the serial number of the desired agreement ---");
@@ -1252,6 +1314,7 @@ public class SupplierSystemUI {
         return selection;
     }
 
+
     private int showAgreementBySupplier(String supplierId){
         List<String> agreements = supplierSystem.getAgreementsBySupplier(supplierId);
 
@@ -1268,5 +1331,7 @@ public class SupplierSystemUI {
         }
         return agreements.size();
     }
+
+
 }
 

@@ -151,7 +151,7 @@ public class ProductFacade
         boolean shortage=total<p.getMinQuantity();
         if(shortage)
         {
-            OrderController.getInstance().reportStockShortage(productName,total-p.getMinQuantity());
+            OrderController.getInstance().reportStockShortage(productName,p.getMinQuantity()-total);
         }
         return shortage;
     }
@@ -175,9 +175,20 @@ public class ProductFacade
         boolean shortage=total<p.getMinQuantity();
         if(shortage)
         {
-            OrderController.getInstance().reportStockShortage(productName,total-p.getMinQuantity());
+            OrderController.getInstance().reportStockShortage(productName,p.getMinQuantity()-total);
         }
         return shortage;
+    }
+
+    /**
+     * called every monday and thursday before the inventory man updates the sales
+     */
+    public void restartSale()
+    {
+        for(Map.Entry<String,Product> entry:productsByName.entrySet())
+        {
+            entry.getValue().restartSales();
+        }
     }
 
     //#################################################################################

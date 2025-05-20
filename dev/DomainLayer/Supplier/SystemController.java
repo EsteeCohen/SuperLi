@@ -1,5 +1,6 @@
 package DomainLayer.Supplier;
 
+import DomainLayer.OrderController;
 import DomainLayer.Supplier.Enums.*;
 
 
@@ -262,6 +263,11 @@ public class SystemController {
         try {
             STATUS status = STATUS.values()[newStatus-1];
             order.setStatus(status);
+            if(order.getStatus() == STATUS.IN_PROCESS && order.getSupplyDate().isAfter(LocalDate.now())) {
+                OrderController.getInstance().addOrder(order);
+            } else if(order.getStatus() == STATUS.DELIVERED || order.getStatus() == STATUS.CANCELLED){
+                OrderController.getInstance().removeOrder(order);
+            }
             return true;
         } catch (IllegalArgumentException e) {
             return false;
@@ -537,5 +543,54 @@ public class SystemController {
     public List<Supplier> getAllSupplierObjects() {
         return new ArrayList<>(suppliers.values());
     }
+
+
+    // Create a new order
+    public boolean insertOrder(String supplierId, LocalDate orderDate, LocalDate supplyDate,
+                               Map<Integer, Integer> indexQuantityItems,  String contactPresonName, String contactPersonPhone, int agreementIndex, int statusIndex) {
+        if (!suppliers.containsKey(supplierId)) return false;
+        OrderController orderController = OrderController.getInstance();
+        int orderId = orderController.getOrderId();
+        orderController.incrementOrderId();
+
+        Agreement agreement = suppliers.get(supplierId).getAgreements().get(agreementIndex);
+        Map<String, Integer> items = parseIndexTOCatalogNumber(indexQuantityItems, agreement);
+        double totalPrice = getTotalPrice(supplierId, items, agreementIndex);
+        ContactPerson contactPerson = new ContactPerson(contactPresonName, contactPersonPhone);
+        STATUS status = STATUS.values()[statusIndex -1];
+        Order newOrder = new Order(orderId, supplierId, orderDate, contactPerson, agreement, supplyDate, items, status, totalPrice);
+        orders.put(orderId, newOrder);
+        if(newOrder.getStatus() == STATUS.IN_PROCESS){
+            OrderController.getInstance().addOrder(newOrder);
+        }
+        return true;
+    }
+
+    public boolean isProductNameExistsInAgreement(String supplierId, int agreementIndex, String productName) {
+        Supplier supplier = suppliers.get(supplierId);
+        if (supplier == null) {
+            return false;
+        }
+        List<Agreement> agreements = supplier.getAgreements();
+        if (agreementIndex < 0 || agreementIndex >= agreements.size()) {
+            return false;
+        }
+        Agreement agreement = agreements.get(agreementIndex);
+
+        Map<String, Map<Integer, Integer>> productCatalog = agreement.getProductCatalog();
+        for (String catalogNumber : productCatalog.keySet()) {
+            Product product = supplier.getProductFromCatalog(catalogNumber);
+            if (product != null && product.getProductName() != null &&
+                    product.getProductName().equalsIgnoreCase(productName.trim())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void addOrder(Order order) {
+        orders.put(order.getOrderId(), order);
+    }
+
 
 }

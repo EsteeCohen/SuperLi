@@ -12,7 +12,7 @@ public class SystemInitializer {
         System.out.println("Suppliers initialized.");
 
         /* ---------------- Products ---------------- */
-        service.addProduct("P1", "SUP001", "WM001", 10, 25.0, 1);
+        service.addProduct("milk", "SUP001", "WM001", 10, 25.0, 1);
         service.addProduct("P2", "SUP001", "WM002", 5, 15.0, 2);
         service.addProduct("P3", "SUP002", "AM001", 8, 30.0, 1);
         service.addProduct("P4", "SUP002", "AM002", 12, 50.0, 2);

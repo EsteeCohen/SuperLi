@@ -138,7 +138,10 @@ public class presentation {
                 return;
             if (args[0].equals("help"))
                 printHelp();
-
+            else if(args[0].equals("supply"))
+            {
+                parseSupply(args);
+            }
             else if (args[0].isEmpty())
             {//just pressed enter
                 return;
@@ -271,6 +274,21 @@ public class presentation {
     {
         String content = str.substring(1, str.length() - 1);
         return Arrays.asList(content.split(","));
+    }
+
+    //parses a SUPPLY command
+    private void parseSupply(String[] args) throws Exception
+    {
+        if(args.length!=6)
+            throw new Exception("SUPPLY command gets exactly 5 arguments!");
+        if(!isInteger(args[2])||!isInteger(args[3]))
+            throw new Exception("quantities must be integers!");
+        if(!isNumber(args[4]))
+            throw new Exception("cost price must be a number!");
+        if(!correctDate(args[5]))
+            throw new Exception("ExpirationDate must be of format: dd/MM/yyyy!");
+
+        System.out.println(serviceFactory.addSupply(args[1],Double.parseDouble(args[4]),LocalDate.parse(args[5],FORMATTER),Integer.parseInt(args[2]),Integer.parseInt(args[3])));
     }
 
     //parses and add commands

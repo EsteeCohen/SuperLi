@@ -1,5 +1,6 @@
 package ServiceLayer;
 
+import DomainLayer.OrderController;
 import DomainLayer.Supplier.SystemController;
 import DomainLayer.Supplier.Product;
 
@@ -12,9 +13,12 @@ import java.util.Set;
 public class SupplierSystemService {
     private static SupplierSystemService instance;
     private SystemController systemController;
+    private OrderController orderController;
 
     private SupplierSystemService() {
+
         this.systemController = SystemController.getInstance();
+        this.orderController = OrderController.getInstance();
     }
 
     public static synchronized SupplierSystemService getInstance() {
@@ -84,12 +88,12 @@ public class SupplierSystemService {
 
 
     // ===== ORDER =====
-/*
+
     public boolean insertOrder(String supplierId, LocalDate orderDate, LocalDate supplyDate, Map<Integer, Integer> indexString, String contactPresonName, String contactPersonPhone, int agreementIndex, int statusIndex)
     {
         return systemController.insertOrder(supplierId, orderDate, supplyDate, indexString, contactPresonName, contactPersonPhone, agreementIndex, statusIndex);
     }
-*/
+
 
     // Update order status
     public boolean updateOrderStatus(int orderId, int newStatus) {
@@ -174,6 +178,15 @@ public class SupplierSystemService {
 
     public LocalDate getValidFromOfAgreement(String supplierId, int agreementIndex) {
         return systemController.getValidFromOfAgreement(supplierId, agreementIndex);
+    }
+
+    public void addPeriodicOrders(String supplierId, int agreementIndex, Map<String, Integer> products) {
+        orderController.addPeriodicOrders(supplierId, agreementIndex, products);
+    }
+
+    public boolean isProductNameExistsInAgreement(String supplierId, int agreementIndex, String productName) {
+        return systemController.isProductNameExistsInAgreement(supplierId, agreementIndex, productName);
+
     }
 
 }

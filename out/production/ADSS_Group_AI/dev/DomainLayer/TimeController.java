@@ -1,5 +1,8 @@
 package DomainLayer;
 
+import DomainLayer.Inventory.ProductFacade;
+
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 
 /*
@@ -18,7 +21,8 @@ public class TimeController
      */
     public static void GoToTheFuture(int days)
     {
-        date = date.plusDays(days);
+        for(int i=0;i<days;i++)
+            NextDay();
     }
 
     public static LocalDate getDate()
@@ -28,8 +32,14 @@ public class TimeController
     public static void NextDay()
     {
         date = date.plusDays(1);
+        System.out.println("The date is now: "+date);
         orderController.confirmOrderArrival(getDate());
         //להוסיף בדיקה עבור כל ההזמנות הפתוחות הגיעו
+        if(date.getDayOfWeek()== DayOfWeek.MONDAY || date.getDayOfWeek()== DayOfWeek.THURSDAY)
+        {//reset the latest sales for all the products
+            System.out.println("ATTENTION! ITS "+date.getDayOfWeek());
+            ProductFacade.getInstance().restartSale();
+        }
 
     }
 }

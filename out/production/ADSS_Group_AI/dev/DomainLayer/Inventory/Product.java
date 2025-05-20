@@ -5,7 +5,7 @@ import java.sql.Time;
 import java.time.LocalDate;
 import java.util.*;
 
-class Product {
+public class Product {
     private final int BUFFER_SUPPLY_DAYS = 1;
     private final int DAYS_BETWEEN_REPORTS = 3;//monday to thursday, thursday to monday, we don't work during shabat
 
@@ -29,7 +29,7 @@ class Product {
     private List<Sale> latestSales;//saves sales data since the last restart
     private int latestSalesCount;//count the sales since the last restart
 
-    private int supplyRate = 7;//the days it takes for a new supply to come, assume for now a week
+    private final int supplyRate = 7;//the days it takes for a new supply to come, assume for now a week
 
     private final Map<Integer, Supply> supplies = new HashMap<>();//a map of all the supplies
 
@@ -254,7 +254,7 @@ class Product {
     each supply hold its own experation date
     and its own cost price to allow managing purchacing prices
      */
-    private class Supply {
+    public class Supply {
         private final int supplyID;
         private final double cost;//the cost per product that the store had to pay
         private final LocalDate expirationDate;
