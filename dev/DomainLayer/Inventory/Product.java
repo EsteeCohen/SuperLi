@@ -52,7 +52,44 @@ public class Product {
         this.storageLocation = storageLocation;
     }
 
-    String getProductName() {
+    public double getSellPrice() {
+        return sellPrice;
+    }
+
+    public List<String> getSubCategories() {
+        return subCategories;
+    }
+
+    public String getManufacturer() {
+        return manufacturer;
+    }
+
+    public String getStorageLocation() {
+        return storageLocation;
+    }
+    public LocalDate getDiscountStart()
+    {
+        if(discount!=null)
+            return discount.getStartDate();
+        return null;
+    }
+    public LocalDate getDiscountEnd()
+    {
+        if(discount!=null)
+            return discount.getEndDate();
+        return null;
+    }
+    public Double getDisountPercentage()
+    {
+        if(discount!=null)
+            return discount.getPrecentage();
+        return null;
+    }
+    public String getStoreLocation() {
+        return storeLocation;
+    }
+
+    public String getProductName() {
         return productName;
     }
 
@@ -64,11 +101,11 @@ public class Product {
         this.discount = discount;
     }
 
-    public int GetShelfQuantity() {
+    int GetShelfQuantity() {
         return this.shelfQuantity;
     }
 
-    public int GetStorageQuantity() {
+    int GetStorageQuantity() {
         return this.storageQuantity;
     }
 
@@ -80,11 +117,11 @@ public class Product {
         return latestSalesCount;
     }
 
-    int getMinQuantity() {
+    public int getMinQuantity() {
         return minQuantity;
     }
 
-    int getBrokenQuantity() {
+    public int getBrokenQuantity() {
         return brokenQuantity;
     }
 
