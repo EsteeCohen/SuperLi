@@ -80,11 +80,12 @@ public class ProductFacade
      * @param percentage discount precentage
      * @throws Exception if the product doesnt exists
      */
-    public void SetDiscount(String productName, LocalDate startDate, LocalDate endDate, double percentage) throws Exception
+    public Product SetDiscount(String productName, LocalDate startDate, LocalDate endDate, double percentage) throws Exception
     {
         if (!productsByName.containsKey(productName))
             throw new Exception("No product is named " + productName);
         else productsByName.get(productName).SetDiscount(new Discount(startDate, endDate, percentage));
+        return productsByName.get(productName);
     }
 
     /**

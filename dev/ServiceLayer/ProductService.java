@@ -70,6 +70,7 @@ class ProductService
     public String SetDiscountForCategory(String category, LocalDate startDate, LocalDate endDate, double percentage) throws Exception
     {
         pf.SetDiscountForCategory(category, startDate, endDate, percentage);
+        inventoryProductDAO.setDiscountForCategory(category,startDate,endDate,percentage);
         return "added discount for category: "+category;
     }
 
@@ -82,7 +83,8 @@ class ProductService
      */
     public String SetDiscount(String productName, LocalDate startDate, LocalDate endDate, double percentage) throws Exception
     {
-        pf.SetDiscount(productName, startDate, endDate, percentage);
+        Product product= pf.SetDiscount(productName, startDate, endDate, percentage);
+        inventoryProductDAO.update(product);
         return "added discount for product: "+productName;
     }
 
