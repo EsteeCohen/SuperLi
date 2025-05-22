@@ -1,8 +1,8 @@
 package DataAccessLayer;
 
+import DataAccessLayer.DTO.InventoryProductDTO;
 import DataAccessLayer.interfacesDAO.InventoryProductDAO;
 import DomainLayer.Inventory.Product;
-import DomainLayer.Supplier.Enums.Units;
 
 import java.util.ArrayList;
 import java.util.stream.Collectors;
@@ -39,24 +39,28 @@ public class InventoryProductDAOImpl implements InventoryProductDAO {
         }
     }
     @Override
-    public Product read(String ProductName)
+    public InventoryProductDTO read(String ProductName)
     {
         String sql = "SELECT * FROM "+TABLE_NAME+" WHERE product_name=?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, ProductName);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                return new DomainLayer.Inventory.Product(
+                return new InventoryProductDTO(
                         rs.getString("product_name"),
+                        rs.getString("category"),
                         Arrays.stream(
                                         rs.getString("sub_categories").substring(1, rs.getString("sub_categories").length() - 1).split(","))
                                 .map(String::trim)
                                 .collect(Collectors.toList()),
                         rs.getString("manufacturer"),
-                        rs.getDouble("sell_price"),
                         rs.getString("shelf_location"),
-                        rs.getString("storage_location")
-
+                        rs.getString("storage_location"),
+                        rs.getInt("min_quantity"),
+                        rs.getDouble("sell_price"),
+                        rs.getDate("discount_start").toLocalDate(),
+                        rs.getDate("discount_end").toLocalDate(),
+                        rs.getDouble("discount_percentage")
                 );
             }
         } catch (SQLException e) {
@@ -65,23 +69,28 @@ public class InventoryProductDAOImpl implements InventoryProductDAO {
         return null;
     }
     @Override
-    public List<Product> readAll()
+    public List<InventoryProductDTO> readAll()
     {
-        List<DomainLayer.Inventory.Product> products = new ArrayList<>();
+        List<InventoryProductDTO> products = new ArrayList<>();
         String sql = "SELECT * FROM "+TABLE_NAME;
         try (Statement stmt = connection.createStatement()) {
             ResultSet rs = stmt.executeQuery(sql);
             while (rs.next()) {
-                products.add(new DomainLayer.Inventory.Product(
+                products.add(new InventoryProductDTO(
                         rs.getString("product_name"),
+                        rs.getString("category"),
                         Arrays.stream(
                                         rs.getString("sub_categories").substring(1, rs.getString("sub_categories").length() - 1).split(","))
                                 .map(String::trim)
                                 .collect(Collectors.toList()),
                         rs.getString("manufacturer"),
-                        rs.getDouble("sell_price"),
                         rs.getString("shelf_location"),
-                        rs.getString("storage_location")
+                        rs.getString("storage_location"),
+                        rs.getInt("min_quantity"),
+                        rs.getDouble("sell_price"),
+                        rs.getDate("discount_start").toLocalDate(),
+                        rs.getDate("discount_end").toLocalDate(),
+                        rs.getDouble("discount_percentage")
                 ));
             }
         } catch (SQLException e) {

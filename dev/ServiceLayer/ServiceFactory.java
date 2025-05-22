@@ -5,6 +5,7 @@ import DomainLayer.OrderController;
 import DomainLayer.Supplier.SystemController;
 
 
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -18,7 +19,7 @@ public class ServiceFactory {
     private final SystemController systemController;
     private final ProductService productService;
     private final ReportService reportService;
-    public ServiceFactory()
+    public ServiceFactory() throws SQLException
     {
         ProductFacade.flush();
         ReportFacade.flush();

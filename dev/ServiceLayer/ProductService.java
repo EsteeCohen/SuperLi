@@ -1,7 +1,13 @@
 package ServiceLayer;
 
+import DataAccessLayer.InventoryProductDAOImpl;
+import DataAccessLayer.SupplyDAOImpl;
+import DataAccessLayer.interfacesDAO.InventoryProductDAO;
+import DataAccessLayer.interfacesDAO.SupplyDAO;
+import DomainLayer.Inventory.Product;
 import DomainLayer.Inventory.ProductFacade;
 
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -9,9 +15,13 @@ class ProductService
 {
 
     private final ProductFacade pf;
-    ProductService(ProductFacade pf)
+    private final InventoryProductDAO inventoryProductDAO;
+    private final SupplyDAO supplyDAO;
+    ProductService(ProductFacade pf) throws SQLException
     {
         this.pf=pf;
+        inventoryProductDAO=new InventoryProductDAOImpl();
+        supplyDAO=new SupplyDAOImpl();
     }
 
     /**
@@ -26,7 +36,8 @@ class ProductService
      */
     public String AddProduct(String productName, String category, List<String> subCategories, String manufacturer, double sellPrice, String shelfLocation, String storageLocation) throws Exception
     {
-        pf.AddProduct(productName, category, subCategories, manufacturer, sellPrice,shelfLocation,storageLocation);
+        Product product= pf.AddProduct(productName, category, subCategories, manufacturer, sellPrice,shelfLocation,storageLocation);
+        inventoryProductDAO.create(category,product);
         return "added product "+productName+" to category "+category;
     }
 
@@ -42,6 +53,10 @@ class ProductService
      */
     public String addSupply(String productName, double cost, LocalDate expirationDate,int shelfQuantity,int storageQuantity) throws Exception
     {
+        //###############################################################################################################################################################################################
+        // PROBLEM!!!
+        // WE COMPLETELY BYPASS ADD SUPPLY IN THE SERVICE LAYER, WHICH PREVENTS US FROM UPDATING THE DATABASE!!!
+        //###################################################################################################
         return "added new supply, supply ID: "+String.valueOf(pf.addSupply(productName,cost,expirationDate,shelfQuantity,storageQuantity));
     }
 

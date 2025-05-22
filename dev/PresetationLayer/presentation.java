@@ -3,6 +3,7 @@ package PresetationLayer;
 import DomainLayer.TimeController;
 import ServiceLayer.*;
 
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
@@ -18,11 +19,19 @@ public class presentation {
 
     public static presentation getInstance()
     {
-        if(instance==null)
-            instance=new presentation();
+        if(instance==null) {
+            try {
+                instance = new presentation();
+            }
+            catch (SQLException e)
+            {
+                System.out.println("failed to create Inventory presentation!");
+                e.printStackTrace();
+            }
+        }
         return instance;
     }
-    private presentation()
+    private presentation() throws SQLException
     {
     }
 
@@ -394,7 +403,15 @@ public class presentation {
     public void startUp()
     {
         //initiate a new service factory because you cant have the same product twice
-        serviceFactory=new ServiceFactory();
+        try {
+            serviceFactory = new ServiceFactory();
+        }
+        catch(SQLException e)
+        {
+            System.out.println("failed creating a new inventory presentation!");
+            e.printStackTrace();
+            return;
+        }
         try{
             serviceFactory.AddProduct("milk","diary",Arrays.asList("milk","3%"),"tara",10,"a1","a1");
             serviceFactory.AddProduct("yogurt","diary",Arrays.asList("yogurt","8%"),"tnuva",15,"a2","a2");

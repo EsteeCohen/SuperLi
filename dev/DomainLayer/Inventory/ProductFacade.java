@@ -37,7 +37,7 @@ public class ProductFacade
      * @param sellPrice the current sell price
      * @throws Exception if product already exists
      */
-    public void AddProduct(String productName, String category, List<String> subCategories, String manufacturer, double sellPrice, String shelfLocation, String storageLocation) throws Exception
+    public Product AddProduct(String productName, String category, List<String> subCategories, String manufacturer, double sellPrice, String shelfLocation, String storageLocation) throws Exception
     {
         if(getProduct(productName)!=null)
             throw new Exception("Product with name: "+productName+" already exists!");
@@ -47,6 +47,7 @@ public class ProductFacade
         productsByCategory.get(category).add(product);
 
         productsByName.put(productName, product);
+        return product;
     }
 
     /**
