@@ -150,18 +150,22 @@ public class Product {
      * @param storageQuantity the new storage quantity
      * @throws Exception if the updated quantity is greater than before
      */
-    void updateSoldQuantity(int supplyID, int storeQuantity, int storageQuantity) throws Exception {
+    Supply updateSoldQuantity(int supplyID, int storeQuantity, int storageQuantity) throws Exception {
         int totalSales = updateQuantities(supplyID, storeQuantity, storageQuantity);
 
         //document sells?
         if (discount != null && discount.getEndDate().isBefore(TimeController.getDate()))//discount ended
             discount = null;
+        Supply sup=supplies.get(supplyID);
         if (totalSales == 0)
-            return;//if just moved, no need to for updates
+            return sup;//if just moved, no need to for updates
 
         Sale sale = new Sale(totalSales, sellPrice, discount == null ? 0 : discount.getPrecentage());
         latestSales.add(sale);
         latestSalesCount += totalSales;
+        if ((sup.shelfQuantity+sup.storageQuantity) == 0)//if supply is empty, delete it
+            supplies.remove(supplyID);
+        return sup;
     }
 
 
@@ -173,9 +177,13 @@ public class Product {
      * @param storageQuantity the new storage quantity
      * @throws Exception if the updated quantity is greater than before
      */
-    void updateFoundBrokenItems(int supplyId, int storeQuantity, int storageQuantity) throws Exception {
+    Supply updateFoundBrokenItems(int supplyId, int storeQuantity, int storageQuantity) throws Exception {
         int totalLost = updateQuantities(supplyId, storeQuantity, storageQuantity);
         brokenQuantity += totalLost;
+        Supply sup=supplies.get(supplyId);
+        if ((sup.shelfQuantity+sup.storageQuantity) == 0)//if supply is empty, delete it
+            supplies.remove(supplyId);
+        return sup;
     }
 
     /**
@@ -222,9 +230,6 @@ public class Product {
         supply.storageQuantity = newStorageQuantity;
         supply.shelfQuantity = newStoreQuantity;
 
-        if (newQuantity == 0)//if supply is empty, delete it
-            supplies.remove(supplyID);
-
         return oldQuantity - newQuantity;
     }
 
@@ -238,7 +243,7 @@ public class Product {
      * @return the id for this supply
      * @throws Exception if either quantity or cost is ngative
      */
-    int addSupply(double cost, LocalDate expirationDate, int storeQuantity, int storageQuantity) throws Exception {
+    Supply addSupply(double cost, LocalDate expirationDate, int storeQuantity, int storageQuantity) throws Exception {
         if (storeQuantity < 0 || storageQuantity < 0 || cost < 0)
             throw new IllegalArgumentException("one of the quantities or the cost is negative!");
         if (storeQuantity + storageQuantity == 0)
@@ -248,7 +253,7 @@ public class Product {
         this.shelfQuantity += storeQuantity;
         this.storageQuantity += storageQuantity;
         supplies.put(id, newSupply);
-        return id;
+        return newSupply;
     }
 
     public ExpiryDesc GetExpiryDescription(LocalDate until) {
@@ -286,6 +291,10 @@ public class Product {
         return new AbscenceDesc(productName, minQuantity - (storageQuantity + shelfQuantity));
     }
 
+    public Supply getSupply(int supplId)
+    {
+        return supplies.get(supplId);
+    }
     /*
     will represent each supply independetly
     each supply hold its own experation date

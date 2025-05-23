@@ -15,13 +15,9 @@ class ProductService
 {
 
     private final ProductFacade pf;
-    private final InventoryProductDAO inventoryProductDAO;
-    private final SupplyDAO supplyDAO;
-    ProductService(ProductFacade pf) throws SQLException
+    ProductService(ProductFacade pf)
     {
         this.pf=pf;
-        inventoryProductDAO=new InventoryProductDAOImpl();
-        supplyDAO=new SupplyDAOImpl();
     }
 
     /**
@@ -36,8 +32,7 @@ class ProductService
      */
     public String AddProduct(String productName, String category, List<String> subCategories, String manufacturer, double sellPrice, String shelfLocation, String storageLocation) throws Exception
     {
-        Product product= pf.AddProduct(productName, category, subCategories, manufacturer, sellPrice,shelfLocation,storageLocation);
-        inventoryProductDAO.create(category,product);
+        pf.AddProduct(productName, category, subCategories, manufacturer, sellPrice,shelfLocation,storageLocation);
         return "added product "+productName+" to category "+category;
     }
 
@@ -53,11 +48,7 @@ class ProductService
      */
     public String addSupply(String productName, double cost, LocalDate expirationDate,int shelfQuantity,int storageQuantity) throws Exception
     {
-        //###############################################################################################################################################################################################
-        // PROBLEM!!!
-        // WE COMPLETELY BYPASS ADD SUPPLY IN THE SERVICE LAYER, WHICH PREVENTS US FROM UPDATING THE DATABASE!!!
-        //###################################################################################################
-        return "added new supply, supply ID: "+String.valueOf(pf.addSupply(productName,cost,expirationDate,shelfQuantity,storageQuantity));
+       return "added new supply, supply ID: "+String.valueOf(pf.addSupply(productName,cost,expirationDate,shelfQuantity,storageQuantity));
     }
 
     /**
@@ -70,7 +61,6 @@ class ProductService
     public String SetDiscountForCategory(String category, LocalDate startDate, LocalDate endDate, double percentage) throws Exception
     {
         pf.SetDiscountForCategory(category, startDate, endDate, percentage);
-        inventoryProductDAO.setDiscountForCategory(category,startDate,endDate,percentage);
         return "added discount for category: "+category;
     }
 
@@ -83,8 +73,7 @@ class ProductService
      */
     public String SetDiscount(String productName, LocalDate startDate, LocalDate endDate, double percentage) throws Exception
     {
-        Product product= pf.SetDiscount(productName, startDate, endDate, percentage);
-        inventoryProductDAO.update(product);
+        pf.SetDiscount(productName, startDate, endDate, percentage);
         return "added discount for product: "+productName;
     }
 

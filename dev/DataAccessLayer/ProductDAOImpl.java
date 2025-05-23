@@ -134,6 +134,7 @@ public class ProductDAOImpl implements ProductDAO {
             stmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
+            e.printStackTrace();
         }
     }
 

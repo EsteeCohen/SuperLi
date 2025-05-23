@@ -74,9 +74,9 @@ public class OrderController {
             updatePeriodicOrders(order, productName, missingUnits);
         }
     }
-    public Order checkOpenOrder(String supplierName, int agreement){
+    public Order checkOpenOrder(String supplierID, int agreement){
         for(Order order : orders){
-            if(order.getSupplierId().equals(supplierName) && order.getAgreement().getAgreementId() == agreement){
+            if(order.getSupplierId().equals(supplierID) && order.getAgreement().getAgreementId() == agreement){
                 return order;
             }
         }
@@ -179,9 +179,7 @@ public class OrderController {
         return result;
     }
 
-    /*------------------------------------------------------
-     *  Suggested additional capabilities
-     *----------------------------------------------------*/
+
 
     /**
      * Automatically raise a purchase order for each product
