@@ -2,6 +2,8 @@ package DomainLayer.Supplier;
 
 import DomainLayer.OrderController;
 import DomainLayer.Supplier.Enums.*;
+import DomainLayer.Supplier.Repositories.ProductRepository;
+import DomainLayer.Supplier.Repositories.ProductRepositoryImpl;
 
 
 import java.io.*;
@@ -19,6 +21,7 @@ public class SystemController {
 
     // Supplier Management
     private Map<String, Supplier> suppliers;
+    ProductRepository repository = new ProductRepositoryImpl();
 
     // Product Management
 
@@ -61,11 +64,19 @@ public class SystemController {
     }
 
     public boolean removeSupplier(String supplierID) {
-        if(!suppliers.containsKey(supplierID)) return false;
-        Map<String, Product> products = this.suppliers.get(supplierID).getProductCatalog();
-        suppliers.remove(supplierID);
-        products.remove(supplierID);
-        return true;
+        try {
+            if (!suppliers.containsKey(supplierID)) return false;
+            Map<String, Product> products = this.suppliers.get(supplierID).getProductCatalog();
+            suppliers.remove(supplierID);
+            for (Product product : products.values()) {
+                repository.remove(product);
+            }
+            products.remove(supplierID);
+
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     public boolean updateSupplierField(String id, String field, String value) {
@@ -234,7 +245,10 @@ public class SystemController {
         Map<String, Product>  supplierProducts = this.suppliers.get(supplierID).getProductCatalog();
         if (!supplierProducts.containsKey(catalogNumber))
             return false;
+        Product product = supplierProducts.get(catalogNumber);
         supplierProducts.remove(catalogNumber);
+        repository.remove(product);
+
 
         return true;
     }
@@ -506,11 +520,17 @@ public class SystemController {
 
     public boolean addProductWithDiscounts(String name, String supplierId, String catalogNumber,
                                            int quantityPerPackage, double price, int unit) {
-        if (!suppliers.containsKey(supplierId)) return false;
-        Supplier supplier = suppliers.get(supplierId);
-        Product product = new Product(name, supplierId, catalogNumber, quantityPerPackage, price, Units.values()[unit-1]);
+        try {
+            if (!suppliers.containsKey(supplierId)) return false;
+            Supplier supplier = suppliers.get(supplierId);
+            Product product = new Product(name, supplierId, catalogNumber, quantityPerPackage, price, Units.values()[unit - 1]);
+            repository.add(product);
 
-        return supplier.addProductToCatalog(product);
+            return supplier.addProductToCatalog(product);
+        }
+        catch (Exception e) {
+            return false;
+        }
     }
 
     public double getTotalPrice(String supplierId, Map<String, Integer> items, int agreementIndex) {
