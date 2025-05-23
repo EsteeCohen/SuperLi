@@ -10,7 +10,15 @@ import java.util.List;
 import java.sql.SQLException;
 
 public class ProductRepositoryImpl implements ProductRepository {
-    private final ProductDAO productDAO = new ProductDAOImpl();
+    private final ProductDAO productDAO;
+
+    public ProductRepositoryImpl() {
+        try {
+            this.productDAO = new ProductDAOImpl();
+        } catch (SQLException e) {
+            throw new RuntimeException("Database connection failed", e);
+        }
+    }
 
     @Override
     public void add(Product product) throws SQLException {

@@ -9,5 +9,5 @@ public interface ProductRepository {
     Product getByCatalog(String catalogNumber) throws SQLException;
     List<Product> getAll() throws SQLException;
 
-    void remove(Product product);
+    void remove(Product product) throws  SQLException;
 }

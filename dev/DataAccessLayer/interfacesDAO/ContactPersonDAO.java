@@ -1,11 +1,13 @@
 package DataAccessLayer.interfacesDAO;
 
-
-import DomainLayer.Supplier.ContactPerson;
+import DataAccessLayer.DTO.ContactPersonDTO;
 import java.util.List;
 
+/**
+ * DAO interface for ContactPerson, working with DTOs.
+ */
 public interface ContactPersonDAO {
-    void create(ContactPerson contact, String supplierId);
-    List<ContactPerson> readAllBySupplier(String supplierId);
+    void create(ContactPersonDTO contact);
+    List<ContactPersonDTO> readAllBySupplier(String supplierId);
     void deleteBySupplier(String supplierId);
 }

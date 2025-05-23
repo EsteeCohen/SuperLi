@@ -1,12 +1,12 @@
 package DomainLayer.Supplier.Repositories;
 
+import DataAccessLayer.DTO.*;
 import DataAccessLayer.interfacesDAO.*;
-import DomainLayer.Supplier.ContactPerson;
-import DomainLayer.Supplier.Supplier;
-import DomainLayer.Supplier.Product;
+import DomainLayer.Supplier.*;
 import DataAccessLayer.*;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 // The repository coordinates the data from DAOs and returns full domain objects
@@ -23,46 +23,112 @@ public class SupplierRepository {
         this.contactPersonDAO = new ContactPersonDAOImpl();
     }
 
+    /*
     public void addSupplier(Supplier supplier) {
-        supplierDAO.create(supplier);
-        for (ContactPerson cp : supplier.getContactPersons()) {
-            contactPersonDAO.create(cp, supplier.getSupplierId());
+        supplierDAO.create(new SupplierDTO(supplier));
+        for (ContactPerson contactPerson : supplier.getContactPersons()) {
+            contactPersonDAO.create(new ContactPersonDTO(contactPerson, supplier.getSupplierId()));
         }
-        // מוצרים והסכמים מתווספים דרך הריפוזיטורי שלהם, לא כאן.
+    }
+     */
+
+    public void addDeliverySupplier(SupplierWithDeliveryDays supplier) {
+        // create DeliverySupplierDTO and persist
+        supplierDAO.create(new DeliverySupplierDTO(supplier));
+
+        // persist contact persons
+        for (ContactPerson cp : supplier.getContactPersons()) {
+            contactPersonDAO.create(new ContactPersonDTO(cp, supplier.getSupplierId()));
+        }
+    }
+
+    public void addPickupSupplier(SupplierNeedsPickup supplier) {
+        // create PickupSupplierDTO and persist
+        supplierDAO.create(new PickupSupplierDTO(supplier));
+
+        // persist contact persons
+        for (ContactPerson cp : supplier.getContactPersons()) {
+            contactPersonDAO.create(new ContactPersonDTO(cp, supplier.getSupplierId()));
+        }
     }
 
     public Supplier getSupplierById(String supplierId) {
-        Supplier supplier = supplierDAO.read(supplierId);
-        if (supplier == null) return null;
-        // שליפת אנשי קשר
-        supplier.setContactPersons(contactPersonDAO.readAllBySupplier(supplierId));
-        // שליפת הסכמים
-        supplier.setAgreements(agreementDAO.readAllBySupplier(supplierId));
-        // שליפת מוצרים
-        List<Product> products = productDAO.readAllBySupplier(supplierId);
-        for (Product p : products) {
-            supplier.addProductToCatalog(p);
-        }
-        return supplier;
+        SupplierDTO dto = supplierDAO.read(supplierId);
+        if (dto == null) return null;
+        return dto.toDomain();
     }
 
     public List<Supplier> getAllSuppliers() {
-        List<Supplier> suppliers = supplierDAO.readAll();
-        for (Supplier supplier : suppliers) {
-            supplier.setContactPersons(contactPersonDAO.readAllBySupplier(supplier.getSupplierId()));
-            supplier.setAgreements(agreementDAO.readAllBySupplier(supplier.getSupplierId()));
-            List<Product> products = productDAO.readAllBySupplier(supplier.getSupplierId());
-            for (Product p : products) {
-                supplier.addProductToCatalog(p);
-            }
+        List<SupplierDTO> dtos = supplierDAO.readAll();
+        List<Supplier> suppliers = new ArrayList<>();
+        for (SupplierDTO dto : dtos) {
+            Supplier supplier = dto.toDomain();
+            List<ContactPerson> contactPersons = new ArrayList<>();
+            for(ContactPersonDTO cp : contactPersonDAO.readAllBySupplier(supplier.getSupplierId()) )
+                contactPersons.add(cp.toDomain());
+            supplier.setContactPersons(contactPersons);
+            List<Agreement> agreements= new ArrayList<>();
+            for (AgreementDTO agreementDTO: agreementDAO.readAllBySupplier(supplier.getSupplierId()))
+                agreements.add(agreementDTO.toDomain());
+            supplier.setAgreements(agreements);
+            for(ProductDTO p : productDAO.readAllBySupplier(supplier.getSupplierId()))
+                supplier.addProductToCatalog(p.toDomain());
+
+
+            suppliers.add(supplier);
         }
         return suppliers;
     }
 
+
+    public List<Supplier> getAllSuppliersFromDB() {
+        List<Supplier> suppliers = new ArrayList<>();
+        for (SupplierDTO dto : supplierDAO.readAll()) {
+            Supplier s = dto.toDomain();
+
+            // מלא אנשי קשר
+            List<ContactPerson> cps = new ArrayList<>();
+            for (ContactPersonDTO cpd : contactPersonDAO.readAllBySupplier(s.getSupplierId())) {
+                cps.add(cpd.toDomain());
+            }
+            s.setContactPersons(cps);
+
+            // מלא הסכמים
+            List<Agreement> ags = new ArrayList<>();
+            for (AgreementDTO ad : agreementDAO.readAllBySupplier(s.getSupplierId())) {
+                ags.add(ad.toDomain());
+            }
+            s.setAgreements(ags);
+
+            // מלא מוצרים
+            for (ProductDTO pd : productDAO.readAllBySupplier(s.getSupplierId())) {
+                s.addProductToCatalog(pd.toDomain());
+            }
+
+            suppliers.add(s);
+        }
+        return suppliers;
+    }
+
+
+    /*public List<String> getAllSupplierStrings() {
+        List<String> all = new ArrayList<>();
+        for (Supplier s : getAllSuppliersFromDB()) {
+            all.add(s.toString());
+        }
+        return all;
+    }*/
+
+
     public void updateSupplier(Supplier supplier) {
-        supplierDAO.update(supplier);
-        // אפשר להוסיף עדכון contact persons
-        // ועדכון מוצרים/הסכמים בריפוזיטורי המתאים
+        if (supplier instanceof SupplierWithDeliveryDays d) {
+            supplierDAO.update(new DeliverySupplierDTO(d));
+        } else if (supplier instanceof SupplierNeedsPickup p) {
+            supplierDAO.update(new PickupSupplierDTO(p));
+        } else {
+            throw new IllegalArgumentException("Unknown supplier type: " + supplier.getSupplierType()
+            );
+        }
     }
 
     public void removeSupplier(String supplierId) {
@@ -70,5 +136,47 @@ public class SupplierRepository {
         productDAO.deleteBySupplier(supplierId);
         agreementDAO.deleteBySupplier(supplierId);
         supplierDAO.delete(supplierId);
+    }
+
+    public void addProductToSupplier(Product product) {
+        productDAO.create(new ProductDTO(product));
+    }
+
+    public void updateProduct(Product product) {
+        productDAO.update(new ProductDTO(product));
+    }
+
+    public Product getProductBySupplierAndCatalog(String supplierId, String catalogNumber) {
+        ProductDTO dto = productDAO.readBySupplierAndCatalog(supplierId, catalogNumber);
+        return dto.toDomain();
+    }
+
+    public void updateSupplierName(String supplierId, String name) {
+        supplierDAO.updateName(supplierId, name);
+    }
+
+    public void updateSupplierBankAccount(String supplierId, String bankAccount) {
+        supplierDAO.updateBankAccount(supplierId, bankAccount);
+    }
+
+    public void updateSupplierId(String oldId, String newId) {
+        supplierDAO.updateSupplierId(oldId, newId);
+    }
+
+    public void updateSupplierDeliveryDays(String supplierId, List<String> days) {
+        supplierDAO.updateDeliveryDays(supplierId, days);
+    }
+
+    public void updateSupplierPickupAddress(String supplierId, String address) {
+        supplierDAO.updatePickupAddress(supplierId, address);
+    }
+
+    public void addContactPerson(String supplierId, ContactPerson cp) {
+
+        contactPersonDAO.create(new ContactPersonDTO(cp, supplierId));
+    }
+
+    public void removeProductFromSupplier(String supplierId, String catalogNumber) {
+        productDAO.delete(catalogNumber);
     }
 }
