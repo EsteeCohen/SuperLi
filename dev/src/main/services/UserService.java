@@ -64,6 +64,17 @@ public class UserService {
         return true;
     }
     
+    //עדכון סיסמת משתמש
+    public boolean updateUserPassword(String userId, String newPassword) {
+        User user = getUserById(userId);
+        if (user == null || newPassword == null || newPassword.trim().isEmpty()) {
+            return false;
+        }
+        
+        user.setPassword(newPassword);
+        return true;
+    }
+    
     //השבתת משתמש
     public boolean deactivateUser(String id) {
         User user = getUserById(id);

@@ -3,32 +3,24 @@ package src.main.ui;
 import java.util.List;
 import java.util.Scanner;
 
-import src.main.controllers.DriverController;
-import src.main.controllers.TruckController;
-import src.main.controllers.UserController;
+import src.main.controllers.FacadeController;
 import src.main.entities.Truck;
 import src.main.entities.Driver;
 import src.main.entities.User;
 
 public class FleetUI {
     private Scanner scanner;
-    private TruckController truckController;
-    private DriverController driverController;
-    private UserController userController;
+    private FacadeController facadeController;
     private String sessionId;
     
     // Fleet Management UI constructor
-    public FleetUI(TruckController truckController, DriverController driverController, UserController userController) {
+    public FleetUI(FacadeController facadeController) {
         this.scanner = new Scanner(System.in);
-        this.truckController = truckController;
-        this.driverController = driverController;
-        this.userController = userController;
+        this.facadeController = facadeController;
     }
     
     // Start Fleet Management interface
     public void start() {
-//        this.sessionId = sessionId;
-        
         boolean exit = false;
         
         while (!exit) {
@@ -77,14 +69,13 @@ public class FleetUI {
             System.out.println("2. View Truck");
             System.out.println("3. View All Trucks");
             System.out.println("4. Search Trucks by License Type");
-            System.out.println("5. Search Trucks by Capacity");
             System.out.println("0. Return to Previous Menu");
             
             int choice = getIntInput("Select an option: ");
             
             switch (choice) {
                 case 1:
-                    if (userController.isAuthorized(sessionId, "CREATE", "TRUCK")) {
+                    if (facadeController.isAuthorized(sessionId, "CREATE", "TRUCK")) {
                         addNewTruck();
                     } else {
                         showAccessDenied("to add a truck");
@@ -98,9 +89,6 @@ public class FleetUI {
                     break;
                 case 4:
                     searchTrucksByLicenseType();
-                    break;
-                case 5:
-                    searchTrucksByCapacity();
                     break;
                 case 0:
                     exit = true;
@@ -127,7 +115,7 @@ public class FleetUI {
             
             switch (choice) {
                 case 1:
-                    if (userController.isAuthorized(sessionId, "CREATE", "DRIVER")) {
+                    if (facadeController.isAuthorized(sessionId, "CREATE", "DRIVER")) {
                         addNewDriver();
                     } else {
                         showAccessDenied("to add a driver");
@@ -161,8 +149,6 @@ public class FleetUI {
         double emptyWeight = getDoubleInput("Enter empty weight (kg): ");
         double maxWeight = getDoubleInput("Enter maximum allowed weight (kg): ");
         
-// ------------- Missing string conversion!!! ---------------
-
         System.out.println("Select required license type:");
         System.out.println("1. C1 - License for trucks up to 12 tons");
         System.out.println("2. C - License for trucks up to 15 tons");
@@ -190,60 +176,59 @@ public class FleetUI {
                 licenseType = "C";
         }
         
-        Truck newTruck = truckController.addTruck(regNumber, model, ""+emptyWeight, ""+maxWeight, licenseType);
+        Truck newTruck = facadeController.addTruck(regNumber, model, String.valueOf(emptyWeight), String.valueOf(maxWeight), licenseType);
         
         if (newTruck != null) {
-            // Truck added successfully
             System.out.println("Truck added successfully!");
+            displayTruckDetails(newTruck);
         } else {
-            System.out.println("Error adding truck. Registration number may already exist in the system.");
+            System.out.println("Error adding truck. Please check the input values and try again.");
         }
     }
     
-    // View a specific truck
     private void viewTruck() {
-        System.out.println("\n=== View Truck ===");
         String regNumber = getStringInput("Enter truck registration number: ");
+        List<Truck> trucks = facadeController.getAllTrucks();
+        boolean found = false;
         
-        Truck truck = truckController.getTruckByRegNumber(regNumber);
+        for (Truck truck : trucks) {
+            if (truck.getRegNumber().equals(regNumber)) {
+                displayTruckDetails(truck);
+                found = true;
+                break;
+            }
+        }
         
-        if (truck != null) {
-            displayTruckDetails(truck);
-        } else {
-            System.out.println("Truck not found in the system.");
+        if (!found) {
+            System.out.println("Truck not found.");
         }
     }
     
-    // View all trucks
     private void viewAllTrucks() {
-        System.out.println("\n=== List of All Trucks ===");
-        
-        List<Truck> trucks = truckController.getAllTrucks();
+        List<Truck> trucks = facadeController.getAllTrucks();
         
         if (trucks.isEmpty()) {
             System.out.println("No trucks in the system.");
-            return;
-        }
-        
-        for (Truck truck : trucks) {
-            displayTruckDetails(truck);
-            System.out.println("--------------------");
+        } else {
+            System.out.println("\n=== All Trucks ===");
+            for (Truck truck : trucks) {
+                displayTruckDetails(truck);
+                System.out.println("------------------------");
+            }
         }
     }
     
-    // Search trucks by license type
     private void searchTrucksByLicenseType() {
-        System.out.println("\n=== Search Trucks by License Type ===");
-        System.out.println("Select license type:");
+        System.out.println("Select license type to search for:");
         System.out.println("1. C1 - License for trucks up to 12 tons");
         System.out.println("2. C - License for trucks up to 15 tons");
         System.out.println("3. CE - License for articulated/combined vehicles");
         System.out.println("4. C1E - License for light trucks with trailer");
         
-        int licenseChoice = getIntInput("Your choice: ");
+        int choice = getIntInput("Your choice: ");
         String licenseType;
         
-        switch (licenseChoice) {
+        switch (choice) {
             case 1:
                 licenseType = "C1";
                 break;
@@ -257,44 +242,27 @@ public class FleetUI {
                 licenseType = "C1E";
                 break;
             default:
-                System.out.println("Invalid selection. Setting default: C");
-                licenseType = "C";
+                System.out.println("Invalid selection.");
+                return;
         }
         
-        List<Truck> trucks = truckController.getTrucksByLicenseType(licenseType);
+        List<Truck> trucks = facadeController.getAllTrucks();
+        boolean found = false;
         
-        if (trucks.isEmpty()) {
-            System.out.println("No trucks with license type " + licenseType);
-            return;
-        }
-        
-        System.out.println("Trucks with license type " + licenseType + ":");
+        System.out.println("\n=== Trucks requiring " + licenseType + " license ===");
         for (Truck truck : trucks) {
-            displayTruckDetails(truck);
-            System.out.println("--------------------");
+            if (truck.getLicenseType().toString().equals(licenseType)) {
+                displayTruckDetails(truck);
+                System.out.println("------------------------");
+                found = true;
+            }
+        }
+        
+        if (!found) {
+            System.out.println("No trucks found requiring " + licenseType + " license.");
         }
     }
     
-    // Search trucks by cargo capacity
-    private void searchTrucksByCapacity() {
-        System.out.println("\n=== Search Trucks by Capacity ===");
-        double minCapacity = getDoubleInput("Enter minimum cargo capacity (kg): ");
-        
-        List<Truck> trucks = truckController.getTrucksByMinCapacity(minCapacity);
-        
-        if (trucks.isEmpty()) {
-            System.out.println("No trucks with capacity greater than " + minCapacity + " kg");
-            return;
-        }
-        
-        System.out.println("Trucks with capacity greater than " + minCapacity + " kg:");
-        for (Truck truck : trucks) {
-            displayTruckDetails(truck);
-            System.out.println("--------------------");
-        }
-    }
-    
-    // Add a new driver
     private void addNewDriver() {
         System.out.println("\n=== Add New Driver ===");
         
@@ -302,7 +270,7 @@ public class FleetUI {
         String name = getStringInput("Enter full name: ");
         String phone = getStringInput("Enter phone number: ");
         
-        System.out.println("Select license type:");
+        System.out.println("Select driver's license type:");
         System.out.println("1. C1 - License for trucks up to 12 tons");
         System.out.println("2. C - License for trucks up to 15 tons");
         System.out.println("3. CE - License for articulated/combined vehicles");
@@ -329,59 +297,52 @@ public class FleetUI {
                 licenseType = "C";
         }
         
-        Driver newDriver = driverController.addDriver(id, name, phone, licenseType);
+        Driver newDriver = facadeController.addDriver(id, name, phone, licenseType);
         
         if (newDriver != null) {
             System.out.println("Driver added successfully!");
+            displayDriverDetails(newDriver);
         } else {
-            System.out.println("Error adding driver. ID may already exist in the system.");
+            System.out.println("Error adding driver. Please check the input values and try again.");
         }
     }
     
-    // View a specific driver
     private void viewDriver() {
-        System.out.println("\n=== View Driver ===");
         String id = getStringInput("Enter driver ID: ");
-        
-        Driver driver = driverController.getDriverById(id);
+        Driver driver = facadeController.getDriverById(id);
         
         if (driver != null) {
             displayDriverDetails(driver);
         } else {
-            System.out.println("Driver not found in the system.");
+            System.out.println("Driver not found.");
         }
     }
     
-    // View all drivers
     private void viewAllDrivers() {
-        System.out.println("\n=== List of All Drivers ===");
-        
-        List<Driver> drivers = driverController.getAllDrivers();
+        List<Driver> drivers = facadeController.getAllDrivers();
         
         if (drivers.isEmpty()) {
             System.out.println("No drivers in the system.");
-            return;
-        }
-        
-        for (Driver driver : drivers) {
-            displayDriverDetails(driver);
-            System.out.println("--------------------");
+        } else {
+            System.out.println("\n=== All Drivers ===");
+            for (Driver driver : drivers) {
+                displayDriverDetails(driver);
+                System.out.println("------------------------");
+            }
         }
     }
     
-    // Search drivers by license type
     private void searchDriversByLicenseType() {
-        System.out.println("\n=== Search Drivers by License Type ===");
-        System.out.println("Select license type:");
+        System.out.println("Select license type to search for:");
         System.out.println("1. C1 - License for trucks up to 12 tons");
         System.out.println("2. C - License for trucks up to 15 tons");
         System.out.println("3. CE - License for articulated/combined vehicles");
         System.out.println("4. C1E - License for light trucks with trailer");
         
-        int licenseChoice = getIntInput("Your choice: ");
+        int choice = getIntInput("Your choice: ");
         String licenseType;
         
-        switch (licenseChoice) {
+        switch (choice) {
             case 1:
                 licenseType = "C1";
                 break;
@@ -395,34 +356,31 @@ public class FleetUI {
                 licenseType = "C1E";
                 break;
             default:
-                System.out.println("Invalid selection. Setting default: C");
-                licenseType = "C";
+                System.out.println("Invalid selection.");
+                return;
         }
         
-        List<Driver> drivers = driverController.getDriversByLicenseType(licenseType);
+        List<Driver> drivers = facadeController.getDriversByLicenseType(licenseType);
         
-        if (drivers.isEmpty()) {
-            System.out.println("No drivers with license type " + licenseType);
-            return;
-        }
-        
-        System.out.println("Drivers with license type " + licenseType + ":");
-        for (Driver driver : drivers) {
-            displayDriverDetails(driver);
-            System.out.println("--------------------");
+        if (drivers == null || drivers.isEmpty()) {
+            System.out.println("No drivers found with " + licenseType + " license.");
+        } else {
+            System.out.println("\n=== Drivers with " + licenseType + " license ===");
+            for (Driver driver : drivers) {
+                displayDriverDetails(driver);
+                System.out.println("------------------------");
+            }
         }
     }
     
-    // Display truck details
     private void displayTruckDetails(Truck truck) {
         System.out.println("Registration Number: " + truck.getRegNumber());
         System.out.println("Model: " + truck.getModel());
         System.out.println("Empty Weight: " + truck.getEmptyWeight() + " kg");
         System.out.println("Maximum Weight: " + truck.getMaxWeight() + " kg");
-        System.out.println("Required License: " + truck.getRequiredLicense());
+        System.out.println("Required License: " + truck.getLicenseType());
     }
     
-    // Display driver details
     private void displayDriverDetails(Driver driver) {
         System.out.println("ID: " + driver.getId());
         System.out.println("Name: " + driver.getName());
@@ -430,51 +388,45 @@ public class FleetUI {
         System.out.println("License Type: " + driver.getLicenseType());
     }
     
-    // Check if user can manage trucks
     private boolean canManageTrucks() {
-        return userController == null || userController.isAuthorized(sessionId, "VIEW", "TRUCK");
+        return facadeController.isAuthorized(sessionId, "VIEW", "TRUCK");
     }
     
-    // Check if user can manage drivers
     private boolean canManageDrivers() {
-        return userController == null || userController.isAuthorized(sessionId, "VIEW", "DRIVER");
+        return facadeController.isAuthorized(sessionId, "VIEW", "DRIVER");
     }
     
-    // Show access denied message
     private void showAccessDenied(String action) {
-        System.out.println("Access denied. You do not have permission " + action + ".");
-        System.out.println("Please contact a system administrator if you need this access.");
+        System.out.println("\nAccess Denied: You do not have permission " + action);
+        System.out.println("Please contact your system administrator if you need this access.");
         System.out.println("\nPress Enter to continue...");
         scanner.nextLine();
     }
     
-    // Get integer input from user
     private int getIntInput(String prompt) {
-        System.out.print(prompt);
-        while (!scanner.hasNextInt()) {
-            System.out.println("Please enter a valid number.");
-            System.out.print(prompt);
-            scanner.next();
+        while (true) {
+            try {
+                System.out.print(prompt);
+                String input = scanner.nextLine();
+                return Integer.parseInt(input);
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter a valid number.");
+            }
         }
-        int input = scanner.nextInt();
-        scanner.nextLine(); // Clean buffer
-        return input;
     }
     
-    // Get double input from user
     private double getDoubleInput(String prompt) {
-        System.out.print(prompt);
-        while (!scanner.hasNextDouble()) {
-            System.out.println("Please enter a valid number.");
-            System.out.print(prompt);
-            scanner.next();
+        while (true) {
+            try {
+                System.out.print(prompt);
+                String input = scanner.nextLine();
+                return Double.parseDouble(input);
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter a valid number.");
+            }
         }
-        double input = scanner.nextDouble();
-        scanner.nextLine(); // Clean buffer
-        return input;
     }
     
-    // Get string input from user
     private String getStringInput(String prompt) {
         System.out.print(prompt);
         return scanner.nextLine();

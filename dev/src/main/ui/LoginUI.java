@@ -2,59 +2,63 @@ package src.main.ui;
 
 import java.util.Scanner;
 
-import src.main.controllers.UserController;
-import src.main.entities.User;
+import src.main.controllers.FacadeController;
 
 public class LoginUI {
     private Scanner scanner;
-    private UserController userController;
+    private FacadeController facadeController;
     
     /**
      * Login UI constructor
      */
-    public LoginUI(UserController userController) {
+    public LoginUI(FacadeController facadeController) {
         this.scanner = new Scanner(System.in);
-        this.userController = userController;
+        this.facadeController = facadeController;
     }
     
     /**
      * Display login screen
      */
-    public void displayLoginScreen() {
-        System.out.println("\n=== Transport Management System - Login ===");
-        System.out.println("Please enter your login details:");
-    }
-    
-    /**
-     * Handle login process
-     * @return Session ID and information about the logged-in user, or null if login failed
-     */
-    public String processLogin() {
-        displayLoginScreen();
+    public String login() {
+        displayLoginHeader();
         
         int attempts = 0;
         final int MAX_ATTEMPTS = 3;
         
         while (attempts < MAX_ATTEMPTS) {
-            String username = getStringInput("Username: ");
-            String password = getStringInput("Password: ");
+            attempts++;
             
-            String sessionId = userController.login(username, password);
+            String username = getStringInput("Username: ");
+            if (username.isEmpty()) {
+                System.out.println("Error: Username cannot be empty.");
+                continue;
+            }
+            
+            String password = getStringInput("Password: ");
+            if (password.isEmpty()) {
+                System.out.println("Error: Password cannot be empty.");
+                continue;
+            }
+            
+            String sessionId = facadeController.login(username, password);
             
             if (sessionId != null) {
-                User user = userController.getCurrentUser(sessionId);
-                System.out.println("\nWelcome, " + user.getFullName() + "!");
-                System.out.println("Role: " + user.getRole());
+                System.out.println("\nLogin successful!");
+                String userName = facadeController.getCurrentUserName(sessionId);
+                String userRole = facadeController.getCurrentUserRole(sessionId);
+                System.out.println("Welcome, " + userName + " (" + userRole + ")");
+                pressEnterToContinue();
                 return sessionId;
             } else {
-                attempts++;
-                System.out.println("Login failed. Username or password incorrect.");
+                System.out.println("\nInvalid username or password.");
                 
                 if (attempts < MAX_ATTEMPTS) {
-                    System.out.println("Remaining attempts: " + (MAX_ATTEMPTS - attempts));
+                    System.out.println("You have " + (MAX_ATTEMPTS - attempts) + " attempt(s) remaining.");
+                    if (!confirmContinue("Try again?")) {
+                        break;
+                    }
                 } else {
-                    System.out.println("Maximum login attempts exceeded. Please try again later.");
-                    return null;
+                    System.out.println("Maximum login attempts exceeded.");
                 }
             }
         }
@@ -62,15 +66,47 @@ public class LoginUI {
         return null;
     }
     
+    private void displayLoginHeader() {
+        System.out.println("\n" + "=".repeat(40));
+        System.out.println("=== Transport Management System ===");
+        System.out.println("=".repeat(40));
+        System.out.println();
+    }
+    
+    private void displayDemoUsers() {
+        // Security: Don't display usernames and passwords
+        // Users should know their own credentials
+    }
+    
+    private void showLoadingAnimation() {
+        try {
+            for (int i = 0; i < 3; i++) {
+                Thread.sleep(300);
+                System.out.print(".");
+            }
+        } catch (InterruptedException e) {
+            // Handle interruption
+        }
+    }
+    
     /**
      * Handle logout
      */
-    public void logout(String sessionId) {
-        if (userController.logout(sessionId)) {
-            System.out.println("You have successfully logged out of the system.");
+    public boolean logout(String sessionId) {
+        System.out.println("\n[LOGOUT] LOGOUT PROCESS");
+        System.out.println("─".repeat(15));
+        
+        boolean success = facadeController.logout(sessionId);
+        
+        if (success) {
+            System.out.println("[OK] Successfully logged out!");
+            System.out.println("[SECURE] Session terminated securely.");
+            System.out.println("[BYE] Thank you for using Transport Management System!");
         } else {
-            System.out.println("Error during logout process.");
+            System.out.println("[WARN] Logout warning: Session may not have been properly terminated.");
         }
+        
+        return success;
     }
     
     /**
@@ -78,6 +114,18 @@ public class LoginUI {
      */
     private String getStringInput(String prompt) {
         System.out.print(prompt);
-        return scanner.nextLine();
+        return scanner.nextLine().trim();
+    }
+    
+    // Helper methods
+    private boolean confirmContinue(String message) {
+        System.out.print(message + " (yes/no): ");
+        String answer = scanner.nextLine().trim().toLowerCase();
+        return answer.equals("yes") || answer.equals("y");
+    }
+    
+    private void pressEnterToContinue() {
+        System.out.print("\nPress Enter to continue...");
+        scanner.nextLine();
     }
 }

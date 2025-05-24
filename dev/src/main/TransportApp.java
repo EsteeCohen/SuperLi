@@ -1,4 +1,3 @@
-
 package src.main;
 
 import src.main.services.*;
@@ -7,38 +6,50 @@ import src.main.ui.*;
 
 public class TransportApp {
     public static void main(String[] args) {
+        System.out.println("=== Transport Management System for Supermarket Chain ===");
+        System.out.println("Initializing system...");
+        
         // Initialize services
         DriverService driverService = new DriverService();
         TruckService truckService = new TruckService();
         SiteService siteService = new SiteService();
         TransportService transportService = new TransportService(truckService, driverService, siteService);
         IncidentService incidentService = new IncidentService(transportService);
-        OrderService orderService = new OrderService(siteService, transportService,incidentService);
+        OrderService orderService = new OrderService(siteService, transportService, incidentService);
         transportService.setOrderService(orderService);
         UserService userService = new UserService();
 
-        // Initialize controllers
-        DriverController driverController = new DriverController(driverService);
-        TruckController truckController = new TruckController(truckService);
-        SiteController siteController = new SiteController(siteService);
-        TransportController transportController = new TransportController(transportService);
-        OrderController orderController = new OrderController(orderService);
-        UserController userController = new UserController(userService);
-        IncidentController incidentController = new IncidentController(incidentService);
+        // Initialize facade controller
+        FacadeController facadeController = new FacadeController(
+            incidentService,
+            driverService,
+            userService,
+            siteService,
+            orderService,
+            truckService,
+            transportService
+        );
+
+        // Initialize system with option for demo data
+        SystemInitializer initializer = new SystemInitializer(driverService, truckService, 
+                                                             siteService, transportService, 
+                                                             orderService, incidentService, userService);
+        initializer.initializeSystem();
 
         // Initialize UI components
-        TransportUI transportUI = new TransportUI(transportController);
-        OrderUI orderUI = new OrderUI(orderController,siteController, transportController);
-        FleetUI fleetUI = new FleetUI(truckController, driverController,userController);
-        SiteUI siteUI = new SiteUI(siteController);
-        LoginUI loginUI = new LoginUI(userController);
-        String sessionId = loginUI.processLogin();
-        UserManagementUI userManagementUI = new UserManagementUI(userController, sessionId);
-        MainUI mainUI = new MainUI(userController,transportController,orderController,truckController,driverController,siteController, incidentController,loginUI,transportUI,orderUI,fleetUI,siteUI, userManagementUI);
+        LoginUI loginUI = new LoginUI(facadeController);
+        TransportUI transportUI = new TransportUI(facadeController);
+        OrderUI orderUI = new OrderUI(facadeController);
+        FleetUI fleetUI = new FleetUI(facadeController);
+        SiteUI siteUI = new SiteUI(facadeController);
+        UserManagementUI userManagementUI = new UserManagementUI(facadeController, "admin");
+        ReportsUI reportsUI = new ReportsUI(facadeController);
+        
+        MainUI mainUI = new MainUI(facadeController, loginUI, transportUI, orderUI, 
+                                  fleetUI, siteUI, userManagementUI, reportsUI);
 
-        // Initialize system with sample data
-        SystemInitializer initializer = new SystemInitializer(driverService, truckService, siteService, transportService, orderService, incidentService, userService);
-        initializer.initializeSystem();
+        System.out.println("System ready. Please log in.");
+        System.out.println();
 
         // Start application
         mainUI.start();

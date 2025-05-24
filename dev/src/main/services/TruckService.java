@@ -54,6 +54,11 @@ public class TruckService {
         return null;
     }
     
+    //מחזיר משאית לפי ID (אליאס ל-getTruckByRegNumber)
+    public Truck getTruckById(String id) {
+        return getTruckByRegNumber(id);
+    }
+    
     //מחזיר משאיות לפי סוג רישיון נדרש
     public List<Truck> getTrucksByLicenseType(LicenseType licenseType) {
         if (licenseType == null) {

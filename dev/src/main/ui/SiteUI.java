@@ -3,19 +3,20 @@ package src.main.ui;
 import java.util.List;
 import java.util.Scanner;
 
-import src.main.controllers.SiteController;
+import src.main.controllers.FacadeController;
 import src.main.entities.Site;
+import src.main.enums.ShippingZone;
 
 public class SiteUI {
     private Scanner scanner;
-    private SiteController siteController;
+    private FacadeController facadeController;
 
     /**
      * Site Management UI constructor
      */
-    public SiteUI(SiteController siteController) {
+    public SiteUI(FacadeController facadeController) {
         this.scanner = new Scanner(System.in);
-        this.siteController = siteController;
+        this.facadeController = facadeController;
     }
 
     /**
@@ -101,12 +102,13 @@ public class SiteUI {
                 zone = "CENTER";
         }
         
-        Site site = siteController.addSite(id, name, address, contactPhone, contactName, zone);
+        Site site = facadeController.addSite(id, name, address, contactPhone, contactName, zone);
         
         if (site != null) {
             System.out.println("Site added successfully!");
+            displaySiteDetails(site);
         } else {
-            System.out.println("Error adding site. ID may already exist in the system.");
+            System.out.println("Error adding site. Please check the input values and try again.");
         }
     }
 
@@ -114,15 +116,13 @@ public class SiteUI {
      * View a specific site
      */
     private void viewSite() {
-        System.out.println("\n=== View Site ===");
         String id = getStringInput("Enter site ID: ");
-        
-        Site site = siteController.getSiteById(id);
+        Site site = facadeController.getSiteById(id);
         
         if (site != null) {
             displaySiteDetails(site);
         } else {
-            System.out.println("Site not found in the system.");
+            System.out.println("Site not found.");
         }
     }
 
@@ -130,18 +130,16 @@ public class SiteUI {
      * View all sites
      */
     private void viewAllSites() {
-        System.out.println("\n=== List of All Sites ===");
-        
-        List<Site> sites = siteController.getAllSites();
+        List<Site> sites = facadeController.getAllSites();
         
         if (sites.isEmpty()) {
             System.out.println("No sites in the system.");
-            return;
-        }
-        
-        for (Site site : sites) {
-            displaySiteDetails(site);
-            System.out.println("--------------------");
+        } else {
+            System.out.println("\n=== All Sites ===");
+            for (Site site : sites) {
+                displaySiteDetails(site);
+                System.out.println("------------------------");
+            }
         }
     }
 
@@ -149,8 +147,7 @@ public class SiteUI {
      * Search sites by shipping zone
      */
     private void searchSitesByZone() {
-        System.out.println("\n=== Search Sites by Zone ===");
-        System.out.println("Select shipping zone:");
+        System.out.println("\nSelect shipping zone:");
         System.out.println("1. North");
         System.out.println("2. Center");
         System.out.println("3. South");
@@ -173,21 +170,20 @@ public class SiteUI {
                 zone = "JERUSALEM";
                 break;
             default:
-                System.out.println("Invalid selection. Showing Center zone sites as default.");
-                zone = "CENTER";
+                System.out.println("Invalid selection.");
+                return;
         }
         
-        List<Site> sites = siteController.getSitesByZone(zone);
+        List<Site> sites = facadeController.getSitesByZone(zone);
         
-        if (sites.isEmpty()) {
-            System.out.println("No sites in this zone.");
-            return;
-        }
-        
-        System.out.println("Sites in zone " + zone + ":");
-        for (Site site : sites) {
-            displaySiteDetails(site);
-            System.out.println("--------------------");
+        if (sites == null || sites.isEmpty()) {
+            System.out.println("No sites found in zone: " + zone);
+        } else {
+            System.out.println("\n=== Sites in zone: " + zone + " ===");
+            for (Site site : sites) {
+                displaySiteDetails(site);
+                System.out.println("------------------------");
+            }
         }
     }
 
@@ -207,15 +203,15 @@ public class SiteUI {
      * Get integer input from user
      */
     private int getIntInput(String prompt) {
-        System.out.print(prompt);
-        while (!scanner.hasNextInt()) {
-            System.out.println("Please enter a valid number.");
-            System.out.print(prompt);
-            scanner.next();
+        while (true) {
+            try {
+                System.out.print(prompt);
+                String input = scanner.nextLine();
+                return Integer.parseInt(input);
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter a valid number.");
+            }
         }
-        int input = scanner.nextInt();
-        scanner.nextLine(); // Clean buffer
-        return input;
     }
 
     /**

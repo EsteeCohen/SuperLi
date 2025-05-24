@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Scanner;
 
 import src.main.entities.*;
 import src.main.enums.*;
@@ -31,6 +31,38 @@ public class SystemInitializer {
 
     // אתחול המערכת
     public void initializeSystem() {
+        System.out.println("Welcome to the Transport Management System");
+        System.out.println();
+        
+        // Ask about demo data
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Would you like to start with demo data?");
+        System.out.println("1. Yes - Load with sample data");
+        System.out.println("2. No - Start with empty system");
+        System.out.print("Your choice (1/2): ");
+        
+        boolean useDemoData = false;
+        try {
+            int choice = Integer.parseInt(scanner.nextLine());
+            useDemoData = (choice == 1);
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid input. Starting without demo data.");
+        }
+        
+        if (useDemoData) {
+            System.out.println("Initializing system with demo data...");
+            initializeWithDemoData();
+            System.out.println("Demo data loaded successfully!");
+        } else {
+            System.out.println("Initializing empty system...");
+            initializeBasicUsers(); // Always need at least one admin user
+            System.out.println("Empty system initialized!");
+        }
+        
+        System.out.println();
+    }
+    
+    private void initializeWithDemoData() {
         initializeDrivers();
         initializeTrucks();
         initializeSites();
@@ -39,39 +71,44 @@ public class SystemInitializer {
         initializeIncidents();
         initializeUsers(); 
     }
+    
+    private void initializeBasicUsers() {
+        // Create at least one admin user so someone can log in
+        userService.addUser("U001", "admin", "admin123", "System Administrator", UserRole.SYSTEM_ADMIN);
+        userService.addUser("U002", "manager", "manager123", "Transport Manager", UserRole.TRANSPORT_MANAGER);
+    }
 
     // אתחול משתמשים
     private void initializeUsers() {
-        userService.addUser("U001", "admin", "admin123", "מנהל מערכת", UserRole.SYSTEM_ADMIN);
-        userService.addUser("U002", "manager", "manager123", "מנהל הובלות", UserRole.TRANSPORT_MANAGER);
-        userService.addUser("U003", "driver1", "driver123", "נהג מספר 1", UserRole.DRIVER);
-        userService.addUser("U004", "viewer", "viewer123", "צופה", UserRole.VIEWER);
+        userService.addUser("U001", "admin", "admin123", "System Administrator", UserRole.SYSTEM_ADMIN);
+        userService.addUser("U002", "manager", "manager123", "Transport Manager", UserRole.TRANSPORT_MANAGER);
+        userService.addUser("U003", "driver1", "driver123", "Driver Number 1", UserRole.DRIVER);
+        userService.addUser("U004", "viewer", "viewer123", "Viewer", UserRole.VIEWER);
     }
-
 
     // אתחול נהגים
     private void initializeDrivers() {
         // נתוני נהגים מהוראות ההפעלה
-        driverService.addDriver("123456789", "ישראל ישראלי", "050-1234567", LicenseType.C);
-        driverService.addDriver("234567890", "משה כהן", "052-2345678", LicenseType.CE);
-        driverService.addDriver("345678901", "דוד לוי", "054-3456789", LicenseType.C1);
+        driverService.addDriver("123456789", "Israel Israeli", "050-1234567", LicenseType.C);
+        driverService.addDriver("234567890", "Moshe Cohen", "052-2345678", LicenseType.CE);
+        driverService.addDriver("345678901", "David Levy", "054-3456789", LicenseType.C1);
     }
 
     // אתחול משאיות
     private void initializeTrucks() {
         // נתוני משאיות מהוראות ההפעלה
-        truckService.addTruck("12-345-67", "וולוו FH16", 9000, 25000, LicenseType.CE);
-        truckService.addTruck("23-456-78", "מרצדס אקטרוס", 8500, 18000, LicenseType.C);
-        truckService.addTruck("34-567-89", "איווקו דיילי", 3500, 7500, LicenseType.C1);
+        truckService.addTruck("12-345-67", "Volvo FH16", 9000, 25000, LicenseType.CE);
+        truckService.addTruck("23-456-78", "Mercedes Actros", 8500, 18000, LicenseType.C);
+        truckService.addTruck("34-567-89", "Iveco Daily", 3500, 7500, LicenseType.C1);
     }
 
     // אתחול אתרים
     private void initializeSites() {
         // נתוני אתרים מהוראות ההפעלה
-        siteService.addSite("SITE001", "מחסן מרכזי", "התעשייה 10, חיפה", "04-8765432", "רונן כהן", ShippingZone.NORTH);
-        siteService.addSite("SITE002", "סופרמרקט גדול", "הרצל 50, תל אביב", "03-6543210", "מיכל לוי", ShippingZone.CENTER);
-        siteService.addSite("SITE003", "חנות כלבו", "יפו 20, ירושלים", "02-5432109", "שרה אברהם", ShippingZone.JERUSALEM);
-        siteService.addSite("SITE004", "מרכז לוגיסטי", "הנגב 5, באר שבע", "08-6789012", "עמית אלון", ShippingZone.SOUTH);
+        siteService.addSite("SITE001", "Central Warehouse", "Industry St. 10, Haifa", "04-8765432", "Ronen Cohen", ShippingZone.NORTH);
+        siteService.addSite("SITE002", "Large Supermarket", "Herzl 50, Tel Aviv", "03-6543210", "Michal Levy", ShippingZone.CENTER);
+        siteService.addSite("SITE003", "Department Store", "Jaffa 20, Jerusalem", "02-5432109", "Sarah Abraham", ShippingZone.JERUSALEM);
+        siteService.addSite("SITE004", "Logistics Center", "Negev 5, Beer Sheva", "08-6789012", "Amit Alon", ShippingZone.SOUTH);
     }
 
     // אתחול הובלות
@@ -112,9 +149,9 @@ public class SystemInitializer {
         Site site3 = siteService.getSiteById("SITE004");
         
         // יצירת פריטים לדוגמה
-        Item item1 = new Item(122, "מקרר", 5, 300);
-        Item item2 = new Item(123, "טלוויזיה", 10, 25);
-        Item item3 = new Item(124, "מכונת כביסה", 8, 150);
+        Item item1 = new Item(122, "Refrigerator", 5, 300);
+        Item item2 = new Item(123, "Television", 10, 25);
+        Item item3 = new Item(124, "Washing Machine", 8, 150);
         
         // יצירת הזמנות
         List<Item> items1 = new ArrayList<>();
@@ -146,7 +183,7 @@ public class SystemInitializer {
         Incident incident = new Incident(
             "INC001",
             IncidentType.OTHER, 
-            "חסימה בכביש 1 לירושלים עקב תאונת דרכים",
+            "Road blockage on Highway 1 to Jerusalem due to traffic accident",
             transport2
         );
         incident.setStatus(IncidentStatus.REPORTED);
@@ -155,7 +192,7 @@ public class SystemInitializer {
         IncidentResolution resolution = new IncidentResolution(
             "RES001", 
             LocalDate.of(2025, 4, 20).atTime(16, 0),
-            "שינוי מסלול דרך כביש 443"
+            "Route change via Highway 443"
         );
         
         // הוספת פתרון לתקלה

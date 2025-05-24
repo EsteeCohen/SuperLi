@@ -2,13 +2,10 @@ package src.main.ui;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 
-import src.main.controllers.OrderController;
-import src.main.controllers.SiteController;
-import src.main.controllers.TransportController;
+import src.main.controllers.FacadeController;
 import src.main.entities.Item;
 import src.main.entities.Order;
 import src.main.entities.Site;
@@ -16,16 +13,12 @@ import src.main.enums.OrderStatus;
 
 public class OrderUI {
     private Scanner scanner;
-    private OrderController orderController;
-    private SiteController siteController;
-    private TransportController transportController;
+    private FacadeController facadeController;
 
     // Constructor
-    public OrderUI(OrderController orderController, SiteController siteController, TransportController transportController) {
+    public OrderUI(FacadeController facadeController) {
         this.scanner = new Scanner(System.in);
-        this.orderController = orderController;
-        this.siteController = siteController;
-        this.transportController = transportController;
+        this.facadeController = facadeController;
     }
     
     // Methods
@@ -84,15 +77,32 @@ public class OrderUI {
     }
 
     private int getIntInput(String prompt) {
-        System.out.print(prompt);
-        while (!scanner.hasNextInt()) {
-            System.out.println("Please enter a valid number.");
-            System.out.print(prompt);
-            scanner.next();
+        while (true) {
+            try {
+                System.out.print(prompt);
+                String input = scanner.nextLine();
+                return Integer.parseInt(input);
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter a valid number.");
+            }
         }
-        int input = scanner.nextInt();
-        scanner.nextLine(); // Clean buffer
-        return input;
+    }
+
+    private double getDoubleInput(String prompt) {
+        while (true) {
+            try {
+                System.out.print(prompt);
+                String input = scanner.nextLine();
+                return Double.parseDouble(input);
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter a valid number.");
+            }
+        }
+    }
+
+    private String getStringInput(String prompt) {
+        System.out.print(prompt);
+        return scanner.nextLine();
     }
 
     public void createNewOrder() {
@@ -113,7 +123,7 @@ public class OrderUI {
         }
 
         // Select site
-        List<Site> sites = siteController.getAllSites();
+        List<Site> sites = facadeController.getAllSites();
         if (sites.isEmpty()) {
             System.out.println("No sites in the system. Cannot create an order.");
             return;
@@ -132,7 +142,7 @@ public class OrderUI {
         Site selectedSite = sites.get(siteChoice);
 
         // Enter items
-        List<Item> items = new java.util.ArrayList<>();
+        List<Item> items = new ArrayList<>();
         boolean addMore = true;
         int itemId = 1;
 
@@ -148,7 +158,7 @@ public class OrderUI {
             addMore = more.equalsIgnoreCase("yes");
         }
 
-        Order newOrder = orderController.createOrder(date, selectedSite.getId(), items);
+        Order newOrder = facadeController.createOrder(date, selectedSite.getId(), items);
         if (newOrder != null) {
             System.out.println("Order created successfully! ID: " + newOrder.getId());
         } else {
@@ -158,7 +168,7 @@ public class OrderUI {
 
     private void viewOrder() {
         int id = getIntInput("Enter order ID: ");
-        Order order = orderController.getOrderById(id);
+        Order order = facadeController.getOrderById(id);
         if (order != null) {
             System.out.println(order);
         } else {
@@ -167,7 +177,7 @@ public class OrderUI {
     }
 
     private void viewAllOrders() {
-        List<Order> orders = orderController.getAllOrders();
+        List<Order> orders = facadeController.getAllOrders();
         if (orders.isEmpty()) {
             System.out.println("No orders in the system.");
         } else {
@@ -180,7 +190,7 @@ public class OrderUI {
 
     private void cancelOrder() {
         int id = getIntInput("Enter order ID to cancel: ");
-        boolean success = orderController.cancelOrder(id);
+        boolean success = facadeController.cancelOrder(id);
         if (success) {
             System.out.println("Order cancelled successfully.");
         } else {
@@ -188,100 +198,57 @@ public class OrderUI {
         }
     }
 
-    private double getDoubleInput(String prompt) {
-        System.out.print(prompt);
-        while (!scanner.hasNextDouble()) {
-            System.out.println("Please enter a valid number.");
-            System.out.print(prompt);
-            scanner.next();
-        }
-        double input = scanner.nextDouble();
-        scanner.nextLine(); // Clean buffer
-        return input;
-    }
-
     public void updateOrderStatus() {
         int id = getIntInput("Enter order ID: ");
-        Order order = orderController.getOrderById(id);
+        Order order = facadeController.getOrderById(id);
         
         if (order == null) {
             System.out.println("Order not found.");
             return;
         }
         
-        System.out.println("Current status: " + order.getStatus());
-        System.out.println("Select new status:");
-        
-        for (int i = 0; i < OrderStatus.values().length; i++) {
-            System.out.println((i + 1) + ". " + OrderStatus.values()[i]);
+        System.out.println("\nCurrent status: " + order.getStatus());
+        System.out.println("\nAvailable statuses:");
+        for (OrderStatus status : OrderStatus.values()) {
+            if (status != order.getStatus()) {
+                System.out.println("- " + status);
+            }
         }
         
-        int statusChoice = getIntInput("Your choice: ");
-        if (statusChoice < 1 || statusChoice > OrderStatus.values().length) {
-            System.out.println("Invalid selection.");
-            return;
-        }
-        
-        OrderStatus newStatus = OrderStatus.values()[statusChoice - 1];
-        boolean updated = orderController.updateOrderStatus(id, newStatus);
-        
-        if (updated) {
-            System.out.println("Status updated successfully.");
-        } else {
-            System.out.println("Error updating status.");
+        String statusStr = getStringInput("Enter new status: ");
+        try {
+            OrderStatus newStatus = OrderStatus.valueOf(statusStr.toUpperCase());
+            if (newStatus == order.getStatus()) {
+                System.out.println("New status is same as current status.");
+                return;
+            }
+            
+            if (facadeController.updateOrderStatus(id, newStatus)) {
+                System.out.println("Status updated successfully.");
+            } else {
+                System.out.println("Failed to update status.");
+            }
+        } catch (IllegalArgumentException e) {
+            System.out.println("Invalid status.");
         }
     }
-    
+
     public void assignTransportToOrder() {
         int orderId = getIntInput("Enter order ID: ");
-        Order order = orderController.getOrderById(orderId);
+        Order order = facadeController.getOrderById(orderId);
         
         if (order == null) {
             System.out.println("Order not found.");
-            return;
-        }
-        
-        if (order.getStatus() == OrderStatus.CANCELLED || order.getStatus() == OrderStatus.DELIVERED) {
-            System.out.println("Cannot assign a " + order.getStatus() + " order to transport.");
             return;
         }
         
         int transportId = getIntInput("Enter transport ID: ");
-        boolean success = orderController.assignOrderToTransport(orderId, transportId);
         
-        if (success) {
+        if (facadeController.assignTransportToOrder(orderId, transportId)) {
             System.out.println("Order assigned to transport successfully.");
         } else {
-            System.out.println("Error assigning order to transport.");
+            System.out.println("Failed to assign order to transport.");
         }
-    }
-
-    private void changeTruckByChoice(int transportId) {
-        String truckId = getStringInput("Enter new truck license number: ");
-        transportController.changeTruck(transportId, truckId);
-    }
-
-    private void removeDestinationByChoice(int transportId) {
-        // Get destinations from transport
-        List<Site> destinations = transportController.getTransportById(transportId).getDestinations();
-        
-        if (destinations.isEmpty()) {
-            System.out.println("This transport has no destinations to remove.");
-            return;
-        }
-        
-        System.out.println("Select destination to remove:");
-        for (int i = 0; i < destinations.size(); i++) {
-            System.out.println((i + 1) + ". " + destinations.get(i).getName());
-        }
-        
-        int choice = getIntInput("Your choice: ") - 1;
-        if (choice < 0 || choice >= destinations.size()) {
-            System.out.println("Invalid selection.");
-            return;
-        }
-        
-        transportController.removeDestination(transportId, destinations.get(choice).getId());
     }
 
     public void viewOrdersByDate() {
@@ -289,100 +256,85 @@ public class OrderUI {
         LocalDate date;
         try {
             date = LocalDate.parse(dateStr);
+            List<Order> orders = facadeController.getOrdersByDate(date);
+            if (orders.isEmpty()) {
+                System.out.println("No orders found for this date.");
+            } else {
+                System.out.println("\n=== Orders for " + date + " ===");
+                for (Order order : orders) {
+                    System.out.println(order);
+                    System.out.println("---------------------");
+                }
+            }
         } catch (Exception e) {
             System.out.println("Invalid date format.");
-            return;
-        }
-        
-        List<Order> orders = orderController.getOrdersByDate(date);
-        
-        if (orders.isEmpty()) {
-            System.out.println("No orders on this date.");
-        } else {
-            for (Order order : orders) {
-                System.out.println(order);
-                System.out.println("---------------------");
-            }
         }
     }
 
     public void viewOrdersByStatus() {
-        System.out.println("Select status:");
-        for (int i = 0; i < OrderStatus.values().length; i++) {
-            System.out.println((i + 1) + ". " + OrderStatus.values()[i]);
+        System.out.println("\nAvailable statuses:");
+        for (OrderStatus status : OrderStatus.values()) {
+            System.out.println("- " + status);
         }
         
-        int statusChoice = getIntInput("Your choice: ");
-        if (statusChoice < 1 || statusChoice > OrderStatus.values().length) {
-            System.out.println("Invalid selection.");
-            return;
-        }
-        
-        OrderStatus status = OrderStatus.values()[statusChoice - 1];
-        List<Order> orders = orderController.getOrdersByStatus(status);
-        
-        if (orders.isEmpty()) {
-            System.out.println("No orders with status " + status);
-        } else {
-            System.out.println("Orders with status " + status + ":");
-            for (Order order : orders) {
-                System.out.println(order);
-                System.out.println("---------------------");
+        String statusStr = getStringInput("Enter status: ");
+        try {
+            OrderStatus status = OrderStatus.valueOf(statusStr.toUpperCase());
+            List<Order> orders = facadeController.getOrdersByStatus(status);
+            
+            if (orders.isEmpty()) {
+                System.out.println("No orders with status: " + status);
+            } else {
+                System.out.println("\n=== Orders with status: " + status + " ===");
+                for (Order order : orders) {
+                    System.out.println(order);
+                    System.out.println("---------------------");
+                }
             }
+        } catch (IllegalArgumentException e) {
+            System.out.println("Invalid status.");
         }
     }
 
     public void removeItemsInOrder(int orderId, int transportId) {
-        Order order = orderController.getOrderById(orderId);
-        
+        Order order = facadeController.getOrderById(orderId);
         if (order == null) {
             System.out.println("Order not found.");
             return;
         }
-        
+
         List<Item> items = order.getItems();
         if (items.isEmpty()) {
-            System.out.println("This order has no items.");
+            System.out.println("No items in this order.");
             return;
         }
-        
-        System.out.println("Select items to remove from transport (enter numbers separated by commas):");
+
+        System.out.println("\nCurrent items in order:");
         for (int i = 0; i < items.size(); i++) {
-            Item item = items.get(i);
-            System.out.println((i + 1) + ". " + item.getName() + " (Quantity: " + item.getQuantity() + ")");
+            System.out.println((i + 1) + ". " + items.get(i));
         }
-        
-        String input = getStringInput("Your selections: ");
-        String[] selections = input.split(",");
-        List<Integer> selectedItems = new ArrayList<>();
-        
-        for (String selection : selections) {
-            try {
-                int index = Integer.parseInt(selection.trim()) - 1;
-                if (index >= 0 && index < items.size()) {
-                    selectedItems.add(items.get(index).getId());
-                }
-            } catch (NumberFormatException e) {
-                // Ignore invalid input
+
+        List<Item> itemsToRemove = new ArrayList<>();
+        boolean more = true;
+
+        while (more && !items.isEmpty()) {
+            int choice = getIntInput("Select item to remove (1-" + items.size() + "): ");
+            if (choice < 1 || choice > items.size()) {
+                System.out.println("Invalid selection.");
+                continue;
+            }
+
+            itemsToRemove.add(items.get(choice - 1));
+            String moreStr = getStringInput("Remove another item? (yes/no): ");
+            more = moreStr.equalsIgnoreCase("yes");
+        }
+
+        if (!itemsToRemove.isEmpty()) {
+            if (facadeController.removeItems(orderId, transportId, itemsToRemove)) {
+                System.out.println("Items removed successfully.");
+            } else {
+                System.out.println("Failed to remove items.");
             }
         }
-        
-        if (selectedItems.isEmpty()) {
-            System.out.println("No valid items selected.");
-            return;
-        }
-        
-        boolean success = orderController.removeItemsFromTransport(orderId, transportId, selectedItems);
-        
-        if (success) {
-            System.out.println("Items removed from transport successfully.");
-        } else {
-            System.out.println("Error removing items from transport.");
-        }
-    }
-
-    private String getStringInput(String prompt) {
-        System.out.print(prompt);
-        return scanner.nextLine();
     }
 }

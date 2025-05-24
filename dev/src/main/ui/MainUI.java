@@ -1,263 +1,219 @@
 package src.main.ui;
 
 import java.util.Scanner;
-import src.main.controllers.*;
-import src.main.entities.User;
-import src.main.enums.UserRole;
-import src.main.ui.*;
+import src.main.controllers.FacadeController;
 
 public class MainUI {
     private Scanner scanner;
+    private FacadeController facadeController;
     private String sessionId;
-    private User currentUser;
     
-    // User interfaces
+    // UI Components
     private LoginUI loginUI;
     private TransportUI transportUI;
     private OrderUI orderUI;
     private FleetUI fleetUI;
     private SiteUI siteUI;
-//    private IncidentUI incidentUI;
     private UserManagementUI userManagementUI;
-    
-    // Controllers
-    private UserController userController;
-    private TransportController transportController;
-    private OrderController orderController;
-    private TruckController truckController;
-    private DriverController driverController;
-    private SiteController siteController;
-    private IncidentController incidentController;
-    
-    /**
-     * Main UI constructor
-     */
-    public MainUI(UserController userController, TransportController transportController,
-                OrderController orderController, TruckController truckController,
-                DriverController driverController, SiteController siteController, IncidentController incidentController,
-                LoginUI loginUI, TransportUI transportUI, OrderUI orderUI,
-                FleetUI fleetUI, SiteUI siteUI, UserManagementUI userManagementUI) {
-        
+    private ReportsUI reportsUI;
+
+    public MainUI(FacadeController facadeController, LoginUI loginUI, TransportUI transportUI, 
+                  OrderUI orderUI, FleetUI fleetUI, SiteUI siteUI, 
+                  UserManagementUI userManagementUI, ReportsUI reportsUI) {
         this.scanner = new Scanner(System.in);
-        
-        // Define controllers
-        this.userController = userController;
-        this.transportController = transportController;
-        this.orderController = orderController;
-        this.truckController = truckController;
-        this.driverController = driverController;
-        this.siteController = siteController;
-        this.incidentController = incidentController;
-        this.userManagementUI = userManagementUI;
-        
-        // Define user interfaces
+        this.facadeController = facadeController;
         this.loginUI = loginUI;
         this.transportUI = transportUI;
         this.orderUI = orderUI;
         this.fleetUI = fleetUI;
         this.siteUI = siteUI;
-//        this.incidentUI = incidentUI;
+        this.userManagementUI = userManagementUI;
+        this.reportsUI = reportsUI;
     }
-    
-    /**
-     * Start the system
-     */
+
     public void start() {
-        boolean exit = false;
-
-        while (!exit) {
-            // Login to system
-//            this.sessionId = loginUI.processLogin();
-            this.sessionId = userManagementUI.getSessionId();
-
-            // If login fails, return to login screen or exit
+        System.out.println("=== Transport Management System ===");
+        
+        // Login process
+        while (sessionId == null) {
+            sessionId = loginUI.login();
             if (sessionId == null) {
-                System.out.println("Do you want to try logging in again? (yes/no)");
-                String retry = getStringInput("Your choice: ");
-                if (!retry.equalsIgnoreCase("yes")) {
-                    exit = true;
+                if (!confirmContinue("Try again?")) {
+                    System.out.println("Goodbye!");
+                    return;
                 }
-                continue;
-            }
-
-            // Get logged-in user details
-            this.currentUser = userController.getCurrentUser(sessionId);
-
-            // Run main menu
-            boolean loggedIn = true;
-            while (loggedIn) {
-                displayMainMenu();
-                int choice = getIntInput("Select an option: ");
-    
-                switch (choice) {
-                    case 1:
-                        if (hasAccess("TRANSPORT")) transportUI.start();
-                        else showAccessDenied();
-                        break;
-                    case 2:
-                        if (hasAccess("FLEET")) fleetUI.start();
-                        else showAccessDenied();
-                        break;
-                    case 3:
-                        if (hasAccess("SITE")) siteUI.start();
-                        else showAccessDenied();
-                        break;
-                    case 4:
-                        if (hasAccess("ORDER")) orderUI.start();
-                        else showAccessDenied();
-                        break;
-                    case 5:
-                        if (hasAccess("USER_MANAGEMENT")) userManagementUI.start();
-                        else showAccessDenied();
-                        break;
-                    case 6:
-                        showUserProfile();
-                        break;
-                    case 0:
-                        logout();
-                        loggedIn = false;
-                        break;
-                    default:
-                        System.out.println("Invalid option, please try again");
-                }
-            }
-    
-            System.out.println("Do you want to log in again? (yes/no)");
-            String again = getStringInput("Your choice: ");
-            if (!again.equalsIgnoreCase("yes")) {
-                exit = true;
             }
         }
-    
-        System.out.println("Thank you for using the Transport Management System. Goodbye!");
+        
+        // Main application loop
+        runMainMenu();
     }
     
-    /**
-     * Display main menu according to user permissions
-     */
+    private void runMainMenu() {
+        boolean exit = false;
+        
+        while (!exit) {
+            displayMainMenu();
+            
+            int choice = getIntInput("Select option: ");
+            
+            switch (choice) {
+                case 1:
+                    transportManagement();
+                    break;
+                case 2:
+                    itemsAndShipmentManagement();
+                    break;
+                case 3:
+                    fleetManagement();
+                    break;
+                case 4:
+                    siteManagement();
+                    break;
+                case 5:
+                    reportsAndStatistics();
+                    break;
+                case 6:
+                    userSettings();
+                    break;
+                case 0:
+                    exit = confirmLogout();
+                    break;
+                default:
+                    System.out.println("Invalid option. Please select a number from 0-6.");
+                    pressEnterToContinue();
+            }
+        }
+    }
+    
     private void displayMainMenu() {
-        System.out.println("\n=== Transport Management System - Main Menu ===");
-        System.out.println("Hello, " + currentUser.getFullName() + " (" + currentUser.getRole() + ")");
-        System.out.println("--------------------------------------");
-        
-        if (hasAccess("TRANSPORT")) {
-            System.out.println("1. Transport Management");
-        }
-        
-        if (hasAccess("FLEET")) {
-            System.out.println("2. Driver and Truck Management");
-        }
-        
-        if (hasAccess("SITE")) {
-            System.out.println("3. Site Management");
-        }
-        
-        if (hasAccess("ORDER")) {
-            System.out.println("4. Order Management");
-        }
-        
-        if (hasAccess("USER_MANAGEMENT")) {
-            System.out.println("5. User Management");
-        }
-        
-        System.out.println("6. View User Profile");
+        System.out.println("\n=== Transport Management System ===");
+        System.out.println();
+        System.out.println("1. Transport Management");
+        System.out.println("2. Items and Shipments Management");
+        System.out.println("3. Fleet Management");
+        System.out.println("4. Site Management");
+        System.out.println("5. Reports and Statistics");
+        System.out.println("6. User Settings");
         System.out.println("0. Logout");
+        System.out.println();
     }
     
-    /**
-     * Check permission for specific module
-     */
-    private boolean hasAccess(String module) {
-        switch (module) {
-            case "TRANSPORT":
-                return userController.isAuthorized(sessionId, "VIEW", "TRANSPORT");
-            case "FLEET":
-                return userController.isAuthorized(sessionId, "VIEW", "TRUCK") || 
-                       userController.isAuthorized(sessionId, "VIEW", "DRIVER");
-            case "SITE":
-                return userController.isAuthorized(sessionId, "VIEW", "SITE");
-            case "ORDER":
-                return userController.isAuthorized(sessionId, "VIEW", "ORDER");
-            case "SCHEDULE":
-                return userController.isAuthorized(sessionId, "VIEW", "SCHEDULE");
-            case "INCIDENT":
-                return userController.isAuthorized(sessionId, "VIEW", "INCIDENT");
-            case "USER_MANAGEMENT":
-                return userController.isAuthorized(sessionId, "MANAGE", "USER");
-            default:
-                return false;
+    private void transportManagement() {
+        transportUI.start();
+    }
+    
+    private void itemsAndShipmentManagement() {
+        orderUI.start();
+    }
+    
+    private void fleetManagement() {
+        fleetUI.start();
+    }
+    
+    private void siteManagement() {
+        siteUI.start();
+    }
+    
+    private void reportsAndStatistics() {
+        reportsUI.start();
+    }
+    
+    private void userSettings() {
+        boolean exit = false;
+        while (!exit) {
+            System.out.println("\n=== User Settings ===");
+            System.out.println();
+            System.out.println("1. User Management");
+            System.out.println("2. Change Password");
+            System.out.println("3. View Profile");
+            System.out.println("0. Back to Main Menu");
+            System.out.println();
+            
+            int choice = getIntInput("Select option: ");
+            switch (choice) {
+                case 1:
+                    if (facadeController.isAuthorized(sessionId, "MANAGE", "USER")) {
+                        userManagementUI.start();
+                    } else {
+                        System.out.println("You don't have permission to manage users.");
+                        pressEnterToContinue();
+                    }
+                    break;
+                case 2:
+                    changePassword();
+                    break;
+                case 3:
+                    viewProfile();
+                    break;
+                case 0:
+                    exit = true;
+                    break;
+                default:
+                    System.out.println("Invalid option.");
+                    pressEnterToContinue();
+            }
         }
     }
     
-    /**
-     * Display current user profile
-     */
-    private void showUserProfile() {
-        System.out.println("\n=== User Profile ===");
-        System.out.println("ID: " + currentUser.getId());
-        System.out.println("Username: " + currentUser.getUsername());
-        System.out.println("Full Name: " + currentUser.getFullName());
-        System.out.println("Role: " + currentUser.getRole());
+    private void changePassword() {
+        System.out.println("\n=== Change Password ===");
         
-        // Display access permissions
-        System.out.println("\n=== Access Permissions ===");
-        if (currentUser.getRole() == UserRole.SYSTEM_ADMIN) {
-            System.out.println("- Full access to all modules");
+        String currentPassword = getStringInput("Enter current password: ");
+        String newPassword = getStringInput("Enter new password: ");
+        String confirmPassword = getStringInput("Confirm new password: ");
+        
+        if (!newPassword.equals(confirmPassword)) {
+            System.out.println("Passwords don't match.");
+            pressEnterToContinue();
+            return;
+        }
+        
+        boolean success = facadeController.changePassword(sessionId, currentPassword, newPassword);
+        if (success) {
+            System.out.println("Password changed successfully!");
         } else {
-            if (hasAccess("TRANSPORT")) {
-                System.out.println("- Access to Transport module");
-            }
-            if (hasAccess("FLEET")) {
-                System.out.println("- Access to Driver and Truck module");
-            }
-            if (hasAccess("SITE")) {
-                System.out.println("- Access to Site module");
-            }
-            if (hasAccess("ORDER")) {
-                System.out.println("- Access to Order module");
-            }
-            if (hasAccess("SCHEDULE")) {
-                System.out.println("- Access to Schedule module");
-            }
-            if (hasAccess("INCIDENT")) {
-                System.out.println("- Access to Incident module");
-            }
-            if (hasAccess("USER_MANAGEMENT")) {
-                System.out.println("- Access to User Management");
-            }
+            System.out.println("Failed to change password. Check your current password.");
+        }
+        pressEnterToContinue();
+    }
+    
+    private void viewProfile() {
+        System.out.println("\n=== User Profile ===");
+        
+        String userName = facadeController.getCurrentUserName(sessionId);
+        String userRole = facadeController.getCurrentUserRole(sessionId);
+        
+        System.out.println("Name: " + userName);
+        System.out.println("Role: " + userRole);
+        System.out.println("Session ID: " + sessionId);
+            
+        pressEnterToContinue();
+    }
+    
+    private boolean confirmLogout() {
+        boolean logout = confirmContinue("Are you sure you want to logout?");
+        
+        if (logout) {
+            facadeController.logout(sessionId);
+            System.out.println("Successfully logged out. Goodbye!");
         }
         
-        System.out.println("\nPress Enter to return to the main menu");
-        scanner.nextLine();
+        return logout;
     }
     
-    /**
-     * Display access denied message
-     */
-    private void showAccessDenied() {
-        System.out.println("\nYou do not have permission to access this module.");
-        System.out.println("Please contact the system administrator if you need access.");
-        System.out.println("\nPress Enter to continue");
-        scanner.nextLine();
+    // Helper methods
+    private boolean confirmContinue(String message) {
+        System.out.print(message + " (yes/no): ");
+        String answer = scanner.nextLine().trim().toLowerCase();
+        return answer.equals("yes") || answer.equals("y");
     }
     
-    /**
-     * Logout from the system
-     */
-    private void logout() {
-        loginUI.logout(sessionId);
-        this.sessionId = null;
-        this.currentUser = null;
-    }
-    
-    /**
-     * Get integer input from user
-     */
     private int getIntInput(String prompt) {
         while (true) {
             try {
                 System.out.print(prompt);
-                String input = scanner.nextLine();
+                String input = scanner.nextLine().trim();
                 return Integer.parseInt(input);
             } catch (NumberFormatException e) {
                 System.out.println("Please enter a valid number.");
@@ -265,11 +221,13 @@ public class MainUI {
         }
     }
     
-    /**
-     * Get string input from user
-     */
     private String getStringInput(String prompt) {
         System.out.print(prompt);
-        return scanner.nextLine();
+        return scanner.nextLine().trim();
+    }
+    
+    private void pressEnterToContinue() {
+        System.out.print("\nPress Enter to continue...");
+        scanner.nextLine();
     }
 }

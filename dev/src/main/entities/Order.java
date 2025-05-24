@@ -23,6 +23,15 @@ public class Order {
         this.status = OrderStatus.CREATED;
     }
 
+    public Order(int id, LocalDate date, Site site, List<Item> items){
+        this.id = id;
+        setDate(date);
+        this.site = site;
+        this.items = items;
+        this.transport = null; //ברירת מחדל שלא צריך משלוח
+        this.status = OrderStatus.CREATED;
+    }
+
 //     GETTERS
     public int getId(){
         return id;
@@ -31,6 +40,9 @@ public class Order {
         return date;
     }
     public Site getSite(){
+        return site;
+    }
+    public Site getDestinationSite(){
         return site;
     }
     public List<Item> getItems(){

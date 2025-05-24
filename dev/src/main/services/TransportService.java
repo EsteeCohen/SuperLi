@@ -137,5 +137,41 @@ public class TransportService {
         }
         return false;
     }
+    
+    public boolean isTruckAvailable(String truckId) {
+        Truck truck = truckService.getTruckByRegNumber(truckId);
+        if (truck == null) return false;
+        
+        // Check if truck is marked as available
+        if (!truck.isAvailable()) return false;
+        
+        // Check if truck is not assigned to any active transport
+        for (Transport transport : transports) {
+            if (transport.getTruck().getRegNumber().equals(truckId) && 
+                transport.getStatus() != TransportStatus.COMPLETED &&
+                transport.getStatus() != TransportStatus.CANCELLED) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    public boolean isDriverAvailable(String driverId) {
+        Driver driver = driverService.getDriverById(driverId);
+        if (driver == null) return false;
+        
+        // Check if driver is marked as available
+        if (!driver.isAvailable()) return false;
+        
+        // Check if driver is not assigned to any active transport
+        for (Transport transport : transports) {
+            if (transport.getDriver().getId().equals(driverId) && 
+                transport.getStatus() != TransportStatus.COMPLETED &&
+                transport.getStatus() != TransportStatus.CANCELLED) {
+                return false;
+            }
+        }
+        return true;
+    }
 
 }
