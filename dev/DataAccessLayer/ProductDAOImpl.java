@@ -137,4 +137,18 @@ public class ProductDAOImpl implements ProductDAO {
         }
     }
 
+    @Override
+    public ProductDTO readByCatalogNumber(String catalogNumber){
+        //TODO
+        return null;
+    }
+
+    @Override
+    public ProductDTO readBySupplierAndCatalog(String supplierId, String catalogNumber){
+        //TODO
+        return null;
+    }
+
+
+
 }

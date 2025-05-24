@@ -2,37 +2,56 @@ package DomainLayer.Supplier;
 
 import DomainLayer.OrderController;
 import DomainLayer.Supplier.Enums.*;
+import DomainLayer.Supplier.Repositories.OrderRepository;
 import DomainLayer.Supplier.Repositories.ProductRepository;
 import DomainLayer.Supplier.Repositories.ProductRepositoryImpl;
+import DomainLayer.Supplier.Repositories.SupplierRepository;
 
 
 import java.io.*;
 import java.util.*;
 import java.time.LocalDate;
+import java.util.stream.Collectors;
 
 
 public class SystemController {
     private static SystemController instance;
-
-    // Order Management
-    private Map<Integer, Order> orders;
-    //private int nextOrderId;
-    private int nextAgreementId;
-
-    // Supplier Management
-    private Map<String, Supplier> suppliers;
-    ProductRepository repository = new ProductRepositoryImpl();
-
+    private Map<Integer, Order> orders;// Order Management
+    private int nextAgreementId;//private int nextOrderId;
+    private Map<String, Supplier> suppliers;// Supplier Management
+    SupplierRepository supplierRepository;
+    OrderRepository orderRepository;
     // Product Management
-
     private SystemController() {
         // Initialize order management
         this.orders = new HashMap<>();
-        //this.nextOrderId = 0;
+        this.suppliers = new HashMap<>();
         this.nextAgreementId = 0;
 
-        // Initialize supplier management
-        this.suppliers = new HashMap<>();
+        // Load suppliers and orders from the repository
+        try {
+            this.supplierRepository = new SupplierRepository();
+            for(Supplier supplier : supplierRepository.getAllSuppliers()) {
+                this.suppliers.put(supplier.getSupplierId(), supplier);
+            }
+            this.orderRepository = new OrderRepository();
+            List<Order> ordersListNotPeriodic = orderRepository.getAllOrdersNotPeriodic();
+            List<Order> odersListPeriodic = orderRepository.getAllOrdersPeriodic();
+            List<Order> ordersList = new ArrayList<>();
+            ordersList.addAll(ordersListNotPeriodic);
+            ordersList.addAll(odersListPeriodic);
+            for(Order order : ordersList) {
+                this.orders.put(order.getOrderId(), order);
+            }
+            for(Order order : odersListPeriodic) {
+                OrderController.getInstance().addPeriodicOrders(order);
+            }
+            OrderController.getInstance().inistializeOrders(ordersList);
+        } catch (Exception e) {
+            System.out.println("Error loading suppliers: " + e.getMessage());
+        }
+
+
     }
 
     public static SystemController getInstance() {
@@ -49,7 +68,10 @@ public class SystemController {
         List<DaysOfTheWeek> days = parseDeliveryDays(deliveryDays);
 
         if (days == null) return false;
-        Supplier supplier = new SupplierWithDeliveryDays(name, id, bankAccount, days);
+        SupplierWithDeliveryDays supplier = new SupplierWithDeliveryDays(name, id, bankAccount, days);
+
+        supplierRepository.addDeliverySupplier(supplier);
+
         addAllContacts(supplier, contacts);
         suppliers.put(id, supplier);
         return true;
@@ -57,8 +79,11 @@ public class SystemController {
 
     public boolean addSupplierNeedsPickup(String name, String id, String bankAccount, String address,  List<String> contacts) {
         if (suppliers.containsKey(id)) return false;
-        Supplier supplier = new SupplierNeedsPickup(name, id, bankAccount, address);
+        SupplierNeedsPickup supplier = new SupplierNeedsPickup(name, id, bankAccount, address);
         addAllContacts(supplier, contacts);
+
+        supplierRepository.addPickupSupplier(supplier);
+
         suppliers.put(id, supplier);
         return true;
     }
@@ -68,9 +93,11 @@ public class SystemController {
             if (!suppliers.containsKey(supplierID)) return false;
             Map<String, Product> products = this.suppliers.get(supplierID).getProductCatalog();
             suppliers.remove(supplierID);
-            for (Product product : products.values()) {
+            /*for (Product product : products.values()) {
+                supplierRepository.removeProductFromSupplier(product);
                 repository.remove(product);
-            }
+            }*/
+            supplierRepository.removeSupplier(supplierID);
             products.remove(supplierID);
 
             return true;
@@ -87,11 +114,11 @@ public class SystemController {
         switch (field.toLowerCase()) {
             case "name":
                 supplier.setName(value);
+                supplierRepository.updateSupplierName(id, value);
+
                 return true;
-
-            case "supplierid":
+            /*case "supplierid":
                 if (suppliers.containsKey(value)) return false;
-
                 supplier.setSupplierId(value);
                 suppliers.remove(id);
                 suppliers.put(value, supplier);
@@ -99,10 +126,11 @@ public class SystemController {
                 for (Product product : supplierProducts.values()) {
                     product.setSupplierId(value);
                 }
-
-                return true;
+                supplierRepository.updateSupplierId(id, value);
+                return true;*/
             case "bankaccount":
                 supplier.setBankAccount(value);
+                supplierRepository.updateSupplierBankAccount(id, value);
                 return true;
             case "contactpersons":
                 return addContactPersonFromString(supplier, value);
@@ -111,6 +139,10 @@ public class SystemController {
                     List<DaysOfTheWeek> days = parseDeliveryDays(value);
                     if (days == null) return false;
                     ((SupplierWithDeliveryDays) supplier).setDeliveryDays(days);
+                    List<String> strDays = days.stream()
+                            .map(Enum::toString)
+                            .collect(Collectors.toList());
+                    supplierRepository.updateSupplierDeliveryDays(id, strDays);
                     return true;
                 }
                 return false;
@@ -247,8 +279,7 @@ public class SystemController {
             return false;
         Product product = supplierProducts.get(catalogNumber);
         supplierProducts.remove(catalogNumber);
-        repository.remove(product);
-
+        supplierRepository.removeProductFromSupplier(product.getSupplierId(), product.getCatalogNumber());
 
         return true;
     }
@@ -282,6 +313,8 @@ public class SystemController {
             } else if(order.getStatus() == STATUS.DELIVERED || order.getStatus() == STATUS.CANCELLED){
                 OrderController.getInstance().removeOrder(order);
             }
+
+            orderRepository.updateOrderStatus(orderId,STATUS.values()[newStatus].toString());
             return true;
         } catch (IllegalArgumentException e) {
             return false;
@@ -524,8 +557,7 @@ public class SystemController {
             if (!suppliers.containsKey(supplierId)) return false;
             Supplier supplier = suppliers.get(supplierId);
             Product product = new Product(name, supplierId, catalogNumber, quantityPerPackage, price, Units.values()[unit - 1]);
-            repository.add(product);
-
+            supplierRepository.addProductToSupplier(product);
             return supplier.addProductToCatalog(product);
         }
         catch (Exception e) {
@@ -579,10 +611,14 @@ public class SystemController {
         ContactPerson contactPerson = new ContactPerson(contactPresonName, contactPersonPhone);
         STATUS status = STATUS.values()[statusIndex -1];
         Order newOrder = new Order(orderId, supplierId, orderDate, contactPerson, agreement, supplyDate, items, status, totalPrice);
+
         orders.put(orderId, newOrder);
         if(newOrder.getStatus() == STATUS.IN_PROCESS){
             OrderController.getInstance().addOrder(newOrder);
         }
+
+        // Save the order to the repository
+        orderRepository.addOrder(newOrder, false);
         return true;
     }
 

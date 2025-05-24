@@ -175,4 +175,15 @@ public abstract class Supplier {
 
 
     public abstract LocalDate getClosestSupplyDate(LocalDate today);
+
+    public String getSupplierType() {
+        if (this instanceof SupplierWithDeliveryDays) {
+            return "delivery_days";
+        } else if (this instanceof SupplierNeedsPickup) {
+            return "needs_pickup";
+        } else {
+            return null;
+        }
+
+    }
 }

@@ -1,10 +1,11 @@
 package DataAccessLayer;
 
+import DataAccessLayer.DTO.ContactPersonDTO;
 import DataAccessLayer.interfacesDAO.ContactPersonDAO;
-import DomainLayer.Supplier.ContactPerson;
-import DataAccessLayer.DatabaseConnection;
+
 import java.sql.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ContactPersonDAOImpl implements ContactPersonDAO {
     private final Connection connection;
@@ -14,12 +15,12 @@ public class ContactPersonDAOImpl implements ContactPersonDAO {
     }
 
     @Override
-    public void create(ContactPerson contact, String supplierId) {
+    public void create(ContactPersonDTO dto) {
         String sql = "INSERT INTO SupplierContacts (supplier_id, contact_name, phone_number) VALUES (?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, supplierId);
-            stmt.setString(2, contact.getContactName());
-            stmt.setString(3, contact.getPhoneNumber());
+            stmt.setString(1, dto.getSupplierId());
+            stmt.setString(2, dto.getContactName());
+            stmt.setString(3, dto.getPhoneNumber());
             stmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -27,14 +28,15 @@ public class ContactPersonDAOImpl implements ContactPersonDAO {
     }
 
     @Override
-    public List<ContactPerson> readAllBySupplier(String supplierId) {
-        List<ContactPerson> contacts = new ArrayList<>();
-        String sql = "SELECT * FROM SupplierContacts WHERE supplier_id=?";
+    public List<ContactPersonDTO> readAllBySupplier(String supplierId) {
+        List<ContactPersonDTO> list = new ArrayList<>();
+        String sql = "SELECT supplier_id, contact_name, phone_number FROM SupplierContacts WHERE supplier_id=?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, supplierId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                contacts.add(new ContactPerson(
+                list.add(new ContactPersonDTO(
+                        rs.getString("supplier_id"),
                         rs.getString("contact_name"),
                         rs.getString("phone_number")
                 ));
@@ -42,7 +44,7 @@ public class ContactPersonDAOImpl implements ContactPersonDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return contacts;
+        return list;
     }
 
     @Override

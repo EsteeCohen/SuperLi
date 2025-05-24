@@ -15,5 +15,7 @@ public interface ProductDAO {
     void deleteBySupplier(String supplierId);
 
     ProductDTO readByCatalogNumber(String catalogNumber);
+
+    ProductDTO readBySupplierAndCatalog(String supplierId, String catalogNumber);
 }
 
