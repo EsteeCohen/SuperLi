@@ -415,27 +415,8 @@ public class TransportUI {
     }
     
     private double getEstimatedWeight() {
-        System.out.println("📦 CARGO WEIGHT ESTIMATION");
-        System.out.println("─".repeat(25));
-        
-        double weight = 0;
-        while (weight <= 0) {
-            String input = getStringInput("Enter estimated cargo weight (kg): ");
-            try {
-                weight = Double.parseDouble(input);
-                if (weight <= 0) {
-                    System.out.println("⚠️ Weight must be greater than 0.");
-                } else if (weight > 40000) {
-                    System.out.println("⚠️ Weight seems too high. Maximum truck capacity is typically 40,000 kg.");
-                    if (!confirmContinue("Continue with this weight?")) {
-                        weight = 0;
-                    }
-                }
-            } catch (NumberFormatException e) {
-                System.out.println("❌ Please enter a valid number.");
-            }
-        }
-        return weight;
+        // Use service layer for business logic calculation
+        return facadeController.calculateEstimatedWeight(currentDraft.getDestinationIds());
     }
     
     private void displayVehicleAssignmentSummary() {
@@ -677,11 +658,7 @@ public class TransportUI {
         System.out.println("🚛 Finding suitable trucks...");
         System.out.println("📦 Minimum capacity required: " + requiredCapacity + " kg");
         
-        List<Truck> trucks = facadeController.getAllTrucks();
-        List<Truck> suitableTrucks = trucks.stream()
-            .filter(truck -> truck.getMaxWeight() >= requiredCapacity)
-            .filter(truck -> facadeController.isTruckAvailable(truck.getRegNumber()))
-            .collect(java.util.stream.Collectors.toList());
+        List<Truck> suitableTrucks = facadeController.getAvailableTrucksWithCapacity(requiredCapacity);
         
         if (suitableTrucks.isEmpty()) {
             System.out.println("❌ No suitable trucks available.");
@@ -712,11 +689,7 @@ public class TransportUI {
     private String selectAvailableDriver(String requiredLicense) {
         System.out.println("👨‍✈️ Finding drivers with " + requiredLicense + " license...");
         
-        List<Driver> drivers = facadeController.getAllDrivers();
-        List<Driver> suitableDrivers = drivers.stream()
-            .filter(driver -> driver.getLicenseType().toString().equals(requiredLicense))
-            .filter(driver -> facadeController.isDriverAvailable(driver.getId()))
-            .collect(java.util.stream.Collectors.toList());
+        List<Driver> suitableDrivers = facadeController.getAvailableDriversWithLicense(requiredLicense);
         
         if (suitableDrivers.isEmpty()) {
             System.out.println("❌ No available drivers with " + requiredLicense + " license.");

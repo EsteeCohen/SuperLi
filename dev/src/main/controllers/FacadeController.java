@@ -7,6 +7,7 @@ import src.main.enums.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.ArrayList;
 
 public class FacadeController {
     private final IncidentService incidentService;
@@ -155,6 +156,10 @@ public class FacadeController {
         return truckService.getAllTrucks();
     }
 
+    public List<Truck> getAvailableTrucksWithCapacity(double requiredCapacity) {
+        return truckService.getAvailableTrucksWithCapacity(requiredCapacity, transportService);
+    }
+
     public Truck getTruckById(String id) {
         return truckService.getTruckById(id);
     }
@@ -245,6 +250,11 @@ public class FacadeController {
         return transportService.addDestination(transportId, siteId);
     }
 
+    // Method to calculate estimated weight for transport planning
+    public double calculateEstimatedWeight(List<String> destinationIds) {
+        return transportService.calculateEstimatedWeight(destinationIds);
+    }
+
     // Incident Management Methods
     public boolean reportIncident(int transportId, String type, String description) {
         try {
@@ -294,5 +304,14 @@ public class FacadeController {
         
         // Update password
         return userService.updateUserPassword(user.getId(), newPassword);
+    }
+
+    public List<Driver> getAvailableDriversWithLicense(String licenseType) {
+        try {
+            LicenseType license = LicenseType.valueOf(licenseType.toUpperCase());
+            return driverService.getAvailableDriversWithLicense(license, transportService);
+        } catch (IllegalArgumentException e) {
+            return new ArrayList<>();
+        }
     }
 } 

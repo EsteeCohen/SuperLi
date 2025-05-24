@@ -129,4 +129,11 @@ public class TruckService {
     public void clearAllTrucks() {
         trucks.clear();
     }
+
+    public List<Truck> getAvailableTrucksWithCapacity(double requiredCapacity, TransportService transportService) {
+        return trucks.stream()
+            .filter(truck -> truck.getMaxWeight() >= requiredCapacity)
+            .filter(truck -> transportService.isTruckAvailable(truck.getRegNumber()))
+            .collect(java.util.stream.Collectors.toList());
+    }
 }

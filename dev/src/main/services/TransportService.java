@@ -89,29 +89,45 @@ public class TransportService {
     public boolean changeTruck(int transportId, String truckId){
         Transport t = getTransportById(transportId);
         Truck truck = truckService.getTruckByRegNumber(truckId);
+        
         if (t == null || truck == null) return false;
+        
+        // ✅ בדיקה שאפשר לשנות משאית (רק בשלב תכנון)
+        if (!t.canChangeTruck()) return false;
+        
         t.setTruck(truck);
         return true;
     }
     public boolean changeDriver(int transportId, String driverId){
         Transport t = getTransportById(transportId);
         Driver driver = driverService.getDriverById(driverId);
+        
         if (t == null || driver == null) return false;
+        
+        // ✅ בדיקה שאפשר לשנות נהג (רק בשלב תכנון)
+        if (!t.canChangeDriver()) return false;
+        
         t.setDriver(driver);
         return true;
     }
     public boolean addDestination(int transportId, String siteId) {
         Transport transport = getTransportById(transportId);
         Site site = siteService.getSiteById(siteId);
+        
+        if (transport == null || site == null) return false;
 
-        List<Site> destinations = transport.getDestinations();
+        List<Site> destinations = new ArrayList<>(transport.getDestinations());
+        
         if (!destinations.isEmpty()) {
             ShippingZone zone = destinations.getFirst().getShippingZone();
             if (site.getShippingZone() != zone) return false;
         }
+        
         if (!destinations.contains(site)) {
             destinations.add(site);
+            transport.setDestinations(destinations);
         }
+        
         return true;
     }
 
@@ -172,6 +188,17 @@ public class TransportService {
             }
         }
         return true;
+    }
+
+    /**
+     * Calculate estimated weight for transport planning
+     * @param destinationIds List of destination site IDs
+     * @return Estimated weight in kg
+     */
+    public double calculateEstimatedWeight(List<String> destinationIds) {
+        double baseWeight = 500.0; // Base weight in kg
+        int destinationCount = destinationIds.size();
+        return baseWeight + (destinationCount * 100.0); // Add 100kg per destination
     }
 
 }

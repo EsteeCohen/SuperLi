@@ -93,4 +93,11 @@ public class DriverService {
         drivers.clear();
     }
 
+    public List<Driver> getAvailableDriversWithLicense(LicenseType requiredLicense, TransportService transportService) {
+        return drivers.stream()
+            .filter(driver -> driver.getLicenseType() == requiredLicense)
+            .filter(driver -> transportService.isDriverAvailable(driver.getId()))
+            .collect(java.util.stream.Collectors.toList());
+    }
+
 }

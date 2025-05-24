@@ -70,7 +70,7 @@ public class OrderService {
     public List<Order> getOrdersInTransport(int transportId){
         List<Order> result = new ArrayList<>();
         for (Order o : this.orders) {
-            if (o.getTransport().getId() == transportId)
+            if (o.getTransport() != null && o.getTransport().getId() == transportId)
                 result.add(o);
         }
         return result;
@@ -93,9 +93,12 @@ public class OrderService {
 
         double newWeight = order.OrderWeight() + transport.getCurrentWeight();
         if (newWeight > transport.getTruck().getMaxWeight()) {
-            incidentService.reportIncident(transportId, IncidentType.WEIGHT_OVERLOAD,"the weight overload when added this order");
-            return false;//1/2/3יש חריגה במשקל צריך לפתןר אותה
+            incidentService.reportIncident(transportId, IncidentType.WEIGHT_OVERLOAD,
+                "Weight overload when attempting to add order #" + orderId + 
+                ". Required: " + newWeight + "kg, Max capacity: " + transport.getTruck().getMaxWeight() + "kg");
+            return false;
         }
+        
         order.setTransport(transport);
         transport.setCurrentWeight(newWeight);
         order.setStatus(OrderStatus.IN_PROGRESS);
@@ -116,7 +119,7 @@ public class OrderService {
         for (Item itemToRemove : itemsToRemove) {
             if (orderItems.contains(itemToRemove)) {
                 orderItems.remove(itemToRemove);
-                removedWeight += itemToRemove.getWeight();
+                removedWeight += itemToRemove.getTotalWeight();
             }
         }
         order.setItems(orderItems);
