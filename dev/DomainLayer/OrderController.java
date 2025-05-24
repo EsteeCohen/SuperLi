@@ -6,7 +6,7 @@ import DomainLayer.Supplier.*;
 import DomainLayer.Supplier.Enums.STATUS;
 import DomainLayer.Supplier.Repositories.OrderRepository;
 import ServiceLayer.SupplierSystemService;
-import org.junit.jupiter.api.parallel.Execution;
+//import org.junit.jupiter.api.parallel.Execution;
 
 
 import java.time.LocalDate;
@@ -17,7 +17,6 @@ import java.util.Map;
 
 public class OrderController {
     /*Dependencies injected via constructor*/
-    private final SystemController systemController;
     private final ProductFacade productFacade;
     private final ReportFacade reportFacade;
     private List<Order> orders;
@@ -56,7 +55,6 @@ public class OrderController {
     private OrderController() {
         this.productFacade = ProductFacade.getInstance();
         this.reportFacade = ReportFacade.getInstance();
-        this.systemController = SystemController.getInstance();
         this.orders = new ArrayList<Order>();
         this.nextOrderId = 0;
         this.periodicOrders = new HashMap<>();
@@ -66,7 +64,6 @@ public class OrderController {
             throw new RuntimeException("Failed to initialize OrderRepository: " + e.getMessage());
         }
     }
-
 
     /**
      * Declare that a specific product is below its minimum
@@ -114,7 +111,7 @@ public class OrderController {
         String bestSupplierId = null;
         int bestAgreementId = -1;
 
-        for (Supplier supplier : systemController.getAllSupplierObjects()) {
+        for (Supplier supplier : SystemController.getInstance().getAllSupplierObjects()) {
             Map<String, Object> supplierData = supplier.getBestPriceAndAgreementForProductName(productName, requiredQuantity);
 
             if (supplierData.isEmpty() ||
@@ -148,6 +145,7 @@ public class OrderController {
      * @param actualArrivalDate real arrival date at warehouse
      */
     public void confirmOrderArrival(LocalDate actualArrivalDate) {
+        SystemController systemController = SystemController.getInstance();
         try {
             List<Order> ordersArrival = getOrdersArrivingOn(actualArrivalDate);
             if (ordersArrival.isEmpty()) return;
@@ -209,6 +207,7 @@ public class OrderController {
      * the latest Abscence/Damage/Expiry reports.
      */
     public Order createAutomaticShortageOrders(String supplierId, int agreementId, String productName, int requiredQuantity) {
+        SystemController systemController = SystemController.getInstance();
         LocalDate orderDate = LocalDate.now();
         Supplier supplier = systemController.getSupplierObjectById(supplierId);
         if (supplier == null) return null;
@@ -275,7 +274,7 @@ public class OrderController {
      */
     public void updatePeriodicOrders(Order order, String productName, int requiredQuantity) {
         Map<String, Integer> items = new HashMap<>();
-        Supplier supplier = systemController.getSupplierObjectById(order.getSupplierId());
+        Supplier supplier = SystemController.getInstance().getSupplierObjectById(order.getSupplierId());
         if (supplier == null) return;
         String catalogNumber = supplier.findProductByName(productName).getCatalogNumber();
         items.put(catalogNumber, requiredQuantity);

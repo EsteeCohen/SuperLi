@@ -6,8 +6,10 @@ import DomainLayer.Supplier.*;
 import DataAccessLayer.*;
 
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 // The repository coordinates the data from DAOs and returns full domain objects
 public class SupplierRepository {
@@ -50,6 +52,10 @@ public class SupplierRepository {
         for (ContactPerson cp : supplier.getContactPersons()) {
             contactPersonDAO.create(new ContactPersonDTO(cp, supplier.getSupplierId()));
         }
+    }
+
+    public void addAgreement(Agreement agreement) {
+        agreementDAO.create(new AgreementDTO(agreement));
     }
 
     public Supplier getSupplierById(String supplierId) {
@@ -138,6 +144,14 @@ public class SupplierRepository {
         supplierDAO.delete(supplierId);
     }
 
+    public void removeSupplierAgreement(String supplierId) {
+        agreementDAO.deleteBySupplier(supplierId);
+    }
+
+    public void removeAgreement(int agreementId) {
+        agreementDAO.delete(agreementId);
+    }
+
     public void addProductToSupplier(Product product) {
         productDAO.create(new ProductDTO(product));
     }
@@ -172,11 +186,36 @@ public class SupplierRepository {
     }
 
     public void addContactPerson(String supplierId, ContactPerson cp) {
-
         contactPersonDAO.create(new ContactPersonDTO(cp, supplierId));
     }
+//    public void updateContactPerson(String supplierId, ContactPerson cp) {
+//        contactPersonDAO.deleteBySupplier(supplierId);
+//        contactPersonDAO.create(new ContactPersonDTO(cp, supplierId));
+//    }
 
     public void removeProductFromSupplier(String supplierId, String catalogNumber) {
         productDAO.delete(catalogNumber);
     }
+
+    public void updateAgreementPaymentMethod(int agreementId, String paymentMethod) {
+        agreementDAO.updatePaymentMethod(agreementId, paymentMethod);
+    }
+
+    public void updateAgreementPaymentTiming(int agreementId, String paymentTiming) {
+        agreementDAO.updatePaymentTiming(agreementId, paymentTiming);
+    }
+
+    public void updateAgreementValidFrom(int agreementId, LocalDate validFrom) {
+        agreementDAO.updateValidFrom(agreementId, validFrom);
+    }
+
+    public void updateAgreementValidTo(int agreementId, LocalDate validTo) {
+        agreementDAO.updateValidTo(agreementId, validTo);
+    }
+
+    public void updateAgreementProducts(String supplierId, int agreementId, Map<String, Map<Integer,Integer>> discounts) {
+        agreementDAO.updateProductDiscounts(supplierId, agreementId, discounts);
+    }
+
+
 }

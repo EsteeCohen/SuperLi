@@ -63,7 +63,7 @@ public class SystemController {
 
     // ===================== Supplier Management =====================
 
-    public boolean addSupplierWithDelivery(String name, String id, String bankAccount, String deliveryDays,  List<String>  contacts) {
+    public boolean addSupplierWithDelivery(String name, String id, String bankAccount, String deliveryDays, List<String> contacts) {
         if (suppliers.containsKey(id)) return false;
         List<DaysOfTheWeek> days = parseDeliveryDays(deliveryDays);
 
@@ -133,7 +133,8 @@ public class SystemController {
                 supplierRepository.updateSupplierBankAccount(id, value);
                 return true;
             case "contactpersons":
-                return addContactPersonFromString(supplier, value);
+                updateContactPersonFromString(supplier, value);
+                return true;
             case "deliverydays":
                 if (supplier instanceof SupplierWithDeliveryDays) {
                     List<DaysOfTheWeek> days = parseDeliveryDays(value);
@@ -151,10 +152,12 @@ public class SystemController {
         }
     }
 
-    private boolean addContactPersonFromString(Supplier supplier, String value) {
+    private boolean updateContactPersonFromString(Supplier supplier, String value) {
         String[] parts = value.split(",");
         if (parts.length != 2) return false;
-        supplier.addContactPerson(new ContactPerson(parts[0].trim(), parts[1].trim()));
+        ContactPerson cp = new ContactPerson(parts[0].trim(), parts[1].trim());
+        supplier.addContactPerson(cp);
+        supplierRepository.addContactPerson(supplier.getSupplierId(),cp);
         return true;
     }
 
@@ -432,6 +435,7 @@ public class SystemController {
 
         Map<String, Map<Integer, Integer>> productDiscounts = parseOrderItems(indexProducts, supplier);
         agreement.setProductCatalog(productDiscounts);
+        supplierRepository.updateAgreementProducts(agreement.getSupplierId(), agreement.getAgreementId(), agreement.getProductCatalog());
         return true;
     }
 
@@ -445,10 +449,13 @@ public class SystemController {
         try {
             PaymentMethod paymentMethod = PaymentMethod.values()[paymentMethodIndex];
             agreement.setPaymentMethod(paymentMethod);
+            supplierRepository.updateAgreementPaymentMethod(agreement.getAgreementId(), agreement.getPaymentMethod().toString());
+
             return true;
         } catch (IllegalArgumentException e) {
             return false;
         }
+
     }
 
     public boolean updatePaymentTiming(String supplierId, int agreementIndex, int paymentTimingIndex) {
@@ -461,10 +468,13 @@ public class SystemController {
         try {
             PaymentTiming paymentTiming = PaymentTiming.values()[paymentTimingIndex];
             agreement.setPaymentTiming(paymentTiming);
+            supplierRepository.updateAgreementPaymentTiming(agreement.getAgreementId(), agreement.getPaymentTiming().toString());
+
             return true;
         } catch (IllegalArgumentException e) {
             return false;
         }
+
     }
 
     public boolean updateValidFrom(String supplierId, int agreementIndex, LocalDate validFrom) {
@@ -475,6 +485,8 @@ public class SystemController {
         if (agreement == null) return false;
 
         agreement.setValidFrom(validFrom);
+        supplierRepository.updateAgreementValidFrom(agreement.getAgreementId(), agreement.getValidFrom());
+
         return true;
     }
 
@@ -486,6 +498,8 @@ public class SystemController {
         if (agreement == null) return false;
 
         agreement.setValidTo(validTo);
+        supplierRepository.updateAgreementValidTo(agreement.getAgreementId(), agreement.getValidTo());
+
         return true;
     }
 
@@ -501,6 +515,7 @@ public class SystemController {
             int serialNumber = supplier.getAgreementSerialNumber(nextAgreementId);
             updateAgreementProducts(supplierId, serialNumber, IndexProducts);
             nextAgreementId++;
+            supplierRepository.addAgreement(agreement);
             return true;
         } catch (IllegalArgumentException e) {
             return false;
@@ -515,6 +530,7 @@ public class SystemController {
         if (agreementIndex < 0 || agreementIndex >= agreements.size()) return false;
 
         agreements.remove(agreementIndex);
+        supplierRepository.removeAgreement(agreementIndex);
         return true;
     }
 
@@ -543,7 +559,9 @@ public class SystemController {
                 String contactName = parts[0].trim();
                 String phone = parts[1].trim();
                 if (!contactName.isEmpty() && !phone.isEmpty()) {
-                    supplier.addContactPerson(new ContactPerson(contactName, phone));
+                    ContactPerson cp = new ContactPerson(contactName, phone);
+                    supplier.addContactPerson(cp);
+                    supplierRepository.addContactPerson(supplier.getSupplierId(), cp);
                 }
             }
         }

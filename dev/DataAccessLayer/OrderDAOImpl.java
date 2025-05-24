@@ -190,12 +190,30 @@ public class OrderDAOImpl implements OrderDAO {
 
     @Override
     public List<OrderDTO> readAllPeriodic(){
-        //TODO: Implement this method
-        return null;
+        List<OrderDTO> list = new ArrayList<>();
+        String sql = "SELECT * FROM Orders WHERE is_Periodic=true";
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                list.add(mapResultSetToDTO(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
     }
 
     public List<OrderDTO> readAllNotPeriodic(){
-        //TODO: Implement this method
-        return null;
+        List<OrderDTO> list = new ArrayList<>();
+        String sql = "SELECT * FROM Orders WHERE is_Periodic=false";
+        try (Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                list.add(mapResultSetToDTO(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
     }
 }

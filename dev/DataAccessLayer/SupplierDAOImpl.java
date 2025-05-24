@@ -91,27 +91,6 @@ public class SupplierDAOImpl implements SupplierDAO {
 
 
     @Override
-    public List<SupplierDTO> readByType(String supplierType) {
-        List<SupplierDTO> list = new ArrayList<>();
-        String sql = "SELECT supplier_id FROM Suppliers WHERE supplier_type = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, supplierType);
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    String id = rs.getString("supplier_id");
-                    SupplierDTO dto = read(id);
-                    if (dto != null) {
-                        list.add(dto);
-                    }
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return list;
-    }
-
-    @Override
     public void update(SupplierDTO dto) {
         String sql = "UPDATE Suppliers SET name = ?, bank_account = ?, supplier_type = ? WHERE supplier_id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {

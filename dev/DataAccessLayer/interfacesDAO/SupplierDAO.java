@@ -16,7 +16,6 @@ public interface SupplierDAO {
     void updateDeliveryDays(String supplierId, List<String> days);
     void updatePickupAddress(String supplierId, String address);
 
-    /** new: read suppliers by supplier_type (e.g. "PICKUP") */
-    List<SupplierDTO> readByType(String supplierType);
+    //List<SupplierDTO> readByType(String supplierType);
 
 }

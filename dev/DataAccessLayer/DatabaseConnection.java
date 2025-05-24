@@ -10,7 +10,7 @@ public class DatabaseConnection {
 
     public static Connection getConnection() throws SQLException {
         if (connection == null || connection.isClosed()) {
-            connection = DriverManager.getConnection("jdbc:sqlite:supplyinventory.db");
+            connection = DriverManager.getConnection("jdbc:sqlite:C:/Users/shiri/ADSS_Group_AI/dev/supplyinventory.db");
         }
         return connection;
     }

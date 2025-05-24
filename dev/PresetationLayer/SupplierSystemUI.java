@@ -142,7 +142,7 @@ public class SupplierSystemUI {
             System.out.println("Exiting the system. Goodbye!");
             return false;
         }
-        if (choice < 0) {
+        if (choice < -1 || choice > 21) {
             System.out.println("Invalid choice. Please try again.");
             return true;
         }
@@ -310,7 +310,7 @@ public class SupplierSystemUI {
             }
 
 
-            contacts.add(name + ", " + phone);
+            contacts.add(personName + ", " + phone);
 
             System.out.print("Add another contact person? (Y/N): ");
         } while (scanner.nextLine().equalsIgnoreCase("Y"));

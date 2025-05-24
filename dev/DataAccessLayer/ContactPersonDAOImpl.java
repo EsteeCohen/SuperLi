@@ -16,7 +16,7 @@ public class ContactPersonDAOImpl implements ContactPersonDAO {
 
     @Override
     public void create(ContactPersonDTO dto) {
-        String sql = "INSERT INTO SupplierContacts (supplier_id, contact_name, phone_number) VALUES (?, ?, ?)";
+        String sql = "INSERT OR IGNORE INTO ContactPersons (supplier_id, contact_name, phone_number) VALUES (?, ?, ?)";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, dto.getSupplierId());
             stmt.setString(2, dto.getContactName());
@@ -30,7 +30,7 @@ public class ContactPersonDAOImpl implements ContactPersonDAO {
     @Override
     public List<ContactPersonDTO> readAllBySupplier(String supplierId) {
         List<ContactPersonDTO> list = new ArrayList<>();
-        String sql = "SELECT supplier_id, contact_name, phone_number FROM SupplierContacts WHERE supplier_id=?";
+        String sql = "SELECT supplier_id, contact_name, phone_number FROM ContactPersons WHERE supplier_id=?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, supplierId);
             ResultSet rs = stmt.executeQuery();
@@ -49,7 +49,7 @@ public class ContactPersonDAOImpl implements ContactPersonDAO {
 
     @Override
     public void deleteBySupplier(String supplierId) {
-        String sql = "DELETE FROM SupplierContacts WHERE supplier_id=?";
+        String sql = "DELETE FROM ContactPersons WHERE supplier_id=?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, supplierId);
             stmt.executeUpdate();
