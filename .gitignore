@@ -1,6 +1,2 @@
-# IDE files
-.idea/
-*.iml
-
-# Build output
-target/
+.idea/ 
+target/ 
