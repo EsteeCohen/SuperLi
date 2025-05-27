@@ -1,5 +1,6 @@
 package DomainLayer.Supplier;
 
+import DataAccessLayer.DatabaseConnection;
 import DomainLayer.OrderController;
 import DomainLayer.Supplier.Enums.*;
 import DomainLayer.Supplier.Repositories.OrderRepository;

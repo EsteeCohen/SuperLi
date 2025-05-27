@@ -63,9 +63,10 @@ public class ProductFacade
             productsByCategory.put(category, new ArrayList<>());
         Product product=new Product(productName, subCategories, manufacturer, sellPrice,shelfLocation,storageLocation);
         productsByCategory.get(category).add(product);
+        productsByName.put(productName, product);
         if(inventoryProductDAO!=null)
             inventoryProductDAO.create(category,product);
-        productsByName.put(productName, product);
+
     }
 
     /**
@@ -181,6 +182,8 @@ public class ProductFacade
                 supplyDAO.update(productName, sup);
         }
         p.calcMinQuantity();
+        if(inventoryProductDAO!=null)
+            inventoryProductDAO.update(p);
         int total=p.GetShelfQuantity()+p.GetStorageQuantity();
         boolean shortage=total<p.getMinQuantity();
         if(shortage)
