@@ -233,6 +233,6 @@ public class OrderDAOImpl implements OrderDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return -1; // אם יש שגיאה, התחל מ-0
+        return -1;
     }
 }
