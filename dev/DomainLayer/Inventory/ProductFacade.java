@@ -1,10 +1,15 @@
 package DomainLayer.Inventory;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import DataAccessLayer.InventoryProductDAOImpl;
+import DataAccessLayer.SupplyDAOImpl;
+import DataAccessLayer.interfacesDAO.InventoryProductDAO;
+import DataAccessLayer.interfacesDAO.SupplyDAO;
 import DomainLayer.OrderController;
 import ServiceLayer.ServiceFactory;
 
@@ -13,6 +18,8 @@ public class ProductFacade
     private final Map<String, List<Product>> productsByCategory=new HashMap<>();
     private final Map<String, Product> productsByName=new HashMap<>();
     private static ProductFacade instance=null;
+    private InventoryProductDAO inventoryProductDAO;
+    private SupplyDAO supplyDAO;
     //singelton getter
     public static ProductFacade getInstance()
     {
@@ -27,6 +34,17 @@ public class ProductFacade
     }
     private ProductFacade()
     {
+        try {
+            inventoryProductDAO = new InventoryProductDAOImpl();
+            supplyDAO = new SupplyDAOImpl();
+        }
+        catch (SQLException e)
+        {
+            System.out.println("Failed to connect to database! ProductFacade is not initialized! "+e.getMessage());
+            e.printStackTrace();
+            inventoryProductDAO=null;
+            supplyDAO=null;
+        }
     }
     /**
      * adds a new product to the system
@@ -37,7 +55,7 @@ public class ProductFacade
      * @param sellPrice the current sell price
      * @throws Exception if product already exists
      */
-    public Product AddProduct(String productName, String category, List<String> subCategories, String manufacturer, double sellPrice, String shelfLocation, String storageLocation) throws Exception
+    public void AddProduct(String productName, String category, List<String> subCategories, String manufacturer, double sellPrice, String shelfLocation, String storageLocation) throws Exception
     {
         if(getProduct(productName)!=null)
             throw new Exception("Product with name: "+productName+" already exists!");
@@ -45,9 +63,9 @@ public class ProductFacade
             productsByCategory.put(category, new ArrayList<>());
         Product product=new Product(productName, subCategories, manufacturer, sellPrice,shelfLocation,storageLocation);
         productsByCategory.get(category).add(product);
-
+        if(inventoryProductDAO!=null)
+            inventoryProductDAO.create(category,product);
         productsByName.put(productName, product);
-        return product;
     }
 
     /**
@@ -69,6 +87,8 @@ public class ProductFacade
         else {
             for (Product product : products)
                 product.SetDiscount(new Discount(startDate, endDate, percentage));
+            if(inventoryProductDAO!=null)
+                inventoryProductDAO.setDiscountForCategory(productCategory,startDate,endDate,percentage);
         }
     }
 
@@ -84,7 +104,11 @@ public class ProductFacade
     {
         if (!productsByName.containsKey(productName))
             throw new Exception("No product is named " + productName);
-        else productsByName.get(productName).SetDiscount(new Discount(startDate, endDate, percentage));
+        else {
+            productsByName.get(productName).SetDiscount(new Discount(startDate, endDate, percentage));
+            if(inventoryProductDAO!=null)
+                inventoryProductDAO.update(productsByName.get(productName));
+        }
     }
 
     /**
@@ -129,7 +153,10 @@ public class ProductFacade
         if(p==null)
             throw new Exception("Product "+productName+" does not exist!");
 
-        return p.addSupply(cost,expirationDate,shelfQuantity,storageQuantity);
+        Product.Supply supply= p.addSupply(cost,expirationDate,shelfQuantity,storageQuantity);
+        if(supplyDAO!=null)
+            supplyDAO.create(productName,supply);
+        return supply.getSupplyID();
     }
 
     /**
@@ -146,7 +173,13 @@ public class ProductFacade
         Product p=getProduct(productName);
         if(p==null)
             throw new Exception("Product " +productName+" is not found!");
-        p.updateSoldQuantity(supplyId,newShelfQuantity,newStorageQuantity);
+        Product.Supply sup= p.updateSoldQuantity(supplyId,newShelfQuantity,newStorageQuantity);
+        if(supplyDAO!=null) {
+            if (sup.getShelfQuantity() + sup.getStorageQuantity() == 0)
+                supplyDAO.delete(productName, sup.getSupplyID());
+            else
+                supplyDAO.update(productName, sup);
+        }
         p.calcMinQuantity();
         int total=p.GetShelfQuantity()+p.GetStorageQuantity();
         boolean shortage=total<p.getMinQuantity();
@@ -171,7 +204,14 @@ public class ProductFacade
         Product p=getProduct(productName);
         if(p==null)
             throw new Exception("Product " +productName+" is not found!");
-        p.updateFoundBrokenItems(supplyId,newShelfQuantity,newStorageQuantity);
+        Product.Supply sup=p.updateFoundBrokenItems(supplyId,newShelfQuantity,newStorageQuantity);
+
+        if(supplyDAO!=null) {
+            if (sup.getShelfQuantity() + sup.getStorageQuantity() == 0)
+                supplyDAO.delete(productName, sup.getSupplyID());
+            else
+                supplyDAO.update(productName, sup);
+        }
         int total=p.GetShelfQuantity()+p.GetStorageQuantity();
         boolean shortage=total<p.getMinQuantity();
         if(shortage)

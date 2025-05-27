@@ -4,8 +4,9 @@ import DomainLayer.Inventory.ProductFacade;
 import DomainLayer.Inventory.ReportFacade;
 import DomainLayer.Supplier.*;
 import DomainLayer.Supplier.Enums.STATUS;
+import DomainLayer.Supplier.Repositories.OrderRepository;
 import ServiceLayer.SupplierSystemService;
-import org.junit.jupiter.api.parallel.Execution;
+//import org.junit.jupiter.api.parallel.Execution;
 
 
 import java.time.LocalDate;
@@ -16,13 +17,13 @@ import java.util.Map;
 
 public class OrderController {
     /*Dependencies injected via constructor*/
-    private final SystemController systemController;
     private final ProductFacade productFacade;
     private final ReportFacade reportFacade;
     private List<Order> orders;
     private int nextOrderId;
     private Map<Integer, Order>  periodicOrders;
     private final int PERIODIC_ORDER_DAYS = 7;
+    private final OrderRepository orderRepository;
 
 
     private static OrderController instance;
@@ -33,23 +34,36 @@ public class OrderController {
         return instance;
     }
 
+    public void inistializeOrders(List<Order> orders) {
+        int maxId = 0;
+        if(orders == null || orders.isEmpty()) return;
+        for(Order order : orders) {
+            if(order.getSupplyDate().isAfter(LocalDate.now())) {
+                this.orders.add(order);
+            }
+             if (order.getOrderId() > maxId) {
+                 maxId = order.getOrderId();
+             }
+        }
+        nextOrderId = maxId + 1;
+    }
+
     /**
      * should be used if decide to load default data later in the run
      * wipes out the previous run in order to allow to safely load default data
      */
-    public static void flush()
-    {
-        instance=new OrderController();
-    }
     private OrderController() {
         this.productFacade = ProductFacade.getInstance();
         this.reportFacade = ReportFacade.getInstance();
-        this.systemController = SystemController.getInstance();
         this.orders = new ArrayList<Order>();
         this.nextOrderId = 0;
         this.periodicOrders = new HashMap<>();
+        try {
+            this.orderRepository = new OrderRepository();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to initialize OrderRepository: " + e.getMessage());
+        }
     }
-
 
     /**
      * Declare that a specific product is below its minimum
@@ -74,9 +88,9 @@ public class OrderController {
             updatePeriodicOrders(order, productName, missingUnits);
         }
     }
-    public Order checkOpenOrder(String supplierName, int agreement){
+    public Order checkOpenOrder(String supplierID, int agreement){
         for(Order order : orders){
-            if(order.getSupplierId().equals(supplierName) && order.getAgreement().getAgreementId() == agreement){
+            if(order.getSupplierId().equals(supplierID) && order.getAgreement().getAgreementId() == agreement){
                 return order;
             }
         }
@@ -97,7 +111,7 @@ public class OrderController {
         String bestSupplierId = null;
         int bestAgreementId = -1;
 
-        for (Supplier supplier : systemController.getAllSupplierObjects()) {
+        for (Supplier supplier : SystemController.getInstance().getAllSupplierObjects()) {
             Map<String, Object> supplierData = supplier.getBestPriceAndAgreementForProductName(productName, requiredQuantity);
 
             if (supplierData.isEmpty() ||
@@ -131,6 +145,7 @@ public class OrderController {
      * @param actualArrivalDate real arrival date at warehouse
      */
     public void confirmOrderArrival(LocalDate actualArrivalDate) {
+        SystemController systemController = SystemController.getInstance();
         try {
             List<Order> ordersArrival = getOrdersArrivingOn(actualArrivalDate);
             if (ordersArrival.isEmpty()) return;
@@ -145,16 +160,20 @@ public class OrderController {
                     double cost = agreement.calculatePriceWithDiscount(product, item.getValue())/ item.getValue();
                     LocalDate expirationDate = order.getSupplyDate().plusDays(7);
                     productFacade.addSupply(productName, cost, expirationDate, 0, item.getValue());
-
+                    order.setStatus(STATUS.DELIVERED);
+                    orderRepository.updateOrderStatus(order.getOrderId(), order.getStatus().toString());
                 }
                 order.setStatus(STATUS.DELIVERED);
                 orders.remove(order);
                 if(periodicOrders.containsKey(order.getOrderId())){
                     Order periodicOrder = periodicOrders.get(order.getOrderId());
                     periodicOrder.setDeliveryDate(actualArrivalDate.plusDays(PERIODIC_ORDER_DAYS));
+                    orderRepository.updateDeliveryDate(periodicOrder.getOrderId(), periodicOrder.getSupplyDate());
                     Order newPeriodicOrder = new Order(periodicOrder.getOrderId(), periodicOrder.getSupplierId(), periodicOrder.getSupplyDate(), periodicOrder.getContactPerson(), periodicOrder.getAgreement(), periodicOrder.getSupplyDate(), periodicOrder.getItems(), periodicOrder.getStatus(), periodicOrder.getTotalPrice());
                     orders.add(newPeriodicOrder);
                     systemController.addOrder(newPeriodicOrder);
+                    orderRepository.addOrder(newPeriodicOrder, false);
+
                 }
             }
         } catch (Exception e) {
@@ -179,9 +198,7 @@ public class OrderController {
         return result;
     }
 
-    /*------------------------------------------------------
-     *  Suggested additional capabilities
-     *----------------------------------------------------*/
+
 
     /**
      * Automatically raise a purchase order for each product
@@ -190,6 +207,7 @@ public class OrderController {
      * the latest Abscence/Damage/Expiry reports.
      */
     public Order createAutomaticShortageOrders(String supplierId, int agreementId, String productName, int requiredQuantity) {
+        SystemController systemController = SystemController.getInstance();
         LocalDate orderDate = LocalDate.now();
         Supplier supplier = systemController.getSupplierObjectById(supplierId);
         if (supplier == null) return null;
@@ -207,6 +225,9 @@ public class OrderController {
         orders.add(newOrder);
         System.out.println("Order created: " + newOrder);
         systemController.addOrder(newOrder);
+        orderRepository.addOrder(newOrder, false);
+
+
         return newOrder;
 
     }
@@ -226,6 +247,12 @@ public class OrderController {
 
         Order periodicOrder = new Order(order.getOrderId(), order.getSupplierId(), order.getSupplyDate(), order.getContactPerson(), order.getAgreement(), order.getSupplyDate(), order.getItems(), order.getStatus(), order.getTotalPrice());
         periodicOrders.put(periodicOrder.getOrderId(), periodicOrder);
+        orderRepository.addOrder(order, true);
+    }
+
+    public void addPeriodicOrders(Order order) {
+        if(order == null) return;
+        periodicOrders.put(order.getOrderId(), order);
     }
 
     public double getTotalPrice(Supplier supplier, Map<String, Integer> items, int agreementIndex) {
@@ -247,11 +274,12 @@ public class OrderController {
      */
     public void updatePeriodicOrders(Order order, String productName, int requiredQuantity) {
         Map<String, Integer> items = new HashMap<>();
-        Supplier supplier = systemController.getSupplierObjectById(order.getSupplierId());
+        Supplier supplier = SystemController.getInstance().getSupplierObjectById(order.getSupplierId());
         if (supplier == null) return;
         String catalogNumber = supplier.findProductByName(productName).getCatalogNumber();
         items.put(catalogNumber, requiredQuantity);
         order.setItems(items);
+        orderRepository.addProductToOrder(order.getOrderId(), productName, requiredQuantity);
     }
 
     /**

@@ -19,7 +19,7 @@ public class ServiceFactory {
     private final SystemController systemController;
     private final ProductService productService;
     private final ReportService reportService;
-    public ServiceFactory() throws SQLException
+    public ServiceFactory()
     {
         ProductFacade.flush();
         ReportFacade.flush();

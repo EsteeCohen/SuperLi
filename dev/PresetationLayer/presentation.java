@@ -20,18 +20,11 @@ public class presentation {
     public static presentation getInstance()
     {
         if(instance==null) {
-            try {
                 instance = new presentation();
-            }
-            catch (SQLException e)
-            {
-                System.out.println("failed to create Inventory presentation!");
-                e.printStackTrace();
-            }
         }
         return instance;
     }
-    private presentation() throws SQLException
+    private presentation()
     {
     }
 
@@ -403,15 +396,7 @@ public class presentation {
     public void startUp()
     {
         //initiate a new service factory because you cant have the same product twice
-        try {
-            serviceFactory = new ServiceFactory();
-        }
-        catch(SQLException e)
-        {
-            System.out.println("failed creating a new inventory presentation!");
-            e.printStackTrace();
-            return;
-        }
+        serviceFactory = new ServiceFactory();
         try{
             serviceFactory.AddProduct("milk","diary",Arrays.asList("milk","3%"),"tara",10,"a1","a1");
             serviceFactory.AddProduct("yogurt","diary",Arrays.asList("yogurt","8%"),"tnuva",15,"a2","a2");

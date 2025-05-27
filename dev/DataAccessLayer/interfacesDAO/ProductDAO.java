@@ -1,17 +1,21 @@
 package DataAccessLayer.interfacesDAO;
 
 
-import DomainLayer.Supplier.Product;
+import DataAccessLayer.DTO.ProductDTO;
 import java.util.List;
 
 public interface ProductDAO {
-    void create(Product product);
-    Product read(String catalogNumber);
-    List<Product> readAll();
-    List<Product> readAllBySupplier(String supplierId);
-    void update(Product product);
+    void create(ProductDTO product);
+    ProductDTO read(String catalogNumber);
+    List<ProductDTO> readAll();
+    List<ProductDTO> readAllBySupplier(String supplierId);
+    void update(ProductDTO product);
     void delete(String catalogNumber);
 
     void deleteBySupplier(String supplierId);
+
+    ProductDTO readByCatalogNumber(String catalogNumber);
+
+    ProductDTO readBySupplierAndCatalog(String supplierId, String catalogNumber);
 }
 
