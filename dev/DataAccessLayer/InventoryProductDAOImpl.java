@@ -4,6 +4,7 @@ import DataAccessLayer.DTO.InventoryProductDTO;
 import DataAccessLayer.interfacesDAO.InventoryProductDAO;
 import DomainLayer.Inventory.Product;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 import java.sql.*;
@@ -108,6 +109,20 @@ public class InventoryProductDAOImpl implements InventoryProductDAO {
             stmt.setDate(3,  Date.valueOf(product.getDiscountEnd()));
             stmt.setDouble(4, product.getDisountPercentage());
             stmt.setString(5, product.getProductName());
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    @Override
+    public void setDiscountForCategory(String category, LocalDate start, LocalDate end, double percentage)
+    {
+        String sql = "UPDATE "+TABLE_NAME+" SET discount_start=?, discount_end=?, discount_percentage=? WHERE category=?";
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setDate(1, Date.valueOf(start));
+            stmt.setDate(2,  Date.valueOf(end));
+            stmt.setDouble(3, percentage);
+            stmt.setString(4, category);
             stmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
