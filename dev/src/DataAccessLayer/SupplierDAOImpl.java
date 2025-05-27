@@ -27,7 +27,6 @@ public class SupplierDAOImpl implements SupplierDAO {
             stmt.setString(4, dto.getType());
             stmt.executeUpdate();
 
-            // לפי סוג ה-DTO, מכניסים לטבלאות המשניות
             if (dto instanceof DeliverySupplierDTO del) {
                 insertDeliveryDays(del.getSupplierId(), del.getDeliveryDays());
             } else if (dto instanceof PickupSupplierDTO p) {
@@ -51,7 +50,6 @@ public class SupplierDAOImpl implements SupplierDAO {
                     String type        = rs.getString("supplier_type");
 
                     if ("delivery_days".equals(type)) {
-                        // שליפת ימות משלוח
                         List<String> days = new ArrayList<>();
                         for (DaysOfTheWeek d : getDeliveryDays(supplierId)) {
                             days.add(d.name());
@@ -59,7 +57,6 @@ public class SupplierDAOImpl implements SupplierDAO {
                         return new DeliverySupplierDTO(name, supplierId, bankAccount, days);
 
                     } else if ("needs_pickup".equals(type)) {
-                        // שליפת כתובת איסוף
                         String address = getPickupAddress(supplierId);
                         return new PickupSupplierDTO(name, supplierId, bankAccount, address);
                     }
@@ -68,7 +65,7 @@ public class SupplierDAOImpl implements SupplierDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return null; // לא נמצא
+        return null;
     }
 
     @Override
@@ -100,11 +97,9 @@ public class SupplierDAOImpl implements SupplierDAO {
             stmt.setString(4, dto.getSupplierId());
             stmt.executeUpdate();
 
-            // מנקים פרטים ישנים
             deleteDeliveryDays(dto.getSupplierId());
             deletePickupAddress(dto.getSupplierId());
 
-            // מכניסים פרטים חדשים
             if (dto instanceof DeliverySupplierDTO del) {
                 insertDeliveryDays(del.getSupplierId(), del.getDeliveryDays());
             } else if (dto instanceof PickupSupplierDTO p) {
@@ -118,7 +113,6 @@ public class SupplierDAOImpl implements SupplierDAO {
 
     @Override
     public void delete(String supplierId) {
-        // מוחקים ראשית את הטבלאות המשניות כדי לשמור על שלמות
         deleteDeliveryDays(supplierId);
         deletePickupAddress(supplierId);
 
@@ -228,14 +222,12 @@ public class SupplierDAOImpl implements SupplierDAO {
     public void updateSupplierId(String oldId, String newId) {
         try {
             connection.setAutoCommit(false);
-            // טבלת Suppliers
             try (PreparedStatement p = connection.prepareStatement(
                     "UPDATE Suppliers SET supplier_id = ? WHERE supplier_id = ?")) {
                 p.setString(1, newId);
                 p.setString(2, oldId);
                 p.executeUpdate();
             }
-            // טבלאות משניות
             try (PreparedStatement p = connection.prepareStatement(
                     "UPDATE SupplierDeliveryDays SET supplier_id = ? WHERE supplier_id = ?")) {
                 p.setString(1, newId);

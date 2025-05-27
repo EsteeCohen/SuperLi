@@ -19,4 +19,5 @@ public interface OrderDAO {
     List<OrderDTO> readAllPeriodic();
 
     List<OrderDTO> readAllNotPeriodic();
-}
+    int getMaxOrderId();
+    }

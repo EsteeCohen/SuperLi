@@ -92,21 +92,18 @@ public class SupplierRepository {
         for (SupplierDTO dto : supplierDAO.readAll()) {
             Supplier s = dto.toDomain();
 
-            // מלא אנשי קשר
             List<ContactPerson> cps = new ArrayList<>();
             for (ContactPersonDTO cpd : contactPersonDAO.readAllBySupplier(s.getSupplierId())) {
                 cps.add(cpd.toDomain());
             }
             s.setContactPersons(cps);
 
-            // מלא הסכמים
             List<Agreement> ags = new ArrayList<>();
             for (AgreementDTO ad : agreementDAO.readAllBySupplier(s.getSupplierId())) {
                 ags.add(ad.toDomain());
             }
             s.setAgreements(ags);
 
-            // מלא מוצרים
             for (ProductDTO pd : productDAO.readAllBySupplier(s.getSupplierId())) {
                 s.addProductToCatalog(pd.toDomain());
             }

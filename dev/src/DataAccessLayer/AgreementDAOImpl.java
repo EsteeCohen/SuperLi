@@ -43,7 +43,7 @@ public class AgreementDAOImpl implements AgreementDAO {
                 for (Map.Entry<Integer, Integer> qd : prodEntry.getValue().entrySet()) {
                     stmt.setInt(1, agreementId);
                     stmt.setString(2, catalog);
-                    stmt.setString(3, supplierId); // ← אל תשכחי את זה!
+                    stmt.setString(3, supplierId);
                     stmt.setInt(4, qd.getKey());
                     stmt.setInt(5, qd.getValue());
                     stmt.addBatch();

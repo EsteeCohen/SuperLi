@@ -535,17 +535,6 @@ public class SupplierSystemUI {
                 newValue = scanner.nextLine();
                 break;
 
-            /*case 4:
-                fieldToUpdate = "discounts";
-                System.out.println("Enter new discounts (format: amount,discount). Enter -1 to finish:");
-                ArrayList<String> discountList = new ArrayList<>();
-                while (true) {
-                    String input = scanner.nextLine().trim();
-                    if (input.equals("-1")) break;
-                    discountList.add(input.substring(0, input.length()-1));
-                }
-                newValue = String.join(";", discountList); // נעבד את זה בתוך SystemController
-                break;*/
 
             case 3:
                 fieldToUpdate = "price";

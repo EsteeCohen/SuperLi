@@ -92,4 +92,8 @@ public class OrderRepository {
             orderDAO.update(order);
         }
     }
+
+    public int getMaxOrderId() {
+        return orderDAO.getMaxOrderId();
+    }
 }

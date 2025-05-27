@@ -2,7 +2,7 @@ package DomainLayer.Supplier;
 
 import DomainLayer.Supplier.Enums.*;
 
-import java.time.LocalDate;  // נוסיף את זה
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,7 +14,6 @@ public class Product {
     private double price;   // price per package
     private Units units;
 
-    // קונסטרקטור מעודכן
     public Product(String name, String supplierId, String catalogNumber, int quantityPerPackage, double price, Units units, LocalDate expirationDate) {
         this.ProductName = name;
         this.supplierId = supplierId;

@@ -149,10 +149,10 @@ public abstract class Supplier {
         int bestAgreementId = -1;
         LocalDate today = TimeController.getDate();
 
-        Product matchedProduct = findProductByName(productName); // שימוש בפונקציה החדשה
+        Product matchedProduct = findProductByName(productName);
 
         if (matchedProduct == null) {
-            return new HashMap<>(); // אין לספק את המוצר הזה
+            return new HashMap<>();
         }
 
         for (Agreement agreement : agreements) {

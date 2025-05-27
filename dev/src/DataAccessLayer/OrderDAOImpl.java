@@ -221,4 +221,18 @@ public class OrderDAOImpl implements OrderDAO {
         }
         return list;
     }
+    @Override
+    public int getMaxOrderId() {
+        String sql = "SELECT COALESCE(MAX(order_id), -1) FROM Orders";
+        try (Connection connection = DatabaseConnection.getValidConnection();
+             Statement stmt = connection.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
 }
