@@ -59,8 +59,8 @@ import java.sql.SQLException;
 // Manages the DB connection (Singleton)
 public class DatabaseConnection {
     private static Connection connection;
-    private static final String DB_URL = "jdbc:sqlite:../supplyinventory.db";
-    private static boolean isTestMode = false;
+    //private static final String DB_URL = "jdbc:sqlite:../supplyinventory.db";
+    private static final String DB_URL = "jdbc:sqlite:C:/Users/shiri/ADSS_Group_AI/dev/src/supplyinventory.db";
 
     public static Connection getConnection() throws SQLException {
         if (connection == null || connection.isClosed()) {
@@ -106,7 +106,7 @@ public class DatabaseConnection {
             System.err.println("Failed to reset database connection: " + e.getMessage());
         }
     }
-
+/*
     // Method specifically for tests
     public static void setTestMode(boolean testMode) {
         isTestMode = testMode;
@@ -115,7 +115,7 @@ public class DatabaseConnection {
             resetConnection();
         }
     }
-
+*/
     // Method to ensure connection is valid before use
     public static Connection getValidConnection() throws SQLException {
         if (connection == null || connection.isClosed()) {

@@ -34,7 +34,7 @@ public class OrderController {
         return instance;
     }
 
-    public void inistializeOrders(List<Order> orders) {
+    /*public void inistializeOrders(List<Order> orders) {
         int maxId = 0;
         if(orders == null || orders.isEmpty()) return;
         for(Order order : orders) {
@@ -44,6 +44,28 @@ public class OrderController {
              if (order.getOrderId() > maxId) {
                  maxId = order.getOrderId();
              }
+        }
+        nextOrderId = maxId + 1;
+    }*/
+
+    public void inistializeOrders(List<Order> orders) {
+        int maxId = -1;
+        if(orders == null || orders.isEmpty()) {
+            try {
+                maxId = orderRepository.getMaxOrderId();
+            } catch (Exception e) {
+                System.err.println("Failed to get max order ID from database: " + e.getMessage());
+                maxId = -1;
+            }
+        } else {
+            for(Order order : orders) {
+                if(order.getSupplyDate().isAfter(LocalDate.now())) {
+                    this.orders.add(order);
+                }
+                if (order.getOrderId() > maxId) {
+                    maxId = order.getOrderId();
+                }
+            }
         }
         nextOrderId = maxId + 1;
     }

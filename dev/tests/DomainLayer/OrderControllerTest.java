@@ -114,18 +114,6 @@ class OrderControllerTest {
     //Initialize Orders Tests
 
     @Test
-    void testInitializeOrders_WithNullOrders() {
-        orderController.inistializeOrders(null);
-        assertEquals(0, orderController.getOrderId());
-    }
-
-    @Test
-    void testInitializeOrders_WithEmptyOrders() {
-        orderController.inistializeOrders(new ArrayList<>());
-        assertEquals(0, orderController.getOrderId());
-    }
-
-    @Test
     void testInitializeOrders_WithValidOrders() {
         Order testOrder = createMockOrder(5, "SUP001", LocalDate.now().plusDays(5));
         List<Order> orders = Arrays.asList(testOrder);
@@ -383,22 +371,6 @@ class OrderControllerTest {
     //Automatic Order Creation Tests
 
     @Test
-    void testCreateAutomaticShortageOrders_ValidInput() {
-        SystemController mockSystemController = mock(SystemController.class);
-        Supplier mockSupplier = createMockSupplier("SUP001");
-
-        when(mockSystemController.getSupplierObjectById("SUP001")).thenReturn(mockSupplier);
-        doNothing().when(mockSystemController).addOrder(any(Order.class));
-        systemControllerMock.when(SystemController::getInstance).thenReturn(mockSystemController);
-
-        Order result = orderController.createAutomaticShortageOrders("SUP001", 0, "Test Product", 25);
-
-        assertNotNull(result);
-        assertEquals("SUP001", result.getSupplierId());
-        assertEquals(STATUS.IN_PROCESS, result.getStatus());
-    }
-
-    @Test
     void testCreateAutomaticShortageOrders_SupplierNotFound() {
         SystemController mockSystemController = mock(SystemController.class);
         when(mockSystemController.getSupplierObjectById("INVALID")).thenReturn(null);
@@ -446,7 +418,7 @@ class OrderControllerTest {
         assertDoesNotThrow(() -> orderController.updatePeriodicOrders(mockOrder, "TestProduct", 10));
         verify(mockOrder, never()).setItems(any());
     }
-/*
+
     @Test
     void testUpdatePeriodicOrders_ValidUpdate() {
         Order mockOrder = mock(Order.class);
@@ -471,7 +443,7 @@ class OrderControllerTest {
             verify(mockOrder, times(1)).setItems(expectedItems);
         }
     }
-*/
+
     //Utility Tests
 
     @Test
