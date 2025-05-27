@@ -9,16 +9,14 @@ import java.time.LocalDate;
 import java.util.*;
 
 public class AgreementDAOImpl implements AgreementDAO {
-    private final Connection connection;
 
-    public AgreementDAOImpl() throws SQLException {
-        this.connection = DatabaseConnection.getConnection();
+    public AgreementDAOImpl(){
     }
 
     @Override
     public void create(AgreementDTO dto) {
         String sql = "INSERT INTO Agreements (supplier_id, agreement_id, payment_method, payment_timing, valid_from, valid_to) VALUES (?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement stmt = DatabaseConnection.getValidConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, dto.getSupplierId());
             stmt.setInt(2, dto.getAgreementId());
             stmt.setString(3, dto.getPaymentMethod());
@@ -37,7 +35,7 @@ public class AgreementDAOImpl implements AgreementDAO {
 
     private void insertProductDiscounts(String supplierId, int agreementId, Map<String, Map<Integer, Integer>> discounts) throws SQLException {
         String sql = "INSERT INTO AgreementProductDiscounts (agreement_id, catalog_number, supplier_id, quantity_threshold, discount_percent) VALUES (?, ?, ?, ?, ?)";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement stmt = DatabaseConnection.getValidConnection().prepareStatement(sql)) {
             for (Map.Entry<String, Map<Integer, Integer>> prodEntry : discounts.entrySet()) {
                 String catalog = prodEntry.getKey();
                 for (Map.Entry<Integer, Integer> qd : prodEntry.getValue().entrySet()) {
@@ -56,7 +54,7 @@ public class AgreementDAOImpl implements AgreementDAO {
     @Override
     public AgreementDTO read(int agreementId) {
         String sql = "SELECT * FROM Agreements WHERE agreement_id=?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement stmt = DatabaseConnection.getValidConnection().prepareStatement(sql)) {
             stmt.setInt(1, agreementId);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
@@ -77,7 +75,7 @@ public class AgreementDAOImpl implements AgreementDAO {
     private Map<String, Map<Integer, Integer>> getProductDiscounts(int agreementId) throws SQLException {
         Map<String, Map<Integer, Integer>> discounts = new HashMap<>();
         String sql = "SELECT catalog_number, quantity_threshold, discount_percent FROM AgreementProductDiscounts WHERE agreement_id=?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement stmt = DatabaseConnection.getValidConnection().prepareStatement(sql)) {
             stmt.setInt(1, agreementId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
@@ -94,7 +92,7 @@ public class AgreementDAOImpl implements AgreementDAO {
     public List<AgreementDTO> readAllBySupplier(String supplierId) {
         List<AgreementDTO> list = new ArrayList<>();
         String sql = "SELECT agreement_id FROM Agreements WHERE supplier_id=?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement stmt = DatabaseConnection.getValidConnection().prepareStatement(sql)) {
             stmt.setString(1, supplierId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
@@ -110,7 +108,7 @@ public class AgreementDAOImpl implements AgreementDAO {
     @Override
     public void update(AgreementDTO dto) {
         String sql = "UPDATE Agreements SET payment_method=?, payment_timing=?, valid_from=?, valid_to=? WHERE agreement_id=?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement stmt = DatabaseConnection.getValidConnection().prepareStatement(sql)) {
             stmt.setString(1, dto.getPaymentMethod());
             stmt.setString(2, dto.getPaymentTiming());
             stmt.setDate(3, Date.valueOf(dto.getValidFrom()));
@@ -126,7 +124,7 @@ public class AgreementDAOImpl implements AgreementDAO {
     }
 
     private void deleteProductDiscounts(int agreementId) throws SQLException {
-        try (PreparedStatement stmt = connection.prepareStatement(
+        try (PreparedStatement stmt = DatabaseConnection.getValidConnection().prepareStatement(
                 "DELETE FROM AgreementProductDiscounts WHERE agreement_id=?")) {
             stmt.setInt(1, agreementId);
             stmt.executeUpdate();
@@ -137,7 +135,7 @@ public class AgreementDAOImpl implements AgreementDAO {
     public void delete(int agreementId) {
         try {
             deleteProductDiscounts(agreementId);
-            try (PreparedStatement stmt = connection.prepareStatement(
+            try (PreparedStatement stmt = DatabaseConnection.getValidConnection().prepareStatement(
                     "DELETE FROM Agreements WHERE agreement_id=?")) {
                 stmt.setInt(1, agreementId);
                 stmt.executeUpdate();
@@ -150,7 +148,7 @@ public class AgreementDAOImpl implements AgreementDAO {
     @Override
     public void deleteBySupplier(String supplierId) {
         String sql = "DELETE FROM Agreements WHERE supplier_id=?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement stmt = DatabaseConnection.getValidConnection().prepareStatement(sql)) {
             stmt.setString(1, supplierId);
             stmt.executeUpdate();
         } catch (SQLException e) {
@@ -161,7 +159,7 @@ public class AgreementDAOImpl implements AgreementDAO {
     @Override
     public void updatePaymentMethod(int agreementId, String paymentMethod) {
         String sql = "UPDATE Agreements SET payment_method=? WHERE agreement_id=?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement stmt = DatabaseConnection.getValidConnection().prepareStatement(sql)) {
             stmt.setString(1, paymentMethod);
             stmt.setInt(2, agreementId);
             stmt.executeUpdate();
@@ -173,7 +171,7 @@ public class AgreementDAOImpl implements AgreementDAO {
     @Override
     public void updatePaymentTiming(int agreementId, String paymentTiming) {
         String sql = "UPDATE Agreements SET payment_timing=? WHERE agreement_id=?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement stmt = DatabaseConnection.getValidConnection().prepareStatement(sql)) {
             stmt.setString(1, paymentTiming);
             stmt.setInt(2, agreementId);
             stmt.executeUpdate();
@@ -185,7 +183,7 @@ public class AgreementDAOImpl implements AgreementDAO {
     @Override
     public void updateValidFrom(int agreementId, LocalDate validFrom) {
         String sql = "UPDATE Agreements SET valid_from=? WHERE agreement_id=?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement stmt = DatabaseConnection.getValidConnection().prepareStatement(sql)) {
             stmt.setDate(1, Date.valueOf(validFrom));
             stmt.setInt(2, agreementId);
             stmt.executeUpdate();
@@ -197,7 +195,7 @@ public class AgreementDAOImpl implements AgreementDAO {
     @Override
     public void updateValidTo(int agreementId, LocalDate validTo) {
         String sql = "UPDATE Agreements SET valid_to=? WHERE agreement_id=?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement stmt = DatabaseConnection.getValidConnection().prepareStatement(sql)) {
             stmt.setDate(1, Date.valueOf(validTo));
             stmt.setInt(2, agreementId);
             stmt.executeUpdate();
@@ -210,7 +208,7 @@ public class AgreementDAOImpl implements AgreementDAO {
     public void updateProductDiscounts(String supplierId, int agreementId, Map<String, Map<Integer,Integer>> discounts) {
         System.out.println("check connection:" + DatabaseConnection.isConnectionActive());
         try {
-            try (PreparedStatement del = connection.prepareStatement(
+            try (PreparedStatement del = DatabaseConnection.getValidConnection().prepareStatement(
                     "DELETE FROM AgreementProductDiscounts WHERE agreement_id=?")) {
                 del.setInt(1, agreementId);
                 del.executeUpdate();
@@ -218,7 +216,7 @@ public class AgreementDAOImpl implements AgreementDAO {
             String sql = "INSERT INTO AgreementProductDiscounts " +
                     "(agreement_id, catalog_number, supplier_id, quantity_threshold, discount_percent) " +
                     "VALUES (?, ?, ?, ?, ?)";
-            try (PreparedStatement ins = connection.prepareStatement(sql)) {
+            try (PreparedStatement ins =DatabaseConnection.getValidConnection().prepareStatement(sql)) {
                 for (Map.Entry<String, Map<Integer,Integer>> prod : discounts.entrySet()) {
                     String catalog = prod.getKey();
                     for (Map.Entry<Integer,Integer> qd : prod.getValue().entrySet()) {

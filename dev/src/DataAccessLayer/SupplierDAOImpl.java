@@ -11,16 +11,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SupplierDAOImpl implements SupplierDAO {
-    private final Connection connection;
 
     public SupplierDAOImpl() throws SQLException {
-        this.connection = DatabaseConnection.getConnection();
     }
 
     @Override
     public void create(SupplierDTO dto) {
         String sql = "INSERT INTO Suppliers (supplier_id, name, bank_account, supplier_type) VALUES (?, ?, ?, ?)";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement stmt = DatabaseConnection.getValidConnection().prepareStatement(sql)) {
             stmt.setString(1, dto.getSupplierId());
             stmt.setString(2, dto.getName());
             stmt.setString(3, dto.getBankAccount());
@@ -41,7 +39,7 @@ public class SupplierDAOImpl implements SupplierDAO {
     @Override
     public SupplierDTO read(String supplierId) {
         String sql = "SELECT name, bank_account, supplier_type FROM Suppliers WHERE supplier_id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement stmt =DatabaseConnection.getValidConnection().prepareStatement(sql)) {
             stmt.setString(1, supplierId);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
@@ -73,7 +71,7 @@ public class SupplierDAOImpl implements SupplierDAO {
         List<SupplierDTO> all = new ArrayList<>();
 
         String sql = "SELECT supplier_id FROM Suppliers";
-        try (PreparedStatement stmt = connection.prepareStatement(sql);
+        try (PreparedStatement stmt =DatabaseConnection.getValidConnection().prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
                 String id = rs.getString("supplier_id");
@@ -90,7 +88,7 @@ public class SupplierDAOImpl implements SupplierDAO {
     @Override
     public void update(SupplierDTO dto) {
         String sql = "UPDATE Suppliers SET name = ?, bank_account = ?, supplier_type = ? WHERE supplier_id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement stmt =DatabaseConnection.getValidConnection().prepareStatement(sql)) {
             stmt.setString(1, dto.getName());
             stmt.setString(2, dto.getBankAccount());
             stmt.setString(3, dto.getType());
@@ -117,7 +115,7 @@ public class SupplierDAOImpl implements SupplierDAO {
         deletePickupAddress(supplierId);
 
         String sql = "DELETE FROM Suppliers WHERE supplier_id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement stmt =DatabaseConnection.getValidConnection().prepareStatement(sql)) {
             stmt.setString(1, supplierId);
             stmt.executeUpdate();
         } catch (SQLException e) {
@@ -129,7 +127,7 @@ public class SupplierDAOImpl implements SupplierDAO {
 
     private void insertDeliveryDays(String supplierId, List<String> days) throws SQLException {
         String sql = "INSERT INTO SupplierDeliveryDays (supplier_id, day_of_week) VALUES (?, ?)";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement stmt =DatabaseConnection.getValidConnection().prepareStatement(sql)) {
             for (String d : days) {
                 stmt.setString(1, supplierId);
                 stmt.setString(2, d);
@@ -141,7 +139,7 @@ public class SupplierDAOImpl implements SupplierDAO {
     private List<DaysOfTheWeek> getDeliveryDays(String supplierId) throws SQLException {
         List<DaysOfTheWeek> days = new ArrayList<>();
         String sql = "SELECT day_of_week FROM SupplierDeliveryDays WHERE supplier_id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement stmt =DatabaseConnection.getValidConnection().prepareStatement(sql)) {
             stmt.setString(1, supplierId);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
@@ -154,7 +152,7 @@ public class SupplierDAOImpl implements SupplierDAO {
 
     private void deleteDeliveryDays(String supplierId) {
         String sql = "DELETE FROM SupplierDeliveryDays WHERE supplier_id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement stmt =DatabaseConnection.getValidConnection().prepareStatement(sql)) {
             stmt.setString(1, supplierId);
             stmt.executeUpdate();
         } catch (SQLException e) {
@@ -164,7 +162,7 @@ public class SupplierDAOImpl implements SupplierDAO {
 
     private void insertPickupAddress(String supplierId, String address) throws SQLException {
         String sql = "INSERT INTO SupplierPickupDetails (supplier_id, address) VALUES (?, ?)";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement stmt =DatabaseConnection.getValidConnection().prepareStatement(sql)) {
             stmt.setString(1, supplierId);
             stmt.setString(2, address);
             stmt.executeUpdate();
@@ -173,7 +171,7 @@ public class SupplierDAOImpl implements SupplierDAO {
 
     private String getPickupAddress(String supplierId) throws SQLException {
         String sql = "SELECT address FROM SupplierPickupDetails WHERE supplier_id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement stmt =DatabaseConnection.getValidConnection().prepareStatement(sql)) {
             stmt.setString(1, supplierId);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
@@ -186,7 +184,7 @@ public class SupplierDAOImpl implements SupplierDAO {
 
     private void deletePickupAddress(String supplierId) {
         String sql = "DELETE FROM SupplierPickupDetails WHERE supplier_id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement stmt =DatabaseConnection.getValidConnection().prepareStatement(sql)) {
             stmt.setString(1, supplierId);
             stmt.executeUpdate();
         } catch (SQLException e) {
@@ -197,7 +195,7 @@ public class SupplierDAOImpl implements SupplierDAO {
     @Override
     public void updateName(String supplierId, String name) {
         String sql = "UPDATE Suppliers SET name = ? WHERE supplier_id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement stmt =DatabaseConnection.getValidConnection().prepareStatement(sql)) {
             stmt.setString(1, name);
             stmt.setString(2, supplierId);
             stmt.executeUpdate();
@@ -209,7 +207,7 @@ public class SupplierDAOImpl implements SupplierDAO {
     @Override
     public void updateBankAccount(String supplierId, String bankAccount) {
         String sql = "UPDATE Suppliers SET bank_account = ? WHERE supplier_id = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement stmt =DatabaseConnection.getValidConnection().prepareStatement(sql)) {
             stmt.setString(1, bankAccount);
             stmt.setString(2, supplierId);
             stmt.executeUpdate();
@@ -221,31 +219,31 @@ public class SupplierDAOImpl implements SupplierDAO {
     @Override
     public void updateSupplierId(String oldId, String newId) {
         try {
-            connection.setAutoCommit(false);
-            try (PreparedStatement p = connection.prepareStatement(
+            DatabaseConnection.getValidConnection().setAutoCommit(false);
+            try (PreparedStatement p =DatabaseConnection.getValidConnection().prepareStatement(
                     "UPDATE Suppliers SET supplier_id = ? WHERE supplier_id = ?")) {
                 p.setString(1, newId);
                 p.setString(2, oldId);
                 p.executeUpdate();
             }
-            try (PreparedStatement p = connection.prepareStatement(
+            try (PreparedStatement p =DatabaseConnection.getValidConnection().prepareStatement(
                     "UPDATE SupplierDeliveryDays SET supplier_id = ? WHERE supplier_id = ?")) {
                 p.setString(1, newId);
                 p.setString(2, oldId);
                 p.executeUpdate();
             }
-            try (PreparedStatement p = connection.prepareStatement(
+            try (PreparedStatement p =DatabaseConnection.getValidConnection().prepareStatement(
                     "UPDATE SupplierPickupDetails SET supplier_id = ? WHERE supplier_id = ?")) {
                 p.setString(1, newId);
                 p.setString(2, oldId);
                 p.executeUpdate();
             }
-            connection.commit();
+            DatabaseConnection.getValidConnection().commit();
         } catch (SQLException e) {
-            try { connection.rollback(); } catch (SQLException ignore) {}
+            try {DatabaseConnection.getValidConnection().rollback(); } catch (SQLException ignore) {}
             e.printStackTrace();
         } finally {
-            try { connection.setAutoCommit(true); } catch (SQLException ignore) {}
+            try {DatabaseConnection.getValidConnection().setAutoCommit(true); } catch (SQLException ignore) {}
         }
     }
 

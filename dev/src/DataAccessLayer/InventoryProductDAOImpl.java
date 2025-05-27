@@ -20,7 +20,7 @@ public class InventoryProductDAOImpl implements InventoryProductDAO {
     public void create(String category, Product product)
     {
         String sql = "INSERT INTO "+ TABLE_NAME+" (product_name, category, sub_categories, manufacturer ,shelf_location, storage_location, min_quantity, sell_price, discount_start, discount_end, discount_percentage) VALUES (?, ?, ?, ?, ?, ?,?, ?, ?, ?, ?)";
-        try (PreparedStatement stmt = DatabaseConnection.getConnection().prepareStatement(sql)) {
+        try (PreparedStatement stmt = DatabaseConnection.getValidConnection().prepareStatement(sql)) {
             stmt.setString(1, product.getProductName());
             stmt.setString(2, category);
             stmt.setString(3, product.getSubCategories().toString());
@@ -47,7 +47,7 @@ public class InventoryProductDAOImpl implements InventoryProductDAO {
     public InventoryProductDTO read(String ProductName)
     {
         String sql = "SELECT * FROM "+TABLE_NAME+" WHERE product_name=?";
-        try (PreparedStatement stmt = DatabaseConnection.getConnection().prepareStatement(sql)) {
+        try (PreparedStatement stmt = DatabaseConnection.getValidConnection().prepareStatement(sql)) {
             stmt.setString(1, ProductName);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
@@ -78,7 +78,7 @@ public class InventoryProductDAOImpl implements InventoryProductDAO {
     {
         List<InventoryProductDTO> products = new ArrayList<>();
         String sql = "SELECT * FROM "+TABLE_NAME;
-        try (Statement stmt = DatabaseConnection.getConnection().createStatement()) {
+        try (Statement stmt = DatabaseConnection.getValidConnection().createStatement()) {
             ResultSet rs = stmt.executeQuery(sql);
             while (rs.next()) {
                 products.add(new InventoryProductDTO(
@@ -107,7 +107,7 @@ public class InventoryProductDAOImpl implements InventoryProductDAO {
     public void update(Product product)
     {
         String sql = "UPDATE "+TABLE_NAME+" SET min_quantity=?, discount_start=?, discount_end=?, discount_percentage=? WHERE product_name=?";
-        try (PreparedStatement stmt = DatabaseConnection.getConnection().prepareStatement(sql)) {
+        try (PreparedStatement stmt = DatabaseConnection.getValidConnection().prepareStatement(sql)) {
             stmt.setInt(1, product.getMinQuantity());
             if(product.getDiscountStart()!=null)
                 stmt.setDate(2, Date.valueOf(product.getDiscountStart()));
@@ -129,7 +129,7 @@ public class InventoryProductDAOImpl implements InventoryProductDAO {
     public void setDiscountForCategory(String category, LocalDate start, LocalDate end, double percentage)
     {
         String sql = "UPDATE "+TABLE_NAME+" SET discount_start=?, discount_end=?, discount_percentage=? WHERE category=?";
-        try (PreparedStatement stmt = DatabaseConnection.getConnection().prepareStatement(sql)) {
+        try (PreparedStatement stmt = DatabaseConnection.getValidConnection().prepareStatement(sql)) {
             stmt.setDate(1, Date.valueOf(start));
             stmt.setDate(2,  Date.valueOf(end));
             stmt.setDouble(3, percentage);

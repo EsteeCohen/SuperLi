@@ -8,16 +8,16 @@ import java.sql.*;
 import java.util.*;
 
 public class ProductDAOImpl implements ProductDAO {
-    private final Connection connection;
 
-    public ProductDAOImpl() throws SQLException {
-        this.connection = DatabaseConnection.getConnection();
+
+    public ProductDAOImpl() {
+
     }
 
     @Override
     public void create(ProductDTO product) {
         String sql = "INSERT INTO Products (catalog_number, supplier_id, product_name, quantity_per_package, price_per_package, units) VALUES (?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement stmt = DatabaseConnection.getValidConnection().prepareStatement(sql)) {
             stmt.setString(1, product.getCatalogNumber());
             stmt.setString(2, product.getSupplierId());
             stmt.setString(3, product.getName());
@@ -33,7 +33,7 @@ public class ProductDAOImpl implements ProductDAO {
     @Override
     public ProductDTO read(String catalogNumber) {
         String sql = "SELECT * FROM Products WHERE catalog_number=?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement stmt =DatabaseConnection.getValidConnection().prepareStatement(sql)) {
             stmt.setString(1, catalogNumber);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
@@ -57,7 +57,7 @@ public class ProductDAOImpl implements ProductDAO {
     public List<ProductDTO> readAll() {
         List<ProductDTO> products = new ArrayList<>();
         String sql = "SELECT * FROM Products";
-        try (Statement stmt = connection.createStatement()) {
+        try (Statement stmt =DatabaseConnection.getValidConnection().createStatement()) {
             ResultSet rs = stmt.executeQuery(sql);
             while (rs.next()) {
                 products.add(new ProductDTO(
@@ -79,7 +79,7 @@ public class ProductDAOImpl implements ProductDAO {
     public List<ProductDTO> readAllBySupplier(String supplierId) {
         List<ProductDTO> products = new ArrayList<>();
         String sql = "SELECT * FROM Products WHERE supplier_id=?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement stmt =DatabaseConnection.getValidConnection().prepareStatement(sql)) {
             stmt.setString(1, supplierId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
@@ -101,7 +101,7 @@ public class ProductDAOImpl implements ProductDAO {
     @Override
     public void update(ProductDTO product) {
         String sql = "UPDATE Products SET product_name=?, supplier_id=?, quantity_per_package=?, price_per_package=?, units=? WHERE catalog_number=?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement stmt =DatabaseConnection.getValidConnection().prepareStatement(sql)) {
             stmt.setString(1, product.getName());
             stmt.setString(2, product.getSupplierId());
             stmt.setInt(3, product.getQuantityPerPackage());
@@ -117,7 +117,7 @@ public class ProductDAOImpl implements ProductDAO {
     @Override
     public void delete(String catalogNumber) {
         String sql = "DELETE FROM Products WHERE catalog_number=?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement stmt =DatabaseConnection.getValidConnection().prepareStatement(sql)) {
             stmt.setString(1, catalogNumber);
             stmt.executeUpdate();
         } catch (SQLException e) {
