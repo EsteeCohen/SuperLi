@@ -3,8 +3,6 @@ package DomainLayer.Supplier;
 import DomainLayer.OrderController;
 import DomainLayer.Supplier.Enums.*;
 import DomainLayer.Supplier.Repositories.OrderRepository;
-import DomainLayer.Supplier.Repositories.ProductRepository;
-import DomainLayer.Supplier.Repositories.ProductRepositoryImpl;
 import DomainLayer.Supplier.Repositories.SupplierRepository;
 
 
@@ -133,8 +131,7 @@ public class SystemController {
                 supplierRepository.updateSupplierBankAccount(id, value);
                 return true;
             case "contactpersons":
-                updateContactPersonFromString(supplier, value);
-                return true;
+                return updateContactPersonFromString(supplier, value);
             case "deliverydays":
                 if (supplier instanceof SupplierWithDeliveryDays) {
                     List<DaysOfTheWeek> days = parseDeliveryDays(value);
@@ -153,11 +150,30 @@ public class SystemController {
     }
 
     private boolean updateContactPersonFromString(Supplier supplier, String value) {
+        if (value == null || value.trim().isEmpty()) {
+            return false;
+        }
+
         String[] parts = value.split(",");
-        if (parts.length != 2) return false;
-        ContactPerson cp = new ContactPerson(parts[0].trim(), parts[1].trim());
+
+        if (parts.length != 2) {
+            return false;
+        }
+
+        String name = parts[0].trim();
+        String phone = parts[1].trim();
+
+        if (name.isEmpty() || phone.isEmpty()) {
+            return false;
+        }
+
+        if (!phone.matches("[0-9\\-\\s\\+\\(\\)]+")) {
+            return false;
+        }
+
+        ContactPerson cp = new ContactPerson(name, phone);
         supplier.addContactPerson(cp);
-        supplierRepository.addContactPerson(supplier.getSupplierId(),cp);
+        supplierRepository.addContactPerson(supplier.getSupplierId(), cp);
         return true;
     }
 
@@ -309,6 +325,8 @@ public class SystemController {
         if (order == null) return false;
 
         try {
+            if (newStatus < 1 || newStatus > STATUS.values().length) return false;
+
             STATUS status = STATUS.values()[newStatus-1];
             order.setStatus(status);
             if(order.getStatus() == STATUS.IN_PROCESS && order.getSupplyDate().isAfter(LocalDate.now())) {
@@ -317,7 +335,7 @@ public class SystemController {
                 OrderController.getInstance().removeOrder(order);
             }
 
-            orderRepository.updateOrderStatus(orderId,STATUS.values()[newStatus].toString());
+            orderRepository.updateOrderStatus(orderId, status.toString());
             return true;
         } catch (IllegalArgumentException e) {
             return false;
@@ -508,6 +526,9 @@ public class SystemController {
         if (supplier == null) return false;
 
         try {
+            if (paymentMethod < 0 || paymentMethod >= PaymentMethod.values().length) return false;
+            if (paymentTiming < 0 || paymentTiming >= PaymentTiming.values().length) return false;
+
             PaymentMethod method = PaymentMethod.values()[paymentMethod];
             PaymentTiming timing = PaymentTiming.values()[paymentTiming];
             Agreement agreement = new Agreement(supplierId, nextAgreementId, method, timing, validFrom, validTo);
