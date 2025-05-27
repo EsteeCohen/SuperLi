@@ -6,11 +6,4 @@
       <sourceFolder url="file://$MODULE_DIR$/dev/tests" isTestSource="true" />
     </content>
   </component>
-  <component name="TemplatesService">
-    <option name="TEMPLATE_FOLDERS">
-      <list>
-        <option value="$MODULE_DIR$/src/test/java" />
-      </list>
-    </option>
-  </component>
 </module>

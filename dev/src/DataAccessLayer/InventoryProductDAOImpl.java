@@ -13,7 +13,7 @@ import java.util.List;
 //product: name, category, [subCategories], manufacturer, shelfLocation, storageLocation, minQuantity, sellPrice, discount
 //discount: start, end, percentage #nullable
 public class InventoryProductDAOImpl implements InventoryProductDAO {
-    final String TABLE_NAME="inventory_products";
+    final String TABLE_NAME="inventoryProducts";
     private final Connection connection;
     public InventoryProductDAOImpl() throws SQLException {
         this.connection = DatabaseConnection.getConnection();
