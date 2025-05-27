@@ -9,10 +9,10 @@ import java.time.LocalDate;
 import java.util.*;
 
 public class OrderDAOImpl implements OrderDAO {
-    private final Connection connection;
+    //private final Connection connection;
 
     public OrderDAOImpl() throws SQLException {
-        this.connection = DatabaseConnection.getConnection();
+        //this.connection = DatabaseConnection.getConnection();
     }
 
     @Override
@@ -20,7 +20,8 @@ public class OrderDAOImpl implements OrderDAO {
         String sql = "INSERT INTO Orders " +
                 "(order_id, supplier_id, order_date, supply_date, contact_name, contact_phone, agreement_id, status, total_price) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (Connection connection = DatabaseConnection.getValidConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, dto.getOrderId());
             stmt.setString(2, dto.getSupplierId());
             stmt.setDate(3, Date.valueOf(dto.getOrderDate()));
@@ -39,8 +40,8 @@ public class OrderDAOImpl implements OrderDAO {
 
     private void insertOrderItems(int orderId, Map<String,Integer> items) throws SQLException {
         String sql = "INSERT INTO OrderItems (order_id, catalog_number, quantity) VALUES (?, ?, ?)";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            for (Map.Entry<String,Integer> entry : items.entrySet()) {
+ try (Connection connection = DatabaseConnection.getValidConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {            for (Map.Entry<String,Integer> entry : items.entrySet()) {
                 stmt.setInt(1, orderId);
                 stmt.setString(2, entry.getKey());
                 stmt.setInt(3, entry.getValue());
@@ -53,8 +54,8 @@ public class OrderDAOImpl implements OrderDAO {
     @Override
     public OrderDTO read(int orderId) {
         String sql = "SELECT * FROM Orders WHERE order_id=?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, orderId);
+ try (Connection connection = DatabaseConnection.getValidConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {            stmt.setInt(1, orderId);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
                 return mapResultSetToDTO(rs);
@@ -94,8 +95,8 @@ public class OrderDAOImpl implements OrderDAO {
     private Map<String,Integer> getOrderItems(int orderId) throws SQLException {
         Map<String,Integer> items = new HashMap<>();
         String sql = "SELECT catalog_number, quantity FROM OrderItems WHERE order_id=?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, orderId);
+ try (Connection connection = DatabaseConnection.getValidConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {            stmt.setInt(1, orderId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 items.put(rs.getString("catalog_number"), rs.getInt("quantity"));
@@ -108,7 +109,8 @@ public class OrderDAOImpl implements OrderDAO {
     public List<OrderDTO> readAll() {
         List<OrderDTO> list = new ArrayList<>();
         String sql = "SELECT * FROM Orders";
-        try (Statement stmt = connection.createStatement();
+        try (Connection connection = DatabaseConnection.getValidConnection();
+             Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
                 list.add(mapResultSetToDTO(rs));
@@ -123,8 +125,8 @@ public class OrderDAOImpl implements OrderDAO {
     public List<OrderDTO> readAllBySupplier(String supplierId) {
         List<OrderDTO> list = new ArrayList<>();
         String sql = "SELECT * FROM Orders WHERE supplier_id=?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, supplierId);
+ try (Connection connection = DatabaseConnection.getValidConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {            stmt.setString(1, supplierId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 list.add(mapResultSetToDTO(rs));
@@ -140,8 +142,8 @@ public class OrderDAOImpl implements OrderDAO {
         String sql = "UPDATE Orders SET supplier_id=?, order_date=?, supply_date=?, " +
                 "contact_name=?, contact_phone=?, agreement_id=?, status=?, total_price=? " +
                 "WHERE order_id=?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, dto.getSupplierId());
+ try (Connection connection = DatabaseConnection.getValidConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {            stmt.setString(1, dto.getSupplierId());
             stmt.setDate(2, Date.valueOf(dto.getOrderDate()));
             stmt.setDate(3, Date.valueOf(dto.getSupplyDate()));
             stmt.setString(4, dto.getContactName());
@@ -161,8 +163,8 @@ public class OrderDAOImpl implements OrderDAO {
 
     private void deleteOrderItems(int orderId) throws SQLException {
         String sql = "DELETE FROM OrderItems WHERE order_id=?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, orderId);
+ try (Connection connection = DatabaseConnection.getValidConnection();
+             PreparedStatement stmt = connection.prepareStatement(sql)) {            stmt.setInt(1, orderId);
             stmt.executeUpdate();
         }
     }
@@ -171,8 +173,9 @@ public class OrderDAOImpl implements OrderDAO {
     public void delete(int orderId) {
         try {
             deleteOrderItems(orderId);
-            try (PreparedStatement stmt = connection.prepareStatement(
-                    "DELETE FROM Orders WHERE order_id=?")) {
+            try (Connection connection = DatabaseConnection.getValidConnection();
+                 PreparedStatement stmt = connection.prepareStatement(
+                         "DELETE FROM Orders WHERE order_id=?")) {
                 stmt.setInt(1, orderId);
                 stmt.executeUpdate();
             }
@@ -192,7 +195,8 @@ public class OrderDAOImpl implements OrderDAO {
     public List<OrderDTO> readAllPeriodic(){
         List<OrderDTO> list = new ArrayList<>();
         String sql = "SELECT * FROM Orders WHERE is_Periodic=true";
-        try (Statement stmt = connection.createStatement();
+        try (Connection connection = DatabaseConnection.getValidConnection();
+             Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
                 list.add(mapResultSetToDTO(rs));
@@ -206,7 +210,8 @@ public class OrderDAOImpl implements OrderDAO {
     public List<OrderDTO> readAllNotPeriodic(){
         List<OrderDTO> list = new ArrayList<>();
         String sql = "SELECT * FROM Orders WHERE is_Periodic=false";
-        try (Statement stmt = connection.createStatement();
+        try (Connection connection = DatabaseConnection.getValidConnection();
+             Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
                 list.add(mapResultSetToDTO(rs));

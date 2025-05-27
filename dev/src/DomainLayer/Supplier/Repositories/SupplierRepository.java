@@ -214,6 +214,7 @@ public class SupplierRepository {
     }
 
     public void updateAgreementProducts(String supplierId, int agreementId, Map<String, Map<Integer,Integer>> discounts) {
+        System.out.println("connection: " + DatabaseConnection.isConnectionActive());
         agreementDAO.updateProductDiscounts(supplierId, agreementId, discounts);
     }
 

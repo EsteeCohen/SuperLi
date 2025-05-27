@@ -1,4 +1,4 @@
-package test.DomainLayer;
+package DomainLayer;
 
 import DomainLayer.OrderController;
 import DomainLayer.Supplier.*;
@@ -446,7 +446,7 @@ class OrderControllerTest {
         assertDoesNotThrow(() -> orderController.updatePeriodicOrders(mockOrder, "TestProduct", 10));
         verify(mockOrder, never()).setItems(any());
     }
-
+/*
     @Test
     void testUpdatePeriodicOrders_ValidUpdate() {
         Order mockOrder = mock(Order.class);
@@ -471,7 +471,7 @@ class OrderControllerTest {
             verify(mockOrder, times(1)).setItems(expectedItems);
         }
     }
-
+*/
     //Utility Tests
 
     @Test

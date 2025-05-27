@@ -208,6 +208,7 @@ public class AgreementDAOImpl implements AgreementDAO {
 
     @Override
     public void updateProductDiscounts(String supplierId, int agreementId, Map<String, Map<Integer,Integer>> discounts) {
+        System.out.println("check connection:" + DatabaseConnection.isConnectionActive());
         try {
             try (PreparedStatement del = connection.prepareStatement(
                     "DELETE FROM AgreementProductDiscounts WHERE agreement_id=?")) {
