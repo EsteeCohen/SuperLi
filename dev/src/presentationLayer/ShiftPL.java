@@ -1,6 +1,6 @@
 package presentationLayer;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,12 +12,14 @@ import serviceLayer.ShiftSL;
 
 public class ShiftPL {
 
-    private final LocalDate date;
+    private final LocalDateTime startTime;
+    private final LocalDateTime endTime;
     private final ShiftType shiftType;
     private final Map<RolePL, List<EmployeePL>> employeesAssignment;
 
     public ShiftPL(ShiftSL shift) {
-        this.date = shift.getDate();
+        this.startTime = shift.getStartTime();
+        this.endTime = shift.getEndTime();
         this.shiftType = shift.getShiftType();
         this.employeesAssignment = new HashMap<>();
         for (Map.Entry<RoleSL, List<EmployeeSL>> entry : shift.getEmployeesAssignment().entrySet()) {
@@ -31,18 +33,23 @@ public class ShiftPL {
 
     @Override
     public String toString() {
-        return "[Date: " + date +
+        return "[Start: " + startTime +
+                ", End: " + endTime +
                 ", " + (shiftType == ShiftType.EVENING ? "evening" : "morning") +
                 ", Assigned Employees :" + employeesAssignment +
                 ']';
     }
 
     public String toStringForAvailabilityForm(){
-        return "[" + date + " " + (shiftType == ShiftType.EVENING ? "evening" : "morning") + "]";
+        return "[" + startTime + " - " + endTime + " " + (shiftType == ShiftType.EVENING ? "evening" : "morning") + "]";
     }
 
-    public LocalDate getDate() {
-        return date;
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public LocalDateTime getEndTime() {
+        return endTime;
     }
 
     public ShiftType getShiftType() {

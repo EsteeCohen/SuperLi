@@ -25,7 +25,7 @@ public class ShiftsTablePresentation extends Form {
         shifts = new ArrayList<>(shiftService.getAllShift().stream()
                                              .map(shiftSL -> new ShiftPL(shiftSL))
                                              .toList());
-        shifts.sort(Comparator.comparing(ShiftPL::getDate, Comparator.naturalOrder()));
+        shifts.sort(Comparator.comparing(ShiftPL::getStartTime, Comparator.naturalOrder()));
     }
 
     public void showShiftTable() {
@@ -37,7 +37,8 @@ public class ShiftsTablePresentation extends Form {
         for (ShiftPL shift : shifts) {
             System.out.println("-----------------------------------");
             System.out.println("Shift Number: " + (shifts.indexOf(shift) + 1)); // Display shift number
-            System.out.println("Date: " + shift.getDate());
+            System.out.println("Start Time: " + shift.getStartTime());
+            System.out.println("End Time: " + shift.getEndTime());
             System.out.println("Shift Type: " + shift.getShiftType());
             System.out.println("Assigned Employees:");
             shift.getEmployeesAssignment().forEach((role, employees) -> {
@@ -45,7 +46,7 @@ public class ShiftsTablePresentation extends Form {
                 employees.forEach(employee -> System.out.println("    - " + employee.getFullName() + " (ID: " + employee.getID() + ")"));
             });
             System.out.println("Available Employees:");
-            shiftService.getAvailableEmployeesForShift(shift.getDate(), shift.getShiftType()).forEach(employee -> System.out.println("  - " + employee.getFullName() + " (ID: " + employee.getId() + ")"));
+            shiftService.getAvailableEmployeesForShift(shift.getStartTime(), shift.getShiftType().toString()).forEach(employee -> System.out.println("  - " + employee.getFullName() + " (ID: " + employee.getId() + ")"));
             System.out.println("-----------------------------------");
         }
     }
@@ -94,7 +95,7 @@ public class ShiftsTablePresentation extends Form {
             String roleName = roles.get(roleIndex);
 
             // Assign the employee to the shift
-            assigningService.assignToShift(employeeId, selectedShift.getDate(), selectedShift.getShiftType().toString(), roleName);
+            assigningService.assignToShift(employeeId, selectedShift.getStartTime(), selectedShift.getShiftType().toString(), roleName);
             System.out.println("Employee assigned to shift successfully!");
 
             String response = UserInputManager.promptForString(

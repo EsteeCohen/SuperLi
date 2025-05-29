@@ -2,6 +2,7 @@ package domainLayer;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -25,28 +26,28 @@ public class ShiftFacade {
         return shiftList;
     }
 
-    public void assignToShift(EmployeeDL employee, LocalDate date, String shiftType, RoleDL role) {
-        ShiftDL shift = shifts.get(date.toString() + shiftType);
+    public void assignToShift(EmployeeDL employee, LocalDateTime startTime, String shiftType, RoleDL role) {
+        ShiftDL shift = shifts.get(getShiftKey(startTime, shiftType));
         if (shift == null) {
-            throw new IllegalArgumentException("Shift not found for the given date and type");
+            throw new IllegalArgumentException("Shift not found for the given start time and type");
         }
         shift.assignEmployee(role, employee);
     }
 
-    public void unassignToShift(EmployeeDL employee, LocalDate date, String shiftType, RoleDL role) {
-        ShiftDL shift = shifts.get(date.toString() + shiftType);
+    public void unassignToShift(EmployeeDL employee, LocalDateTime startTime, String shiftType, RoleDL role) {
+        ShiftDL shift = shifts.get(getShiftKey(startTime, shiftType));
         if (shift == null) {
-            throw new IllegalArgumentException("Shift not found for the given date and type");
+            throw new IllegalArgumentException("Shift not found for the given start time and type");
         }
         shift.unassignEmployee(role, employee);
     }
 
-    public ShiftDL getShiftByDateAndType(LocalDate date, String shiftType) {
-        return shifts.get(date.toString() + shiftType);
+    public ShiftDL getShiftByStartTimeAndType(LocalDateTime startTime, String shiftType) {
+        return shifts.get(getShiftKey(startTime, shiftType));
     }
 
     public void addShift(ShiftDL shift) {
-        shifts.put(shift.getDate().toString() + shift.getShiftType().toString(), shift);
+        shifts.put(getShiftKey(shift.getStartTime(), shift.getShiftType().toString()), shift);
     }
 
     public void setRequirements(DayOfWeek day, ShiftType shift, RoleDL role, int quantity) {
@@ -64,14 +65,20 @@ public class ShiftFacade {
 
     public List<ShiftDL> getWeeklyShifts(LocalDate startDay) {
         List<ShiftDL> weeklyShifts = new ArrayList<>();
-        LocalDate endDay = startDay.plusDays(6); 
+        LocalDate endDay = startDay.plusDays(6);
 
         for (ShiftDL shift : shifts.values()) {
-            if (!shift.getDate().isBefore(startDay) && !shift.getDate().isAfter(endDay)) {
+            LocalDate shiftDate = shift.getStartTime().toLocalDate();
+            if (!shiftDate.isBefore(startDay) && !shiftDate.isAfter(endDay)) {
                 weeklyShifts.add(shift);
             }
         }
 
         return weeklyShifts;
+    }
+
+    // Helper method to generate the key for the shifts map
+    private String getShiftKey(LocalDateTime startTime, String shiftType) {
+        return startTime.toString() + shiftType;
     }
 }

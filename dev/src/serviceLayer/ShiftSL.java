@@ -4,18 +4,20 @@ import domainLayer.EmployeeDL;
 import domainLayer.Enums.ShiftType;
 import domainLayer.RoleDL;
 import domainLayer.ShiftDL;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class ShiftSL {
-    private final LocalDate date;
+    private final LocalDateTime startTime;
+    private final LocalDateTime endTime;
     private final ShiftType shiftType;
     private final Map<RoleSL, List<EmployeeSL>> employeesAssignment;
 
     public ShiftSL(ShiftDL shift) {
-        this.date = shift.getDate();
+        this.startTime = shift.getStartTime();
+        this.endTime = shift.getEndTime();
         this.shiftType = shift.getShiftType();
         this.employeesAssignment = new HashMap<>();
         for (Map.Entry<RoleDL, List<EmployeeDL>> entry : shift.getEmployeesAssignment().entrySet()) {
@@ -27,8 +29,12 @@ public class ShiftSL {
         }
     }
 
-    public LocalDate getDate() {
-        return date;
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public LocalDateTime getEndTime() {
+        return endTime;
     }
 
     public ShiftType getShiftType() {

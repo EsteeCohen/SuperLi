@@ -1,5 +1,6 @@
 package domainLayer;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,5 +44,20 @@ public class AvailabilityFacade {
         return null; // No availability found for the employee and shift
     }
 
+    public List<AvailabilityDL> getAllAvailabilities() {
+        return new ArrayList<>(availabilities);
+    }
 
+    public List<AvailabilityDL> getAllAvailabilities(LocalDateTime start, LocalDateTime end) {
+        List<AvailabilityDL> result = new ArrayList<>();
+        for (AvailabilityDL availability : availabilities) {
+            LocalDateTime shiftStart = availability.getShift().getStartTime();
+            LocalDateTime shiftEnd = availability.getShift().getEndTime();
+            if ((shiftStart.isEqual(start) || shiftStart.isAfter(start)) &&
+                (shiftEnd.isEqual(end) || shiftEnd.isBefore(end))) {
+                result.add(availability);
+            }
+        }
+        return result;
+    }
 }

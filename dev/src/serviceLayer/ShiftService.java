@@ -11,9 +11,10 @@ import domainLayer.Enums.ShiftType;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
-
 
 public class ShiftService {
     private ShiftFacade shiftFacade;
@@ -54,10 +55,11 @@ public class ShiftService {
         return allSlShifts;
     }
 
-    public void setAvailabilityOfEmployeeToShift(String employeeId, LocalDate date, String ShiftType, boolean available) {
-        ShiftDL shift = shiftFacade.getShiftByDateAndType(date, ShiftType);
+    // Updated: now uses startTime and shiftType
+    public void setAvailabilityOfEmployeeToShift(String employeeId, LocalDateTime startTime, String shiftType, boolean available) {
+        ShiftDL shift = shiftFacade.getShiftByStartTimeAndType(startTime, shiftType);
         if (shift == null) {
-            throw new IllegalArgumentException("Shift not found for the given date and type");
+            throw new IllegalArgumentException("Shift not found for the given start time and type");
         }
         EmployeeDL employee = employeeFacade.getEmployee(employeeId);
         if (employee == null) {
@@ -73,8 +75,9 @@ public class ShiftService {
         }
     }
 
-    public List<EmployeeDL> getAvailableEmployeesForShift(LocalDate date, ShiftType shiftType) {
-        ShiftDL shift = shiftFacade.getShiftByDateAndType(date, shiftType.toString());
+    // Updated: now uses startTime and shiftType
+    public List<EmployeeDL> getAvailableEmployeesForShift(LocalDateTime startTime, String shiftType) {
+        ShiftDL shift = shiftFacade.getShiftByStartTimeAndType(startTime, shiftType);
         return availabilityFacade.getAvailabilitiesForShift(shift);
     }
     
@@ -92,8 +95,20 @@ public class ShiftService {
         availabilityFacade.addAvailability(availability);
     }
 
+    // Updated: createShift now creates startTime and endTime based on shiftType
     private void createShift(LocalDate date, ShiftType shiftType, List<EmployeeDL> employees) {
-        ShiftDL shift = new ShiftDL(date, shiftType);
+        LocalTime start, end;
+        if (shiftType == ShiftType.MORNING) {
+            start = LocalTime.of(8, 0);
+            end = LocalTime.of(16, 0);
+        } else { // EVENING
+            start = LocalTime.of(16, 0);
+            end = LocalTime.of(23, 59);
+        }
+        LocalDateTime startTime = LocalDateTime.of(date, start);
+        LocalDateTime endTime = LocalDateTime.of(date, end);
+
+        ShiftDL shift = new ShiftDL(startTime, endTime, shiftType);
         shiftFacade.addShift(shift);
         for (EmployeeDL employee : employees) {
             createAvailabilityForShift(shift, employee);

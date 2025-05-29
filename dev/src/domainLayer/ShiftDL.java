@@ -2,7 +2,7 @@ package domainLayer;
 
 import domainLayer.Enums.ShiftType;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.HashMap;
@@ -10,21 +10,24 @@ import java.util.List;
 import java.util.Map;
 
 public class ShiftDL {
-    private final LocalDate date;
+    private final LocalDateTime startTime;
+    private final LocalDateTime endTime;
     private final ShiftType shiftType;
     private final Map<RoleDL, List<EmployeeDL>> employeesAssignment;
 
     // Main constructor
-    public ShiftDL(LocalDate date, ShiftType shiftType) {
-        this.date = date;
+    public ShiftDL(LocalDateTime startTime, LocalDateTime endTime, ShiftType shiftType) {
+        this.startTime = startTime;
+        this.endTime = endTime;
         this.shiftType = shiftType;
         this.employeesAssignment = new HashMap<>();
     }
 
     // Simplified constructor (e.g., for testing or specific use cases)
-    public ShiftDL(LocalDate date, String shiftTypeString) {
-        this.date = date;
-        this.shiftType = ShiftType.valueOf(shiftTypeString.toUpperCase()); // Convert string to ShiftType enum
+    public ShiftDL(LocalDateTime startTime, LocalDateTime endTime, String shiftTypeString) {
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.shiftType = ShiftType.valueOf(shiftTypeString.toUpperCase());
         this.employeesAssignment = new HashMap<>();
     }
 
@@ -45,7 +48,8 @@ public class ShiftDL {
 
     // Get the requirements for this shift
     public Dictionary<RoleDL, Integer> getRequirements() {
-        return WeeklyShiftRequirements.getInstance().getRequirements(date.getDayOfWeek(), shiftType);
+        // Use startTime.toLocalDate() to get the date for requirements
+        return WeeklyShiftRequirements.getInstance().getRequirements(startTime.toLocalDate().getDayOfWeek(), shiftType);
     }
 
     // Check if the shift meets the requirements
@@ -60,8 +64,12 @@ public class ShiftDL {
     }
 
     // Getters
-    public LocalDate getDate() {
-        return date;
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public LocalDateTime getEndTime() {
+        return endTime;
     }
 
     public ShiftType getShiftType() {

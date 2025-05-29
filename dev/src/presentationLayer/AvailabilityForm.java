@@ -24,7 +24,7 @@ public class AvailabilityForm extends Form {
         ArrayList<ShiftPL> workTimes = new ArrayList<>(shiftService.getWeeklyShifts(nextSunday).stream()
             .map(shiftSL -> new ShiftPL(shiftSL))
             .toList());
-        workTimes.sort(Comparator.comparing(ShiftPL::getDate, Comparator.naturalOrder()));
+        workTimes.sort(Comparator.comparing(ShiftPL::getStartTime, Comparator.naturalOrder()));
 
         if (workTimes.isEmpty()) {
             System.out.println("No shifts available.");
@@ -58,9 +58,14 @@ public class AvailabilityForm extends Form {
             try {
                 int selectedIndex = Integer.parseInt(number) - 1;
                 if (selectedIndex >= 0 && selectedIndex < workTimes.size()) {
-                    LocalDate shiftDate = workTimes.get(selectedIndex).getDate();
-                    String shiftType = workTimes.get(selectedIndex).getShiftType().toString();
-                    shiftService.setAvailabilityOfEmployeeToShift(employeeId, shiftDate, shiftType, true);
+                    ShiftPL selectedShift = workTimes.get(selectedIndex);
+                    // Use startTime and shiftType for availability
+                    shiftService.setAvailabilityOfEmployeeToShift(
+                        employeeId,
+                        selectedShift.getStartTime(),
+                        selectedShift.getShiftType().toString(),
+                        true
+                    );
                     anyValid = true;
                 } else {
                     System.out.println("Incorrect number: " + number);
