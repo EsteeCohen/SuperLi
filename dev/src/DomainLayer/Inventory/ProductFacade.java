@@ -39,8 +39,9 @@ public class ProductFacade
         try {
             inventoryProductDAO = new InventoryProductDAOImpl();
             supplyDAO = new SupplyDAOImpl();
+            initiaize();
         }
-        catch (SQLException e)
+        catch (Exception e)
         {
             System.out.println("Failed to connect to database! ProductFacade is not initialized! "+e.getMessage());
             e.printStackTrace();
@@ -58,7 +59,7 @@ public class ProductFacade
         for(InventoryProductDTO p:productsDTO)
         {
             //load the product
-            AddProduct(p.productName(),p.category(),p.subCategories(),p.manufacturer(),p.sellPrice(),p.shelfLocation(),p.storageLocation());
+            addInternalProduct(p.productName(),p.category(),p.subCategories(),p.manufacturer(),p.sellPrice(),p.shelfLocation(),p.storageLocation());
             //if have discount, load it too
             if(p.discountStart()!=null && p.discountEnd()!=null && p.discountPercentage()!=0.0)
                 SetDiscount(p.productName(),p.discountStart(),p.discountEnd(),p.discountPercentage());
@@ -68,9 +69,26 @@ public class ProductFacade
             List<SupplyDTO> suppliesOfProduct= supplyDAO.readAll(p.productName());
             for(SupplyDTO s:suppliesOfProduct)
             {
-                addSupply(p.productName(),s.costPrice(),s.expirationDate(),s.shelfQuantity(),s.storageQuantity());
+                addInternalSupply(p.productName(),s.costPrice(),s.expirationDate(),s.shelfQuantity(),s.storageQuantity());
             }
         }
+    }
+
+    /**
+     * adds a new product to the system and updates the database
+     * @param productName the name of the new product
+     * @param category the category of the new product
+     * @param subCategories the sub cats
+     * @param manufacturer manu
+     * @param sellPrice the current sell price
+     * @throws Exception if product already exists
+     */
+    public void AddProduct(String productName, String category, List<String> subCategories, String manufacturer, double sellPrice, String shelfLocation, String storageLocation) throws Exception
+    {
+        Product product=addInternalProduct(productName,category,subCategories,manufacturer,sellPrice,shelfLocation,storageLocation);
+        if(inventoryProductDAO!=null)
+            inventoryProductDAO.create(category,product);
+
     }
 
     /**
@@ -82,7 +100,7 @@ public class ProductFacade
      * @param sellPrice the current sell price
      * @throws Exception if product already exists
      */
-    public void AddProduct(String productName, String category, List<String> subCategories, String manufacturer, double sellPrice, String shelfLocation, String storageLocation) throws Exception
+    private Product addInternalProduct(String productName, String category, List<String> subCategories, String manufacturer, double sellPrice, String shelfLocation, String storageLocation) throws Exception
     {
         if(getProduct(productName)!=null)
             throw new Exception("Product with name: "+productName+" already exists!");
@@ -91,9 +109,7 @@ public class ProductFacade
         Product product=new Product(productName, subCategories, manufacturer, sellPrice,shelfLocation,storageLocation);
         productsByCategory.get(category).add(product);
         productsByName.put(productName, product);
-        if(inventoryProductDAO!=null)
-            inventoryProductDAO.create(category,product);
-
+        return product;
     }
 
     /**
@@ -177,16 +193,32 @@ public class ProductFacade
      */
     public int addSupply(String productName, double cost, LocalDate expirationDate,int shelfQuantity,int storageQuantity) throws Exception
     {
-        Product p=getProduct(productName);
-        if(p==null)
-            throw new Exception("Product "+productName+" does not exist!");
-
-        Product.Supply supply= p.addSupply(cost,expirationDate,shelfQuantity,storageQuantity);
+        Product.Supply supply=addInternalSupply(productName,cost,expirationDate,shelfQuantity,storageQuantity);
         if(supplyDAO!=null)
             supplyDAO.create(productName,supply);
         return supply.getSupplyID();
     }
 
+    /**
+     * adds a new supply of a product without saving it to the database
+     * @param productName the product the supply belongs to
+     * @param cost how much did the supermarket payed per item
+     * @param expirationDate when does the supply get expired
+     * @param shelfQuantity how many are on the shelfs
+     * @param storageQuantity how many are in the storage
+     * @return the supply
+     * @throws Exception if product not found or either of the quantities or cost in negative
+     */
+    private Product.Supply addInternalSupply(String productName, double cost, LocalDate expirationDate,int shelfQuantity,int storageQuantity) throws Exception
+    {
+        Product p=getProduct(productName);
+        if(p==null)
+            throw new Exception("Product "+productName+" does not exist!");
+
+        Product.Supply supply= p.addSupply(cost,expirationDate,shelfQuantity,storageQuantity);
+
+        return supply;
+    }
     /**
      * update the supply quantity and mark all missing product as sold
      * @param productName the product to update

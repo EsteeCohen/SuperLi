@@ -5,6 +5,7 @@ import DataAccessLayer.interfacesDAO.InventoryProductDAO;
 import DomainLayer.Inventory.Product;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 import java.sql.*;
@@ -13,6 +14,7 @@ import java.util.List;
 //product: name, category, [subCategories], manufacturer, shelfLocation, storageLocation, minQuantity, sellPrice, discount
 //discount: start, end, percentage #nullable
 public class InventoryProductDAOImpl implements InventoryProductDAO {
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     final String TABLE_NAME="inventoryProducts";
     public InventoryProductDAOImpl() throws SQLException {
     }
@@ -30,10 +32,10 @@ public class InventoryProductDAOImpl implements InventoryProductDAO {
             stmt.setInt(7, product.getMinQuantity());
             stmt.setDouble(8, product.getSellPrice());
             if(product.getDiscountStart()!=null)
-                stmt.setDate(9, Date.valueOf(product.getDiscountStart()));
+                stmt.setString(9,product.getDiscountStart().toString());
             else stmt.setNull(9, java.sql.Types.DATE);
             if(product.getDiscountEnd()!=null)
-                stmt.setDate(10, Date.valueOf( product.getDiscountEnd()));
+                stmt.setString(10, product.getDiscountEnd().toString());
             else stmt.setNull(10, java.sql.Types.DATE);
             if(product.getDisountPercentage()!=null)
             stmt.setDouble(11, product.getDisountPercentage());
@@ -63,8 +65,8 @@ public class InventoryProductDAOImpl implements InventoryProductDAO {
                         rs.getString("storage_location"),
                         rs.getInt("min_quantity"),
                         rs.getDouble("sell_price"),
-                        rs.getDate("discount_start")==null? null:rs.getDate("discount_start").toLocalDate(),
-                        rs.getDate("discount_end")==null? null:rs.getDate("discount_end").toLocalDate(),
+                        rs.getString("discount_start")==null? null:LocalDate.parse(rs.getString("discount_start"),FORMATTER),
+                        rs.getString("discount_end")==null? null:LocalDate.parse(rs.getString("discount_end"),FORMATTER),
                         rs.getDouble("discount_percentage")
                 );
             }
@@ -93,8 +95,8 @@ public class InventoryProductDAOImpl implements InventoryProductDAO {
                         rs.getString("storage_location"),
                         rs.getInt("min_quantity"),
                         rs.getDouble("sell_price"),
-                        rs.getDate("discount_start")==null? null:rs.getDate("discount_start").toLocalDate(),
-                        rs.getDate("discount_end")==null? null:rs.getDate("discount_end").toLocalDate(),
+                        rs.getString("discount_start")==null? null:LocalDate.parse(rs.getString("discount_start"),FORMATTER),
+                        rs.getString("discount_end")==null? null:LocalDate.parse(rs.getString("discount_end"),FORMATTER),
                         rs.getDouble("discount_percentage")
                 ));
             }
@@ -110,10 +112,10 @@ public class InventoryProductDAOImpl implements InventoryProductDAO {
         try (PreparedStatement stmt = DatabaseConnection.getValidConnection().prepareStatement(sql)) {
             stmt.setInt(1, product.getMinQuantity());
             if(product.getDiscountStart()!=null)
-                stmt.setDate(2, Date.valueOf(product.getDiscountStart()));
+                stmt.setString(2, product.getDiscountStart().toString());
             else stmt.setNull(2, java.sql.Types.DATE);
             if(product.getDiscountEnd()!=null)
-                stmt.setDate(3, Date.valueOf( product.getDiscountEnd()));
+                stmt.setString(3, product.getDiscountEnd().toString());
             else stmt.setNull(3, java.sql.Types.DATE);
             if(product.getDisountPercentage()!=null)
                 stmt.setDouble(4, product.getDisountPercentage());
@@ -130,8 +132,8 @@ public class InventoryProductDAOImpl implements InventoryProductDAO {
     {
         String sql = "UPDATE "+TABLE_NAME+" SET discount_start=?, discount_end=?, discount_percentage=? WHERE category=?";
         try (PreparedStatement stmt = DatabaseConnection.getValidConnection().prepareStatement(sql)) {
-            stmt.setDate(1, Date.valueOf(start));
-            stmt.setDate(2,  Date.valueOf(end));
+            stmt.setString(1, start.toString());
+            stmt.setString(2,  end.toString());
             stmt.setDouble(3, percentage);
             stmt.setString(4, category);
             stmt.executeUpdate();

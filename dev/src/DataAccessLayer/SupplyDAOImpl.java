@@ -2,15 +2,17 @@ package DataAccessLayer;
 import DataAccessLayer.DTO.SupplyDTO;
 import DataAccessLayer.interfacesDAO.SupplyDAO;
 import DomainLayer.Inventory.Product;
-import DomainLayer.Supplier.Enums.Units;
 
 import java.sql.*;
 import java.sql.Date;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 
 // supply: productName, supplyId, shelfQuantity, storageQuantity, expirationDate, costPrice
 public class SupplyDAOImpl implements SupplyDAO {
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private final String TABLE_NAME="supplies";
     public SupplyDAOImpl() throws SQLException {
     }
@@ -23,7 +25,7 @@ public class SupplyDAOImpl implements SupplyDAO {
             stmt.setInt(2, supply.getSupplyID());
             stmt.setInt(3, supply.getShelfQuantity());
             stmt.setInt(4, supply.getStorageQuantity());
-            stmt.setDate(5, Date.valueOf( supply.getExpirationDate()));
+            stmt.setString(5, supply.getExpirationDate().toString());
             stmt.setDouble(6, supply.getCost());
             stmt.executeUpdate();
         } catch (SQLException e) {
@@ -43,7 +45,7 @@ public class SupplyDAOImpl implements SupplyDAO {
                         rs.getInt("supply_id"),
                         rs.getInt("shelf_quantity"),
                         rs.getInt("storage_quantity"),
-                        rs.getDate("expiration_date").toLocalDate(),
+                        LocalDate.parse( rs.getString("expiration_date"),FORMATTER),
                         rs.getDouble(rs.getString("cost"))
                 );
             }
@@ -62,10 +64,10 @@ public class SupplyDAOImpl implements SupplyDAO {
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 supplies.add(new SupplyDTO(
-                        rs.getInt("supplier_id"),
+                        rs.getInt("supply_id"),
                         rs.getInt("shelf_quantity"),
                         rs.getInt("storage_quantity"),
-                        rs.getDate("expiration_date").toLocalDate(),
+                        LocalDate.parse( rs.getString("expiration_date"),FORMATTER),
                         rs.getDouble("cost")
                 ));
             }

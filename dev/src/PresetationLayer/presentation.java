@@ -114,9 +114,6 @@ public class presentation {
         System.out.println("EREPORT 'untilDate'");
         System.out.println();
 
-        System.out.println("to load some default data(note that it will delete all previous data):");
-        System.out.println("STARTUP");
-        System.out.println();
 
         System.out.println("to advance one day:");
         System.out.println("ND");
