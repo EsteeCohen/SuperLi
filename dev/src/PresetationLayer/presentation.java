@@ -33,7 +33,6 @@ public class presentation {
      */
     public void run()
     {
-        System.out.println("release 1.0");
         System.out.println("Welcome to the storage/inventory management system!");
 
         System.out.println("pls enter a command, for all commands enter help:");

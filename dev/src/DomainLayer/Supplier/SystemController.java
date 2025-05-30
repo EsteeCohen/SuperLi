@@ -535,9 +535,10 @@ public class SystemController {
             Agreement agreement = new Agreement(supplierId, nextAgreementId, method, timing, validFrom, validTo);
             supplier.addAgreement(agreement);
             int serialNumber = supplier.getAgreementSerialNumber(nextAgreementId);
+            supplierRepository.addAgreement(agreement);
             updateAgreementProducts(supplierId, serialNumber, IndexProducts);
             nextAgreementId++;
-            supplierRepository.addAgreement(agreement);
+
             return true;
         } catch (IllegalArgumentException e) {
             return false;
