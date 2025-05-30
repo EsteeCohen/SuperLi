@@ -69,7 +69,7 @@ public class ProductFacade
             List<SupplyDTO> suppliesOfProduct= supplyDAO.readAll(p.productName());
             for(SupplyDTO s:suppliesOfProduct)
             {
-                addInternalSupply(p.productName(),s.costPrice(),s.expirationDate(),s.shelfQuantity(),s.storageQuantity());
+                addInternalSupplyPreditermentId(p.productName(),s.supplyId(),s.costPrice(),s.expirationDate(),s.shelfQuantity(),s.storageQuantity());
             }
         }
     }
@@ -218,6 +218,16 @@ public class ProductFacade
         Product.Supply supply= p.addSupply(cost,expirationDate,shelfQuantity,storageQuantity);
 
         return supply;
+    }
+
+    //add internal supply, except when we read from the database meaning we know the id already
+    private void addInternalSupplyPreditermentId(String productName,int supplyId, double cost, LocalDate expirationDate,int shelfQuantity,int storageQuantity) throws Exception
+    {
+        Product p=getProduct(productName);
+        if(p==null)
+            throw new Exception("Product "+productName+" does not exist!");
+
+        p.addSupply(supplyId,cost,expirationDate,shelfQuantity,storageQuantity);
     }
     /**
      * update the supply quantity and mark all missing product as sold

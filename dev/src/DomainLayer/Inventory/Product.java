@@ -256,6 +256,26 @@ public class Product {
         supplies.put(id, newSupply);
         return newSupply;
     }
+    /**
+     * adds a new supply for a product
+     *SHOULD ONLY BE CALLED ON STARTUP TO AVOID EXISTING SUPPLY ID!
+     * @param cost            the cost per product the the store had to pay
+     * @param expirationDate  the expiration date for said supply
+     * @param storeQuantity   the quantity in the store
+     * @param storageQuantity the quantity in the storage
+     * @throws Exception if either quantity or cost is ngative
+     */
+    void addSupply(int supplyId,double cost, LocalDate expirationDate, int storeQuantity, int storageQuantity) throws Exception {
+        if (storeQuantity < 0 || storageQuantity < 0 || cost < 0)
+            throw new IllegalArgumentException("one of the quantities or the cost is negative!");
+        if (storeQuantity + storageQuantity == 0)
+            throw new IllegalArgumentException("new supply has quantity of 0! its like its not even there!");
+        latestSupplyId = Math.max(latestSupplyId, supplyId+1);
+        Supply newSupply = new Supply(supplyId, cost, expirationDate, storeQuantity, storageQuantity);
+        this.shelfQuantity += storeQuantity;
+        this.storageQuantity += storageQuantity;
+        supplies.put(supplyId, newSupply);
+    }
 
     public ExpiryDesc GetExpiryDescription(LocalDate until) {
         ExpiryDesc expiryDesc = new ExpiryDesc();
