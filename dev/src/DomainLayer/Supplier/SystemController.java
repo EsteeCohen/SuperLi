@@ -79,10 +79,10 @@ public class SystemController {
     public boolean addSupplierNeedsPickup(String name, String id, String bankAccount, String address,  List<String> contacts) {
         if (suppliers.containsKey(id)) return false;
         SupplierNeedsPickup supplier = new SupplierNeedsPickup(name, id, bankAccount, address);
-        addAllContacts(supplier, contacts);
+
 
         supplierRepository.addPickupSupplier(supplier);
-
+        addAllContacts(supplier, contacts);
         suppliers.put(id, supplier);
         return true;
     }
