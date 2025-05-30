@@ -1,10 +1,6 @@
 package serviceLayer.Interfaces;
 
-import java.sql.Date;
 import java.time.LocalDateTime;
-import java.util.List;
-
-import serviceLayer.TransportScheduleSL;
 
 public interface ITransportScheduleService {
     /**
@@ -14,5 +10,5 @@ public interface ITransportScheduleService {
      * @param endDate the end of the time range
      * @return a list of upcoming deliveries scheduled between startDate and endDate
      */
-    List<TransportScheduleSL> getUUpcomingDeliveries(LocalDateTime startDate, LocalDateTime endDate);
+    boolean areThereArivelesBetween(LocalDateTime startDate, LocalDateTime endDate);
 }

@@ -1,21 +1,22 @@
 package domainLayer;
 
+import domainLayer.Enums.ShiftType;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Map;
-
-import domainLayer.Enums.ShiftType;
-
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import serviceLayer.Interfaces.ITransportScheduleService;
 
 public class ShiftFacade {
-    private Map<String, ShiftDL> shifts;
+    private final Map<String, ShiftDL> shifts;
+    private final ITransportScheduleService transportInterface;
 
-    public ShiftFacade() {
-        this.shifts = new HashMap<String, ShiftDL>();
+    public ShiftFacade(ITransportScheduleService transportInterface) {
+        this.shifts = new HashMap<>();
+        this.transportInterface = transportInterface;
     }
 
     public List<ShiftDL> getAllShifts() {
@@ -81,4 +82,24 @@ public class ShiftFacade {
     private String getShiftKey(LocalDateTime startTime, String shiftType) {
         return startTime.toString() + shiftType;
     }
+
+    // Get the shift at a specific time
+    public ShiftDL getShiftAtTime(LocalDateTime time) {
+        for (ShiftDL shift : shifts.values()) {
+            if (shift.getStartTime().isEqual(time) || (time.isAfter(shift.getStartTime()) && time.isBefore(shift.getEndTime()))) {
+                return shift;
+            }
+        }
+        return null; // No shift found at the specified time
+    }
+
+    // makes sure that every shift where a delivery is expected to arrive has at least one warehouseman required
+    public void intergrateShiftToDeliveries(RoleDL warehousemanRole) {
+        for (ShiftDL shift : shifts.values()) {
+            if (transportInterface.areThereArivelesBetween(shift.getStartTime(), shift.getEndTime()) && shift.getAssignedEmployeeCount(warehousemanRole) < 1) {
+                shift.addToRequirements(warehousemanRole, 1);
+            }
+        }
+    }
+
 }

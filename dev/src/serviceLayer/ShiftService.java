@@ -4,11 +4,9 @@ import domainLayer.AvailabilityDL;
 import domainLayer.AvailabilityFacade;
 import domainLayer.EmployeeDL;
 import domainLayer.EmployeeFacade;
+import domainLayer.Enums.ShiftType;
 import domainLayer.ShiftDL;
 import domainLayer.ShiftFacade;
-import domainLayer.WeeklyShiftRequirements;
-import domainLayer.Enums.ShiftType;
-
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;

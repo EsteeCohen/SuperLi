@@ -3,31 +3,19 @@ package serviceLayer;
 import java.time.LocalDateTime;
 
 public class TransportScheduleSL {
-    private String transportId;
-    private LocalDateTime arrivalTime;
-    private int durationMinutes;
-    private String requiredLicense;
-    private String assignedDriverId;
 
-    public TransportScheduleSL(String transportId, LocalDateTime arrivalTime, int durationMinutes, String requiredLicense, 
-                               String assignedDriverId) {
-        this.transportId = transportId;
+    private final LocalDateTime arrivalTime;
+    private final String requiredLicense;
+    private final String assignedDriverId;
+
+    public TransportScheduleSL(LocalDateTime arrivalTime, String requiredLicense, String assignedDriverId) {
         this.arrivalTime = arrivalTime;
-        this.durationMinutes = durationMinutes;
         this.requiredLicense = requiredLicense;
         this.assignedDriverId = assignedDriverId;
     }
 
-    public String getTransportId() {
-        return transportId;
-    }
-
     public LocalDateTime getArrivalTime() {
         return arrivalTime;
-    }
-
-    public int getDurationMinutes() {
-        return durationMinutes;
     }
 
     public String getRequiredLicense() {
@@ -36,9 +24,5 @@ public class TransportScheduleSL {
 
     public String getAssignedDriverId() {
         return assignedDriverId;
-    }
-
-    public void setAssignedDriverId(String assignedDriverId) {
-        this.assignedDriverId = assignedDriverId;
     }
 }

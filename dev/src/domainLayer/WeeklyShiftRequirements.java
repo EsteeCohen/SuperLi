@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 
+// this class manages the generic weekly shift requirements for different roles in shifts
 public class WeeklyShiftRequirements {
     private final Map<String, Dictionary<RoleDL, Integer>> weeklyRequirements;
 
