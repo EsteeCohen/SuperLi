@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import DataAccessLayer.DTO.InventoryProductDTO;
+import DataAccessLayer.DTO.SupplyDTO;
 import DataAccessLayer.InventoryProductDAOImpl;
 import DataAccessLayer.SupplyDAOImpl;
 import DataAccessLayer.interfacesDAO.InventoryProductDAO;
@@ -46,6 +48,31 @@ public class ProductFacade
             supplyDAO=null;
         }
     }
+
+    /**
+     * run in the start and load the database into the facade
+     */
+    private void initiaize() throws Exception
+    {
+        List<InventoryProductDTO> productsDTO=inventoryProductDAO.readAll();
+        for(InventoryProductDTO p:productsDTO)
+        {
+            //load the product
+            AddProduct(p.productName(),p.category(),p.subCategories(),p.manufacturer(),p.sellPrice(),p.shelfLocation(),p.storageLocation());
+            //if have discount, load it too
+            if(p.discountStart()!=null && p.discountEnd()!=null && p.discountPercentage()!=0.0)
+                SetDiscount(p.productName(),p.discountStart(),p.discountEnd(),p.discountPercentage());
+            getProduct(p.productName()).setMinQuantity(p.minQuantity());
+
+            //load all the supplies of this product
+            List<SupplyDTO> suppliesOfProduct= supplyDAO.readAll(p.productName());
+            for(SupplyDTO s:suppliesOfProduct)
+            {
+                addSupply(p.productName(),s.costPrice(),s.expirationDate(),s.shelfQuantity(),s.storageQuantity());
+            }
+        }
+    }
+
     /**
      * adds a new product to the system
      * @param productName the name of the new product

@@ -79,6 +79,7 @@ public class Product {
             return discount.getEndDate();
         return null;
     }
+    void setMinQuantity(int minQuantity) {this.minQuantity = minQuantity;}
     public Double getDisountPercentage()
     {
         if(discount!=null)
