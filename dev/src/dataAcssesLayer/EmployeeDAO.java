@@ -99,20 +99,56 @@ public class EmployeeDAO {
         }
     }
 
-    public void updateEmployee(EmployeeDAO employee) throws SQLException{
-        // Implementation to update an existing employee
+    public void updateEmployee(EmployeeDTO employee) throws SQLException{
+        try (Connection employeeConn = DriverManager.getConnection("jdbc:sqlite:" + DBPath)) {
+            String query = "UPDATE " + employeeTableName + " SET password = ?, fullName = ?, workStartingDate = ?, wage = ?, wageType = ?, yearlySickDays = ?, yearlyDaysOff = ? WHERE id = ?";
+            try (PreparedStatement statement = employeeConn.prepareStatement(query)) {
+                statement.setString(1, employee.getPassword());
+                statement.setString(2, employee.getFullName());
+                statement.setString(3, employee.getWorkStartingDate().toString());
+                statement.setInt(4, employee.getWage());
+                statement.setString(5, employee.getWageType());
+                statement.setInt(6, employee.getYearlySickDays());
+                statement.setInt(7, employee.getYearlyDaysOff());
+                statement.setString(8, employee.getId());
+                statement.executeUpdate();
+            }
+        }
     }
 
     public EmployeeDTO deleteEmployee(String id) throws SQLException{
-        // Implementation to delete an employee by ID
-        return null; // Placeholder return statement
+        EmployeeDTO employee = getEmployeeById(id);
+        if (employee != null) {
+            try (Connection employeeConn = DriverManager.getConnection("jdbc:sqlite:" + DBPath)) {
+                String query = "DELETE FROM " + employeeTableName + " WHERE id = ?";
+                try (PreparedStatement statement = employeeConn.prepareStatement(query)) {
+                    statement.setString(1, id);
+                    statement.executeUpdate();
+                }
+            }
+        }
+        return employee;
     }
 
     public void assignRoleToEmployee(String employeeId, String roleId) throws SQLException {
-        // Implementation to assign a role to an employee
+        try (Connection employeeConn = DriverManager.getConnection("jdbc:sqlite:" + DBPath)) {
+            String query = "INSERT INTO EmployeeRoles (employeeId, roleId) VALUES (?, ?)";
+            try (PreparedStatement statement = employeeConn.prepareStatement(query)) {
+                statement.setString(1, employeeId);
+                statement.setString(2, roleId);
+                statement.executeUpdate();
+            }
+        }
     }
 
     public void removeRoleFromEmployee(String employeeId, String roleId) throws SQLException {
-        // Implementation to remove a role from an employee
+        try (Connection employeeConn = DriverManager.getConnection("jdbc:sqlite:" + DBPath)) {
+            String query = "DELETE FROM EmployeeRoles WHERE employeeId = ? AND roleId = ?";
+            try (PreparedStatement statement = employeeConn.prepareStatement(query)) {
+                statement.setString(1, employeeId);
+                statement.setString(2, roleId);
+                statement.executeUpdate();
+            }
+        }
     }
 }
