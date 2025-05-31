@@ -1,51 +1,102 @@
 package dataAcssesLayer;
 
 import dtos.EmployeeDTO;
+import dtos.RoleDTO;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.List;
 
 public class EmployeeDAO {
-    private final String dbPath = "..//..//db.db";
-    private final String tableName = "Employees";
+    private final String employeeTableName = DBConstants.EMPLOYEE_TABLE;
+    private final String DBPath = DBConstants.DB_PATH;
+    private final String roleTableName = DBConstants.ROLE_TABLE;
 
     public EmployeeDTO getEmployeeById(String id) throws SQLException {
-        EmployeeDTO employee = null;
-        java.sql.Connection conn = null;
-        java.sql.PreparedStatement stmt = null;
-        java.sql.ResultSet rs = null;
-        try {
-            conn = java.sql.DriverManager.getConnection("jdbc:sqlite:" + dbPath);
-            String sql = "SELECT * FROM " + tableName + " WHERE id = ?";
-            stmt = conn.prepareStatement(sql);
-            stmt.setString(1, id);
-            rs = stmt.executeQuery();
-            if (rs.next()) {
-                employee = new EmployeeDTO(
-                    rs.getString("id"),
-                    rs.getString("fullName"),
-                    rs.getString("password"),
-                    rs.getString("startDate"),
-                    rs.getInt("wage"),
-                    rs.getString("wageType"),
-                    rs.getInt("yearlySickDays"),
-                    rs.getInt("yearlyDaysOff")
-                );
+        try (Connection employeeConn = DriverManager.getConnection("jdbc:sqlite:" + DBPath)) {
+            String query = "SELECT * FROM " + employeeTableName + " WHERE id = ?";
+            try (PreparedStatement statement = employeeConn.prepareStatement(query)) {
+                statement.setString(1, id);
+                try (ResultSet rs = statement.executeQuery()) {
+                    if (rs.next()) {
+                        String password = rs.getString("password");
+                        String fullName = rs.getString("fullName");
+                        LocalDate workStartingDate = LocalDate.parse(rs.getString("workStartingDate"));
+                        int wage = rs.getInt("wage");
+                        String wageType = rs.getString("wageType");
+                        int yearlySickDays = rs.getInt("yearlySickDays");
+                        int yearlyDaysOff = rs.getInt("yearlyDaysOff");
+                        List<RoleDTO> roles = getRolesForEmployee(id);
+                        return new EmployeeDTO(id, password, fullName, workStartingDate, wage,
+                                wageType, yearlySickDays, yearlyDaysOff, roles);
+                    } else {
+                        return null;
+                    }
+                }
             }
-        } finally {
-            if (rs != null) rs.close();
-            if (stmt != null) stmt.close();
-            if (conn != null) conn.close();
         }
-        return employee;
+    }
+
+    private List<RoleDTO> getRolesForEmployee(String employeeId) throws SQLException {
+        List<RoleDTO> roles = new java.util.ArrayList<>();
+        try (Connection roleConn = DriverManager.getConnection("jdbc:sqlite:" + DBPath)) {
+            String query = "SELECT * FROM " + roleTableName + " WHERE employeeId = ?";
+            try (PreparedStatement statement = roleConn.prepareStatement(query)) {
+                statement.setString(1, employeeId);
+                try (ResultSet rs = statement.executeQuery()) {
+                    while (rs.next()) {
+                        String roleName = rs.getString("roleName");
+                        roles.add(new RoleDTO(roleName));
+                    }
+                }
+            }
+        }
+        return roles;
     }
 
     public List<EmployeeDTO> getAllEmployees() throws SQLException{
-        // Implementation to retrieve all employees
-        return null; // Placeholder return statement
+        try (Connection employeeConn = DriverManager.getConnection("jdbc:sqlite:" + DBPath)) {
+            String query = "SELECT * FROM " + employeeTableName;
+            try (PreparedStatement statement = employeeConn.prepareStatement(query);
+                 ResultSet rs = statement.executeQuery()) {
+                List<EmployeeDTO> employees = new java.util.ArrayList<>();
+                while (rs.next()) {
+                    String id = rs.getString("id");
+                    String password = rs.getString("password");
+                    String fullName = rs.getString("fullName");
+                    LocalDate workStartingDate = LocalDate.parse(rs.getString("workStartingDate"));
+                    int wage = rs.getInt("wage");
+                    String wageType = rs.getString("wageType");
+                    int yearlySickDays = rs.getInt("yearlySickDays");
+                    int yearlyDaysOff = rs.getInt("yearlyDaysOff");
+                    List<RoleDTO> roles = getRolesForEmployee(id);
+                    employees.add(new EmployeeDTO(id, password, fullName, workStartingDate, wage,
+                            wageType, yearlySickDays, yearlyDaysOff, roles));
+                }
+                return employees;
+            }
+        }
     }
 
-    public void instertEmployee(EmployeeDAO employee) throws SQLException{
-        // Implementation to insert a new employee
+    public void instertEmployee(EmployeeDTO employee) throws SQLException{
+        try (Connection employeeConn = DriverManager.getConnection("jdbc:sqlite:" + DBPath)) {
+            String query = "INSERT INTO " + employeeTableName + " (id, password, fullName, workStartingDate, wage, wageType, yearlySickDays, yearlyDaysOff) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            try (PreparedStatement statement = employeeConn.prepareStatement(query)) {
+                statement.setString(1, employee.getId());
+                statement.setString(2, employee.getPassword());
+                statement.setString(3, employee.getFullName());
+                statement.setString(4, employee.getWorkStartingDate().toString());
+                statement.setInt(5, employee.getWage());
+                statement.setString(6, employee.getWageType());
+                statement.setInt(7, employee.getYearlySickDays());
+                statement.setInt(8, employee.getYearlyDaysOff());
+                statement.executeUpdate();
+            }
+        }
     }
 
     public void updateEmployee(EmployeeDAO employee) throws SQLException{
