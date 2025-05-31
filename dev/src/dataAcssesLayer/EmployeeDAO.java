@@ -2,7 +2,6 @@ package dataAcssesLayer;
 
 import dtos.EmployeeDTO;
 import dtos.RoleDTO;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -12,8 +11,9 @@ import java.time.LocalDate;
 import java.util.List;
 
 public class EmployeeDAO {
-    private final String employeeTableName = DBConstants.EMPLOYEE_TABLE;
+    
     private final String DBPath = DBConstants.DB_PATH;
+    private final String employeeTableName = DBConstants.EMPLOYEE_TABLE;
     private final String roleTableName = DBConstants.ROLE_TABLE;
 
     public EmployeeDTO getEmployeeById(String id) throws SQLException {
