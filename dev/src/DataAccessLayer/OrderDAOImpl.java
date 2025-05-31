@@ -77,7 +77,7 @@ public class OrderDAOImpl implements OrderDAO {
         String status = rs.getString("status");
         double totalPrice = rs.getDouble("total_price");
         Boolean isPeriodic = rs.getBoolean("is_periodic");
-        Map<String,Integer> items = getOrderItems(id);
+        Map<String,Integer> items = new HashMap<>();
 
         return new OrderDTO(id,
                 supplierId,
@@ -116,6 +116,10 @@ public class OrderDAOImpl implements OrderDAO {
             while (rs.next()) {
                 list.add(mapResultSetToDTO(rs));
             }
+            for(OrderDTO dto : list)
+            {
+                dto.setItems( getOrderItems(dto.getOrderId()));
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -131,6 +135,10 @@ public class OrderDAOImpl implements OrderDAO {
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 list.add(mapResultSetToDTO(rs));
+            }
+            for(OrderDTO dto : list)
+            {
+                dto.setItems( getOrderItems(dto.getOrderId()));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -204,6 +212,10 @@ public class OrderDAOImpl implements OrderDAO {
             while (rs.next()) {
                 list.add(mapResultSetToDTO(rs));
             }
+            for(OrderDTO dto : list)
+            {
+                dto.setItems( getOrderItems(dto.getOrderId()));
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -218,6 +230,10 @@ public class OrderDAOImpl implements OrderDAO {
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
                 list.add(mapResultSetToDTO(rs));
+            }
+            for(OrderDTO dto : list)
+            {
+                dto.setItems( getOrderItems(dto.getOrderId()));
             }
         } catch (SQLException e) {
             e.printStackTrace();

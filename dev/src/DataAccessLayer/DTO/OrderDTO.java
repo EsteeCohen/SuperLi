@@ -95,6 +95,8 @@ public class OrderDTO {
     public double getTotalPrice() { return totalPrice; }
     public Map<String, Integer> getItems() { return items; }
 
+    //setters
+    public void setItems(Map<String, Integer> items) { this.items = items; }
     public void setStatus(String newStatus) {
         this.status = STATUS.valueOf(newStatus).toString();
     }
