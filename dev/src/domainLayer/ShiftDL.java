@@ -96,7 +96,7 @@ public class ShiftDL {
         if (requirements != null && requirements.get(role) != null) {
             return requirements.get(role);
         } else {
-            throw new IllegalArgumentException("Role not found in requirements.");
+            return 0; // Role not found in requirements
         }
     }
 

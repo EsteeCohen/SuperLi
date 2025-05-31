@@ -9,8 +9,7 @@ public class DriverAvailabilityInfoDTO {
     private String driverLicenseType;
     private List<TimeSlot> availableTimeSlots;
 
-    public DriverAvailabilityInfoDTO(String driverId, String driverName, String driverLicenseType,
-                                      List<TimeSlot> availableTimeSlots) {
+    public DriverAvailabilityInfoDTO(String driverId, String driverName, String driverLicenseType, List<TimeSlot> availableTimeSlots) {
         this.driverId = driverId;
         this.driverName = driverName;
         this.driverLicenseType = driverLicenseType;

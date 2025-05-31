@@ -96,7 +96,7 @@ public class ShiftFacade {
     // makes sure that every shift where a delivery is expected to arrive has at least one warehouseman required
     public void intergrateShiftToDeliveries(RoleDL warehousemanRole) {
         for (ShiftDL shift : shifts.values()) {
-            if (transportInterface.areThereArivelesBetween(shift.getStartTime(), shift.getEndTime()) && shift.getAssignedEmployeeCount(warehousemanRole) < 1) {
+            if (transportInterface.areThereArivelesBetween(shift.getStartTime(), shift.getEndTime()) && shift.getRequiredEmployeeCount(warehousemanRole) < 1) {
                 shift.addToRequirements(warehousemanRole, 1);
             }
         }
