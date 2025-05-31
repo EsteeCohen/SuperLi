@@ -216,7 +216,7 @@ public class ProductFacade
             throw new Exception("Product "+productName+" does not exist!");
 
         Product.Supply supply= p.addSupply(cost,expirationDate,shelfQuantity,storageQuantity);
-
+        System.out.println("Added supply "+supply.getSupplyID()+" for product "+productName+", with quantity: "+shelfQuantity+":"+storageQuantity );
         return supply;
     }
 

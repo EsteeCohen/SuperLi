@@ -59,7 +59,7 @@ public class OrderController {
             }
         } else {
             for(Order order : orders) {
-                if(order.getSupplyDate().isAfter(LocalDate.now())) {
+                if(order.getSupplyDate().isAfter(TimeController.getDate())) {
                     this.orders.add(order);
                 }
                 if (order.getOrderId() > maxId) {
@@ -230,7 +230,7 @@ public class OrderController {
      */
     public Order createAutomaticShortageOrders(String supplierId, int agreementId, String productName, int requiredQuantity) {
         SystemController systemController = SystemController.getInstance();
-        LocalDate orderDate = LocalDate.now();
+        LocalDate orderDate = TimeController.getDate();
         Supplier supplier = systemController.getSupplierObjectById(supplierId);
         if (supplier == null) return null;
         LocalDate supplyDate = supplier.getClosestSupplyDate(orderDate);
@@ -301,7 +301,7 @@ public class OrderController {
         String catalogNumber = supplier.findProductByName(productName).getCatalogNumber();
         items.put(catalogNumber, requiredQuantity);
         order.setItems(items);
-        orderRepository.addProductToOrder(order.getOrderId(), productName, requiredQuantity);
+        orderRepository.addProductToOrder(order.getOrderId(), catalogNumber, requiredQuantity);
     }
 
     /**

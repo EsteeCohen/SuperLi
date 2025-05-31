@@ -21,8 +21,6 @@ public class ServiceFactory {
     private final ReportService reportService;
     public ServiceFactory()
     {
-        ProductFacade.flush();
-        ReportFacade.flush();
         productFacade=ProductFacade.getInstance();
         reportFacade=ReportFacade.getInstance();
         productService=new ProductService(productFacade);

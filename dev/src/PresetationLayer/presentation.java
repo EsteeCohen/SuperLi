@@ -44,6 +44,7 @@ public class presentation {
             command =scanner.nextLine().toLowerCase();
         }
         System.out.println("Good bye!");
+        System.exit(0);
     }
 
     //like normal run, but with a custom scanner

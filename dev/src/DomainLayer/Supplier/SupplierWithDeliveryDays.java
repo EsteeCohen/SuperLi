@@ -36,7 +36,7 @@ public class SupplierWithDeliveryDays extends  Supplier{
         for (DaysOfTheWeek deliveryDay : deliveryDays) {
             int deliveryValue = deliveryDay.ordinal() + 1;
             int daysUntil = deliveryValue - todayValue;
-            if (daysUntil < 0) {
+            if (daysUntil <= 0) {//can't be =0 because we were told to give at least 1 day off
                 daysUntil += 7; // next week
             }
             if (daysUntil <= minDays) {
