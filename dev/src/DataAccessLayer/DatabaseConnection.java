@@ -59,8 +59,8 @@ import java.sql.SQLException;
 // Manages the DB connection (Singleton)
 public class DatabaseConnection {
     private static Connection connection;
-    private static final String DB_URL = "jdbc:sqlite:supplyinventory.db";
-    //private static final String DB_URL = "jdbc:sqlite:C:/Users/User/Desktop/long_name/ADSS_Group_AI/dev/src/supplyinventory.db";
+    //private static final String DB_URL = "jdbc:sqlite:supplyinventory.db";
+    private static final String DB_URL = "jdbc:sqlite:C:/Users/User/Desktop/long_name/ADSS_Group_AI/dev/src/supplyinventory.db";
 
     public static Connection getConnection() throws SQLException {
         if (connection == null || connection.isClosed()) {

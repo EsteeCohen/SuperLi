@@ -13,41 +13,73 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class ProductFacadeTest {
     ProductFacade facade;
-    private static Connection connection;
 
 
     @BeforeEach
     void setUp() {
-        try {
-            connection = DatabaseConnection.getConnection();
-        }
-        catch (Exception e){}
-        facade=ProductFacade.getInstance();
-        // Clear database tables first
+        ProductFacade.flush();
+        DatabaseConnection.closeConnection();
+        facade = ProductFacade.getInstance();
 
-            // Disable foreign key checks if needed (depends on your DB)
-            try (Statement stmt = connection.createStatement()) {
-                // Delete from SUPPLIES first (child table)
+        Connection conn = null;
+        try {
+            conn = DatabaseConnection.getValidConnection();
+            conn.setAutoCommit(false);  // Begin transaction
+
+            // First clear all data
+            try (Statement stmt = conn.createStatement()) {
                 stmt.executeUpdate("DELETE FROM SUPPLIES");
-                // Then delete from INVENTORYPRODUCTS (parent table)
                 stmt.executeUpdate("DELETE FROM INVENTORYPRODUCTS");
+                System.out.println("Deleted all data from database");
             }
-            catch (SQLException e) {
-            fail("Failed to clean database: " + e.getMessage());
-        }
 
-        try {
+            // Now wait for the deletion to complete
+            conn.commit();
+
+            // Create new connection and transaction for adding products
+            conn.setAutoCommit(false);
+
+            // Add products one by one
             facade.AddProduct("11", "1", new ArrayList<>(), "", 1,"","");
             facade.AddProduct("12", "1", new ArrayList<>(), "", 1,"","");
             facade.AddProduct("21", "2", new ArrayList<>(), "", 1,"","");
             facade.AddProduct("31", "3", new ArrayList<>(), "", 1,"","");
+
+            conn.commit();
+        } catch (Exception e) {
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
+            System.out.println("Setup failed: " + e.getMessage());
+            e.printStackTrace();
+            fail("Setup failed: " + e.getMessage());
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.close();
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
         }
-        catch(Exception e){e.printStackTrace();};
     }
+
+
 
     @AfterEach
     void tearDown() {
         ProductFacade.flush();
+        DatabaseConnection.closeConnection();
+        try (Statement stmt = DatabaseConnection.getConnection().createStatement()) {
+            stmt.executeUpdate("DELETE FROM SUPPLIES");
+            stmt.executeUpdate("DELETE FROM INVENTORYPRODUCTS");
+            System.out.println("Deleted all data from database");
+        }
+        catch(Exception ignored){}
     }
 
     @Test
@@ -80,7 +112,7 @@ class ProductFacadeTest {
             assertDoesNotThrow(()->{facade.AddProduct("13", "1", new ArrayList<>(), "", 1,"","");});
 
             // Verify database state
-            try (PreparedStatement stmt = connection.prepareStatement("SELECT * FROM inventoryProducts WHERE product_name = ?")) {
+            try (PreparedStatement stmt = DatabaseConnection.getValidConnection().prepareStatement("SELECT * FROM inventoryProducts WHERE product_name = ?")) {
 
                 stmt.setString(1, "13");
                 ResultSet rs = stmt.executeQuery();
@@ -151,7 +183,7 @@ class ProductFacadeTest {
             int supplyId = facade.addSupply("11", 10, LocalDate.now(), 20, 15);
             // Verify database state
             try (
-                 PreparedStatement stmt = connection.prepareStatement("SELECT * FROM supplies WHERE supply_id = ?")) {
+                 PreparedStatement stmt = DatabaseConnection.getValidConnection().prepareStatement("SELECT * FROM supplies WHERE supply_id = ?")) {
 
                 stmt.setInt(1, supplyId);
                 ResultSet rs = stmt.executeQuery();
@@ -204,14 +236,16 @@ class ProductFacadeTest {
             try {
                 supId1=facade.addSupply("11",1,LocalDate.now(),10,10);
             }
-            catch(Exception ignored){}
+            catch(Exception e){
+                e.printStackTrace();
+            }
             // Add supply
             facade.updateSoldQuantity("11",supId1,5,5);
 
             // Verify database state
             try (
 
-                 PreparedStatement stmt = DatabaseConnection.getConnection().prepareStatement("SELECT * FROM supplies WHERE supply_id = ?")) {
+                 PreparedStatement stmt = DatabaseConnection.getValidConnection().prepareStatement("SELECT * FROM supplies WHERE supply_id = ?")) {
 
                 stmt.setInt(1, supId1);
                 ResultSet rs = stmt.executeQuery();
@@ -266,7 +300,7 @@ class ProductFacadeTest {
 
             // Verify database state
             try (
-                 PreparedStatement stmt = connection.prepareStatement("SELECT * FROM supplies WHERE supply_id = ?")) {
+                 PreparedStatement stmt = DatabaseConnection.getValidConnection().prepareStatement("SELECT * FROM supplies WHERE supply_id = ?")) {
 
                 stmt.setInt(1, supId1);
                 ResultSet rs = stmt.executeQuery();
@@ -276,6 +310,7 @@ class ProductFacadeTest {
                 assertEquals(5, rs.getInt("storage_quantity"));
             }
         } catch (Exception e) {
+            e.printStackTrace();
             fail("Should not throw exception: " + e.getMessage());
         }
     }
