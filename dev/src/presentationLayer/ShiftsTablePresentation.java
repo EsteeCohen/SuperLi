@@ -45,6 +45,12 @@ public class ShiftsTablePresentation extends Form {
                 System.out.println("  Role: " + role.getName());
                 employees.forEach(employee -> System.out.println("    - " + employee.getFullName() + " (ID: " + employee.getID() + ")"));
             });
+            System.out.println("Shift Requirements:");
+            if (shift.getShiftRoleRequirements() != null && shift.getShiftRoleRequirements() instanceof java.util.Map) {
+                ((java.util.Map<?, ?>)shift.getShiftRoleRequirements()).entrySet().forEach(entry -> {
+                    System.out.println("  Role: " + ((java.util.Map.Entry<?, ?>)entry).getKey().toString() + ", Required: " + ((java.util.Map.Entry<?, ?>)entry).getValue());
+                });
+            }
             System.out.println("Available Employees:");
             shiftService.getAvailableEmployeesForShift(shift.getStartTime(), shift.getShiftType().toString()).forEach(employee -> System.out.println("  - " + employee.getFullName() + " (ID: " + employee.getId() + ")"));
             System.out.println("-----------------------------------");
