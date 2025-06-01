@@ -3,6 +3,7 @@ package src.main.entities;
 import java.time.LocalDate;
 import java.util.List;
 import src.main.enums.OrderStatus;
+import src.main.enums.OrderType;
 
 
 public class Order {
@@ -13,6 +14,7 @@ public class Order {
     private List<Item> items;
     private Transport transport;
     private OrderStatus status;
+    private OrderType type;
 
     public Order(LocalDate date, Site site, List<Item> items){
         this.id = idCounter++;
@@ -21,6 +23,17 @@ public class Order {
         this.items = items;
         this.transport = null; //ברירת מחדל שלא צריך משלוח
         this.status = OrderStatus.CREATED;
+        this.type = OrderType.DELIVERY; // ברירת מחדל
+    }
+
+    public Order(LocalDate date, Site site, List<Item> items, OrderType type){
+        this.id = idCounter++;
+        setDate(date);
+        this.site = site;
+        this.items = items;
+        this.transport = null; //ברירת מחדל שלא צריך משלוח
+        this.status = OrderStatus.CREATED;
+        this.type = type;
     }
 
     public Order(int id, LocalDate date, Site site, List<Item> items){
@@ -30,6 +43,7 @@ public class Order {
         this.items = items;
         this.transport = null; //ברירת מחדל שלא צריך משלוח
         this.status = OrderStatus.CREATED;
+        this.type = OrderType.DELIVERY; // ברירת מחדל
     }
 
 //     GETTERS
@@ -54,6 +68,9 @@ public class Order {
     public OrderStatus getStatus(){
         return status;
     }
+    public OrderType getType() {
+        return type;
+    }
 
 //    SETTERS
     public void setDate(LocalDate date){
@@ -73,6 +90,9 @@ public class Order {
     }
     public void setStatus(OrderStatus status){
         this.status = status;
+    }
+    public void setType(OrderType type) {
+        this.type = type;
     }
 
 //    METHODS

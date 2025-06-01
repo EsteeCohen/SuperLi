@@ -66,6 +66,11 @@ public class User {
         this.active = active;
     }
     
+    // בדיקת סיסמה
+    public boolean checkPassword(String password) {
+        return this.password != null && this.password.equals(password);
+    }
+    
     //בדיקה אם למשתמש יש הרשאה מסוימת
     public boolean hasPermission(String operation, String resourceType) {
         switch (this.role) {
