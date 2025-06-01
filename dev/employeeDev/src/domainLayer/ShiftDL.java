@@ -1,7 +1,7 @@
-package domainLayer;
+package employeeDev.src.domainLayer;
 
-import domainLayer.Enums.ShiftType;
-import presentationLayer.RolePL;
+import employeeDev.src.domainLayer.Enums.ShiftType;
+import employeeDev.src.presentationLayer.RolePL;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

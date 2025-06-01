@@ -1,11 +1,11 @@
-package presentationLayer;
+package employeeDev.src.presentationLayer;
 
 import java.util.Scanner;
-import serviceLayer.AssigningService;
-import serviceLayer.EmployeeService;
-import serviceLayer.Factory;
-import serviceLayer.RoleService;
-import serviceLayer.ShiftService;
+import employeeDev.src.serviceLayer.AssigningService;
+import employeeDev.src.serviceLayer.EmployeeService;
+import employeeDev.src.serviceLayer.Factory;
+import employeeDev.src.serviceLayer.RoleService;
+import employeeDev.src.serviceLayer.ShiftService;
 
 public class HRSystemUI {
 

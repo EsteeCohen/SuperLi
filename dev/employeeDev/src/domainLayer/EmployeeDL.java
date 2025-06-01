@@ -1,6 +1,6 @@
-package domainLayer;
+package employeeDev.src.domainLayer;
 
-import domainLayer.Enums.WageType;
+import employeeDev.src.domainLayer.Enums.WageType;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;

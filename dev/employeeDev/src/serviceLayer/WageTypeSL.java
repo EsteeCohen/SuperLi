@@ -1,4 +1,4 @@
-package serviceLayer;
+package employeeDev.src.serviceLayer;
 
 public enum WageTypeSL {
     HOURLY('H'),

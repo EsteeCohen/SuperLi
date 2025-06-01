@@ -1,4 +1,4 @@
-package dataAcssesLayer;
+package employeeDev.src.dataAcssesLayer;
 
 public class DBConstants {
     public static final String DB_PATH = "..//..//db.db";

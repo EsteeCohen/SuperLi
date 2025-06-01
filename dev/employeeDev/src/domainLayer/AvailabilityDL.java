@@ -1,4 +1,4 @@
-package domainLayer;
+package employeeDev.src.domainLayer;
 
 public class AvailabilityDL {
     private final ShiftDL shift;

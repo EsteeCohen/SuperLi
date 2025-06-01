@@ -1,4 +1,4 @@
-package presentationLayer;
+package employeeDev.src.presentationLayer;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -6,10 +6,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import domainLayer.Enums.ShiftType;
-import serviceLayer.EmployeeSL;
-import serviceLayer.RoleSL;
-import serviceLayer.ShiftSL;
+import employeeDev.src.domainLayer.Enums.ShiftType;
+import employeeDev.src.serviceLayer.EmployeeSL;
+import employeeDev.src.serviceLayer.RoleSL;
+import employeeDev.src.serviceLayer.ShiftSL;
 
 public class ShiftPL {
 

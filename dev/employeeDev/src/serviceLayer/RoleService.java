@@ -1,6 +1,6 @@
-package serviceLayer;
+package employeeDev.src.serviceLayer;
 
-import domainLayer.RoleFacade;
+import employeeDev.src.domainLayer.RoleFacade;
 import java.util.List;
 
 public class RoleService {

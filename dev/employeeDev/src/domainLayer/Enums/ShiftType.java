@@ -1,4 +1,4 @@
-package domainLayer.Enums;
+package employeeDev.src.domainLayer.Enums;
 
 public enum ShiftType {
     MORNING("Morning"),

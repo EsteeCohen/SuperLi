@@ -1,9 +1,9 @@
-package serviceLayer;
+package employeeDev.src.serviceLayer;
 
 import java.util.Map;
 
-import domainLayer.EmployeeDL;
-import domainLayer.EmployeeFacade;
+import employeeDev.src.domainLayer.EmployeeDL;
+import employeeDev.src.domainLayer.EmployeeFacade;
 
 public class EmployeeService {
     private EmployeeFacade employeeFacade;

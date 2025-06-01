@@ -1,6 +1,6 @@
-package serviceLayer;
+package employeeDev.src.serviceLayer;
 
-import domainLayer.RoleDL;
+import employeeDev.src.domainLayer.RoleDL;
 
 public class RoleSL {
     private final String name;

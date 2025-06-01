@@ -1,11 +1,11 @@
-package presentationLayer;
+package employeeDev.src.presentationLayer;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Scanner;
 
-import serviceLayer.ShiftService;
+import employeeDev.src.serviceLayer.ShiftService;
 
 public class AvailabilityForm extends Form {
     private ShiftService shiftService;

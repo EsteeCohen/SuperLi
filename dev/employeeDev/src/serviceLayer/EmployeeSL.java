@@ -1,7 +1,9 @@
-package serviceLayer;
+package employeeDev.src.serviceLayer;
 
-import domainLayer.EmployeeDL;
-import domainLayer.RoleDL;
+import employeeDev.src.domainLayer.EmployeeDL;
+import employeeDev.src.domainLayer.RoleDL;
+import transportDev.src.main.entities.Site;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +17,7 @@ public class EmployeeSL {
     private final List<RoleSL> roles;
     private final int yearlySickDays;
     private final int yearlyDaysOff;
+    private final Site site;
 
     public EmployeeSL(String id, String fullName, LocalDate wordStartingDate, int wage, char wageTypeChar, int yearlySickDays, int yearlyDaysOff) {
         this.id = id;
@@ -25,6 +28,7 @@ public class EmployeeSL {
         this.roles = new ArrayList<>();
         this.yearlySickDays = yearlySickDays;
         this.yearlyDaysOff = yearlyDaysOff;
+        this.site = null;
     }
 
     public EmployeeSL(EmployeeDL edl){
@@ -39,6 +43,7 @@ public class EmployeeSL {
         }
         this.yearlySickDays = edl.getYearlySickDays();
         this.yearlyDaysOff = edl.getYearlyDaysOff();
+        this.site = null;
     }
 
     // Getters for the fields (optional, if needed)

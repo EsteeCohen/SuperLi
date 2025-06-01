@@ -1,8 +1,8 @@
-package dataAcssesLayer;
+package employeeDev.src.dataAcssesLayer;
 
-import dtos.AvilibilityDTO;
-import dtos.EmployeeDTO;
-import dtos.ShiftDTO;
+import employeeDev.src.dtos.AvilibilityDTO;
+import employeeDev.src.dtos.EmployeeDTO;
+import employeeDev.src.dtos.ShiftDTO;
 
 import java.sql.*;
 import java.time.LocalDateTime;

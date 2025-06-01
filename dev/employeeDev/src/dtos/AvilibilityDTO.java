@@ -1,4 +1,4 @@
-package dtos;
+package employeeDev.src.dtos;
 
 public class AvilibilityDTO {
     private ShiftDTO shift;

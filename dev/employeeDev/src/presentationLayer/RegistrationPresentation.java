@@ -1,8 +1,8 @@
-package presentationLayer;
+package employeeDev.src.presentationLayer;
 
 import java.util.Scanner;
 
-import serviceLayer.EmployeeService;
+import employeeDev.src.serviceLayer.EmployeeService;
 
 public class RegistrationPresentation extends Form {
     private EmployeeService employeeService;

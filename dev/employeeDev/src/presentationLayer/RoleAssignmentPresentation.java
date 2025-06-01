@@ -1,11 +1,11 @@
-package presentationLayer;
+package employeeDev.src.presentationLayer;
 
 import java.util.List;
 import java.util.Scanner;
 
-import serviceLayer.EmployeeService;
-import serviceLayer.RoleSL;
-import serviceLayer.RoleService;
+import employeeDev.src.serviceLayer.EmployeeService;
+import employeeDev.src.serviceLayer.RoleSL;
+import employeeDev.src.serviceLayer.RoleService;
 
 public class RoleAssignmentPresentation extends Form {
     private RoleService roleService;

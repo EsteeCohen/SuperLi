@@ -1,6 +1,6 @@
-package domainLayer;
+package employeeDev.src.domainLayer;
 
-import domainLayer.Enums.ShiftType;
+import employeeDev.src.domainLayer.Enums.ShiftType;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import serviceLayer.Interfaces.ITransportScheduleService;
+import employeeDev.src.serviceLayer.Interfaces.ITransportScheduleService;
 
 public class ShiftFacade {
     private final Map<String, ShiftDL> shifts;

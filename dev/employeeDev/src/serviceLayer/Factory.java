@@ -1,10 +1,10 @@
-package serviceLayer;
+package employeeDev.src.serviceLayer;
 
-import domainLayer.AvailabilityFacade;
-import domainLayer.EmployeeFacade;
-import domainLayer.RoleFacade;
-import domainLayer.ShiftFacade;
-import serviceLayer.Interfaces.ITransportScheduleService;
+import employeeDev.src.domainLayer.AvailabilityFacade;
+import employeeDev.src.domainLayer.EmployeeFacade;
+import employeeDev.src.domainLayer.RoleFacade;
+import employeeDev.src.domainLayer.ShiftFacade;
+import employeeDev.src.serviceLayer.Interfaces.ITransportScheduleService;
 
 public class Factory {
     public EmployeeService employeeService;

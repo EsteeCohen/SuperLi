@@ -1,7 +1,7 @@
-package dataAcssesLayer;
+package employeeDev.src.dataAcssesLayer;
 
-import dtos.EmployeeDTO;
-import dtos.RoleDTO;
+import employeeDev.src.dtos.EmployeeDTO;
+import employeeDev.src.dtos.RoleDTO;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;

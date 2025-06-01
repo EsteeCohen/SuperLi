@@ -1,13 +1,13 @@
-package presentationLayer;
+package employeeDev.src.presentationLayer;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
 
-import serviceLayer.AssigningService;
-import serviceLayer.EmployeeService;
-import serviceLayer.ShiftService;
+import employeeDev.src.serviceLayer.AssigningService;
+import employeeDev.src.serviceLayer.EmployeeService;
+import employeeDev.src.serviceLayer.ShiftService;
 
 public class ShiftsTablePresentation extends Form {
     private ShiftService shiftService;

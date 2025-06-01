@@ -1,7 +1,7 @@
-package presentationLayer;
+package employeeDev.src.presentationLayer;
 
 import java.util.Scanner;
-import serviceLayer.RoleService;
+import employeeDev.src.serviceLayer.RoleService;
 
 public class RoleCreationPresentation extends Form {
     private RoleService roleService;

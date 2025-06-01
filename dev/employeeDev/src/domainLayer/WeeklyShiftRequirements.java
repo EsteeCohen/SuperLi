@@ -1,6 +1,6 @@
-package domainLayer;
+package employeeDev.src.domainLayer;
 
-import domainLayer.Enums.ShiftType;
+import employeeDev.src.domainLayer.Enums.ShiftType;
 import java.time.DayOfWeek;
 import java.util.HashMap;
 import java.util.Map;
