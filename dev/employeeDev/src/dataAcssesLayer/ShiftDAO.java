@@ -13,9 +13,9 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 
-import dtos.EmployeeDTO;
-import dtos.RoleDTO;
-import dtos.ShiftDTO;
+import employeeDev.src.dtos.EmployeeDTO;
+import employeeDev.src.dtos.RoleDTO;
+import employeeDev.src.dtos.ShiftDTO;
 
 public class ShiftDAO {
     private final String DBPath = DBConstants.DB_PATH;
