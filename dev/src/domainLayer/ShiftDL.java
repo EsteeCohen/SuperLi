@@ -3,7 +3,6 @@ package domainLayer;
 import domainLayer.Enums.ShiftType;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,7 +12,7 @@ public class ShiftDL {
     private final LocalDateTime endTime;
     private final ShiftType shiftType;
     private final Map<RoleDL, List<EmployeeDL>> employeesAssignment;
-    private Dictionary<RoleDL, Integer> requirements;
+    private final Map<RoleDL, Integer> requirements;
 
     // Main constructor
     public ShiftDL(LocalDateTime startTime, LocalDateTime endTime, ShiftType shiftType) {
@@ -24,12 +23,12 @@ public class ShiftDL {
         this.requirements = WeeklyShiftRequirements.getInstance().getRequirements(startTime.toLocalDate().getDayOfWeek(), shiftType);
     }
 
-    // Simplified constructor (e.g., for testing or specific use cases)
     public ShiftDL(LocalDateTime startTime, LocalDateTime endTime, String shiftTypeString) {
         this.startTime = startTime;
         this.endTime = endTime;
         this.shiftType = ShiftType.valueOf(shiftTypeString.toUpperCase());
         this.employeesAssignment = new HashMap<>();
+        this.requirements = new HashMap<>();
     }
 
     // Assign an employee to a role in the shift
@@ -48,15 +47,15 @@ public class ShiftDL {
     }
 
     // Get the requirements for this shift
-    public Dictionary<RoleDL, Integer> getRequirements() {
+    public Map<RoleDL, Integer> getRequirements() {
         // Use startTime.toLocalDate() to get the date for requirements
         return requirements;
     }
 
     // Check if the shift meets the requirements
     public boolean meetTheRequirements() {
-        Dictionary<RoleDL, Integer> requirements = getRequirements();
-        for (RoleDL role : java.util.Collections.list(requirements.keys())) {
+        Map<RoleDL, Integer> requirements = getRequirements();
+        for (RoleDL role : requirements.keySet()) {
             if (employeesAssignment.get(role) == null || employeesAssignment.get(role).size() < requirements.get(role)) {
                 return false;
             }

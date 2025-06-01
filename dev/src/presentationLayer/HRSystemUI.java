@@ -16,6 +16,9 @@ public class HRSystemUI {
 
     private final String ADMIN_ROLE_NAME = "HrManager";
     private final String SHIFT_MNG_ROLE = "Shift Manager";
+    private final String WAREHOUSEMAN = "Warehouseman";
+    private final String DRIVER = "Driver";
+
 
     private final Scanner scanner;
 
@@ -35,6 +38,8 @@ public class HRSystemUI {
         // Registering the admin
         roleService.createRole(ADMIN_ROLE_NAME);
         roleService.createRole(SHIFT_MNG_ROLE);
+        roleService.createRole(WAREHOUSEMAN);
+        roleService.createRole(DRIVER);
         employeeService.registerAdmin();
         shiftService.createShiftsForNextWeek();
         assigningService.initializeRequirements();
@@ -86,6 +91,7 @@ public class HRSystemUI {
         System.out.println("5. View and manage shift schedule");
         System.out.println("6. Search employee by ID");
         System.out.println("7. Update employee details");
+        System.out.println("8. View corrent shifts and employees");
         System.out.println("0. Exit");
     }
 
@@ -93,6 +99,7 @@ public class HRSystemUI {
         System.out.println("\n=== Employee Menu ===");
         System.out.println("1. Enter availability");
         System.out.println("2. View my shifts");
+        System.out.println("3. View corrent shifts and employees");
         System.out.println("0. Exit");
     }
 
@@ -152,6 +159,10 @@ public class HRSystemUI {
                 EmployeeUpdatePresentation employeeUpdate = new EmployeeUpdatePresentation(employeeService, scanner);
                 employeeUpdate.updateEmployeeDetails();
                 break;
+            case 8:
+                CurrentShiftsTablePresentation currentShifts = new CurrentShiftsTablePresentation(shiftService, scanner, assigningService, employeeService);
+                currentShifts.showCurrentShiftsAndEmployees();
+                break;
             default:
                 System.out.println("Invalid option. Please try again.");
                 break;
@@ -168,6 +179,10 @@ public class HRSystemUI {
             case 2:
                 ShiftsTablePresentation shiftsTable = new ShiftsTablePresentation(shiftService, scanner, assigningService, employeeService);
                 shiftsTable.showShiftTable();
+                break;
+            case 3:
+                CurrentShiftsTablePresentation currentShifts = new CurrentShiftsTablePresentation(shiftService, scanner, assigningService, employeeService);
+                currentShifts.showCurrentShiftsAndEmployees();
                 break;
             default:
                 System.out.println("Invalid option. Please try again.");

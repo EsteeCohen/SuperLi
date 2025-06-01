@@ -14,12 +14,18 @@ public class ShiftSL {
     private final LocalDateTime endTime;
     private final ShiftType shiftType;
     private final Map<RoleSL, List<EmployeeSL>> employeesAssignment;
+    private final Map<RoleSL, Integer> shiftRoleRequirements;
 
     public ShiftSL(ShiftDL shift) {
         this.startTime = shift.getStartTime();
         this.endTime = shift.getEndTime();
         this.shiftType = shift.getShiftType();
         this.employeesAssignment = new HashMap<>();
+        this.shiftRoleRequirements = new HashMap<>();
+        for (Map.Entry<RoleDL, Integer> entry : shift.getRequirements().entrySet()) {
+            RoleSL role = new RoleSL(entry.getKey());
+            shiftRoleRequirements.put(role, entry.getValue());
+        }
         for (Map.Entry<RoleDL, List<EmployeeDL>> entry : shift.getEmployeesAssignment().entrySet()) {
             RoleSL role = new RoleSL(entry.getKey());
             List<EmployeeSL> employees = entry.getValue().stream()
@@ -43,5 +49,9 @@ public class ShiftSL {
 
     public Map<RoleSL, List<EmployeeSL>> getEmployeesAssignment() {
         return employeesAssignment;
+    }
+
+    public Map<RoleSL, Integer> getShiftRoleRequirements() {
+        return shiftRoleRequirements;
     }
 }

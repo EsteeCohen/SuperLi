@@ -1,6 +1,7 @@
 package presentationLayer;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +17,7 @@ public class ShiftPL {
     private final LocalDateTime endTime;
     private final ShiftType shiftType;
     private final Map<RolePL, List<EmployeePL>> employeesAssignment;
+    private final Map<RolePL, Integer> shiftRoleRequirements;
 
     public ShiftPL(ShiftSL shift) {
         this.startTime = shift.getStartTime();
@@ -28,6 +30,14 @@ public class ShiftPL {
                     .map(EmployeePL::new)
                     .toList();
             employeesAssignment.put(role, employees);
+        }
+        // Initialize shiftRoleRequirements, assuming shift.getShiftRoleRequirements() returns a Map<RoleSL, Integer>
+        this.shiftRoleRequirements = new HashMap<>();
+        if (shift.getShiftRoleRequirements() != null) {
+            Map<RoleSL, Integer> roleRequirements = (Map<RoleSL, Integer>) shift.getShiftRoleRequirements();
+            for (Map.Entry<RoleSL, Integer> entry : roleRequirements.entrySet()) {
+                this.shiftRoleRequirements.put(new RolePL(entry.getKey()), entry.getValue());
+            }
         }
     }
 
@@ -58,6 +68,11 @@ public class ShiftPL {
 
     public Map<RolePL, List<EmployeePL>> getEmployeesAssignment() {
         return employeesAssignment;
+    }
+
+    public ArrayList<ShiftPL> getShiftRoleRequirements() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getShiftRoleRequirements'");
     }
 
 
