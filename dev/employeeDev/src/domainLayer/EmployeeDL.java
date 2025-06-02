@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import transportDev.src.main.entities.Site;
+import transportDev.src.main.enums.LicenseType;
 
 public class EmployeeDL {
     private final String id;
@@ -120,5 +121,15 @@ public class EmployeeDL {
                     throw new IllegalArgumentException("Invalid attribute: " + key);
             }
         }
+    }
+
+    public LicenseType getDriverLicenseType() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getDriverLicenseType'");
+    }
+
+    public String getPhone() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getPhone'");
     }
 }

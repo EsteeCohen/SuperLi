@@ -6,7 +6,6 @@ import employeeDev.src.serviceLayer.EmployeeService;
 import employeeDev.src.serviceLayer.Factory;
 import employeeDev.src.serviceLayer.RoleService;
 import employeeDev.src.serviceLayer.ShiftService;
-import transportDev.src.main.serviceLayer.DriverService;
 
 public class HRSystemUI {
 
@@ -14,7 +13,6 @@ public class HRSystemUI {
     private ShiftService shiftService;
     private EmployeeService employeeService;
     private AssigningService assigningService;
-    private DriverService driverService;
 
     private final String ADMIN_ROLE_NAME = "HrManager";
     private final String SHIFT_MNG_ROLE = "Shift Manager";

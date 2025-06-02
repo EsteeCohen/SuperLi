@@ -5,14 +5,12 @@ import employeeDev.src.domainLayer.EmployeeFacade;
 import employeeDev.src.domainLayer.RoleFacade;
 import employeeDev.src.domainLayer.ShiftFacade;
 import employeeDev.src.serviceLayer.Interfaces.ITransportScheduleService;
-import transportDev.src.main.services.DriverService;
 
 public class Factory {
     public EmployeeService employeeService;
     public ShiftService shiftService;
     public AssigningService assigningService;
     public RoleService roleService;
-    public DriverService driverService;
 
     public Factory() {
         // Initialize the facades
@@ -22,12 +20,12 @@ public class Factory {
         ShiftFacade shiftFacade = new ShiftFacade(transportScheduleService);
         AvailabilityFacade availabilityFacade = new AvailabilityFacade();
         
-        
         // Initialize the services with the facades
         this.employeeService = new EmployeeService(employeeFacade);
         this.shiftService = new ShiftService(shiftFacade, availabilityFacade, employeeFacade);
         this.assigningService = new AssigningService(shiftFacade, employeeFacade, roleFacade);
         this.roleService = new RoleService(roleFacade);
+
     }
 
     public ShiftService getShiftService() {

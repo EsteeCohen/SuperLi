@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.TreeMap;
-import transportDev.src.main.services.DriverService;
 import employeeDev.src.serviceLayer.AssigningService;
 import employeeDev.src.serviceLayer.EmployeeService;
 import employeeDev.src.serviceLayer.ShiftService;
@@ -15,11 +14,10 @@ public class ShiftsTablePresentation extends Form {
     private ShiftService shiftService;
     private EmployeeService employeeService;
     private AssigningService assigningService;
-    private DriverService driverService;
     private Scanner scanner;
     private ArrayList<ShiftPL> shifts;
 
-    public ShiftsTablePresentation(ShiftService service, Scanner scanner, AssigningService assigningService, EmployeeService employeeService, DriverService driverService) {
+    public ShiftsTablePresentation(ShiftService service, Scanner scanner, AssigningService assigningService, EmployeeService employeeService) {
         super("Weekly Shift Table");
         this.assigningService = assigningService;
         this.employeeService = employeeService;
@@ -29,7 +27,6 @@ public class ShiftsTablePresentation extends Form {
                                              .map(shiftSL -> new ShiftPL(shiftSL))
                                              .toList());
         shifts.sort(Comparator.comparing(ShiftPL::getStartTime, Comparator.naturalOrder()));
-        this.driverService = driverService;
     }
 
     public void showShiftTable() {
@@ -73,7 +70,9 @@ public class ShiftsTablePresentation extends Form {
                             .toList();
                         for (RolePL role : roles) {
                             if (role.getName() == "Driver"){
-                                driverService.getDriverById(employee.getId())
+                                employeeService.getAllDrivers().stream()
+                                    .filter(driver -> driver.getId().equals(employee.getId()))
+                                    .findFirst()
                                     .ifPresent(driver -> System.out.println("    - " + role.toString() + " (License: " + driver.getLicenseType() + ")"));
                             }
                             else
@@ -165,6 +164,7 @@ public class ShiftsTablePresentation extends Form {
             }
         }
         hasShiftsWithMissingWorkers();
+        handleMissingAvailability();
     }
 
     public boolean hasShiftsWithMissingWorkers() {
