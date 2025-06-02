@@ -7,7 +7,9 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 
 public class EmployeeDAO {
@@ -25,14 +27,14 @@ public class EmployeeDAO {
                     if (rs.next()) {
                         String password = rs.getString("password");
                         String fullName = rs.getString("fullName");
-                        LocalDate workStartingDate = LocalDate.parse(rs.getString("workStartingDate"));
+                        LocalDate workStartingDate = Instant.ofEpochSecond(rs.getInt("workStatingDate")).atZone(ZoneId.systemDefault()).toLocalDate();
                         int wage = rs.getInt("wage");
                         String wageType = rs.getString("wageType");
                         int yearlySickDays = rs.getInt("yearlySickDays");
                         int yearlyDaysOff = rs.getInt("yearlyDaysOff");
                         List<RoleDTO> roles = getRolesForEmployee(id);
                         return new EmployeeDTO(id, password, fullName, workStartingDate, wage,
-                                wageType, yearlySickDays, yearlyDaysOff, roles);
+                                wageType, yearlySickDays, yearlyDaysOff, roles, null);
                     } else {
                         return null;
                     }
@@ -44,12 +46,12 @@ public class EmployeeDAO {
     private List<RoleDTO> getRolesForEmployee(String employeeId) throws SQLException {
         List<RoleDTO> roles = new java.util.ArrayList<>();
         try (Connection roleConn = DriverManager.getConnection("jdbc:sqlite:" + DBPath)) {
-            String query = "SELECT * FROM " + roleTableName + " WHERE employeeId = ?";
+            String query = "SELECT * FROM " + roleTableName + " WHERE employee_id = ?";
             try (PreparedStatement statement = roleConn.prepareStatement(query)) {
                 statement.setString(1, employeeId);
                 try (ResultSet rs = statement.executeQuery()) {
                     while (rs.next()) {
-                        String roleName = rs.getString("roleName");
+                        String roleName = rs.getString("role_roleName");
                         roles.add(new RoleDTO(roleName));
                     }
                 }
@@ -68,14 +70,13 @@ public class EmployeeDAO {
                     String id = rs.getString("id");
                     String password = rs.getString("password");
                     String fullName = rs.getString("fullName");
-                    LocalDate workStartingDate = LocalDate.parse(rs.getString("workStartingDate"));
+                    LocalDate workStartingDate = Instant.ofEpochSecond(rs.getInt("workStatingDate")).atZone(ZoneId.systemDefault()).toLocalDate();
                     int wage = rs.getInt("wage");
                     String wageType = rs.getString("wageType");
                     int yearlySickDays = rs.getInt("yearlySickDays");
                     int yearlyDaysOff = rs.getInt("yearlyDaysOff");
                     List<RoleDTO> roles = getRolesForEmployee(id);
-                    employees.add(new EmployeeDTO(id, password, fullName, workStartingDate, wage,
-                            wageType, yearlySickDays, yearlyDaysOff, roles));
+                    employees.add(new EmployeeDTO(id, password, fullName, workStartingDate, wage, wageType, yearlySickDays, yearlyDaysOff, roles, null));
                 }
                 return employees;
             }
@@ -89,7 +90,7 @@ public class EmployeeDAO {
                 statement.setString(1, employee.getId());
                 statement.setString(2, employee.getPassword());
                 statement.setString(3, employee.getFullName());
-                statement.setString(4, employee.getWorkStartingDate().toString());
+                statement.setLong(4, employee.getWorkStartingDate().atStartOfDay(ZoneId.systemDefault()).toEpochSecond());
                 statement.setInt(5, employee.getWage());
                 statement.setString(6, employee.getWageType());
                 statement.setInt(7, employee.getYearlySickDays());
@@ -105,7 +106,7 @@ public class EmployeeDAO {
             try (PreparedStatement statement = employeeConn.prepareStatement(query)) {
                 statement.setString(1, employee.getPassword());
                 statement.setString(2, employee.getFullName());
-                statement.setString(3, employee.getWorkStartingDate().toString());
+                statement.setLong(3,  employee.getWorkStartingDate().atStartOfDay(ZoneId.systemDefault()).toEpochSecond());
                 statement.setInt(4, employee.getWage());
                 statement.setString(5, employee.getWageType());
                 statement.setInt(6, employee.getYearlySickDays());
@@ -130,23 +131,23 @@ public class EmployeeDAO {
         return employee;
     }
 
-    public void assignRoleToEmployee(String employeeId, String roleId) throws SQLException {
+    public void assignRoleToEmployee(String employeeId, String roleName) throws SQLException {
         try (Connection employeeConn = DriverManager.getConnection("jdbc:sqlite:" + DBPath)) {
-            String query = "INSERT INTO EmployeeRoles (employeeId, roleId) VALUES (?, ?)";
+            String query = "INSERT INTO " + roleTableName + " (employee_id, role_roleName) VALUES (?, ?)";
             try (PreparedStatement statement = employeeConn.prepareStatement(query)) {
                 statement.setString(1, employeeId);
-                statement.setString(2, roleId);
+                statement.setString(2, roleName);
                 statement.executeUpdate();
             }
         }
     }
 
-    public void removeRoleFromEmployee(String employeeId, String roleId) throws SQLException {
+    public void removeRoleFromEmployee(String employeeId, String roleName) throws SQLException {
         try (Connection employeeConn = DriverManager.getConnection("jdbc:sqlite:" + DBPath)) {
-            String query = "DELETE FROM EmployeeRoles WHERE employeeId = ? AND roleId = ?";
+            String query = "DELETE FROM " + roleTableName + " WHERE employee_id = ? AND role_roleName = ?";
             try (PreparedStatement statement = employeeConn.prepareStatement(query)) {
                 statement.setString(1, employeeId);
-                statement.setString(2, roleId);
+                statement.setString(2, roleName);
                 statement.executeUpdate();
             }
         }
