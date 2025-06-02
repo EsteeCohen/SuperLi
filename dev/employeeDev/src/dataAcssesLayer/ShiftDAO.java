@@ -3,6 +3,7 @@ package employeeDev.src.dataAcssesLayer;
 import employeeDev.src.dtos.EmployeeDTO;
 import employeeDev.src.dtos.RoleDTO;
 import employeeDev.src.dtos.ShiftDTO;
+import employeeDev.src.dtos.SiteDTO;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -25,9 +26,11 @@ public class ShiftDAO {
     private final String assignmentsTableName = DBConstants.ASSIGNMENT_TABLE;
 
     private final EmployeeDAO employeeDAO;
+    private final SiteDAO siteDAO;
 
     public ShiftDAO() {
         this.employeeDAO = new EmployeeDAO();
+        this.siteDAO = new SiteDAO();
     }
 
     public void insertShift(ShiftDTO shift) throws SQLException {
@@ -55,7 +58,11 @@ public class ShiftDAO {
                 // need to fetch requirements and assignments
                 Dictionary<RoleDTO, Integer> requirements = getRequirementsForShift(startingTime);
                 HashMap<RoleDTO, List<EmployeeDTO>> assignments = getAssignmentsForShift(startingTime);
-                return new ShiftDTO(shiftType, startingTime, endTime, requirements, assignments, null);
+                SiteDTO site = siteDAO.getSite(rs.getString("siteName"));
+                if (site == null) {
+                    throw new SQLException("Site not found in DB");
+                }
+                return new ShiftDTO(shiftType, startingTime, endTime, requirements, assignments, site);
             }
         }
         return null;
@@ -84,6 +91,10 @@ public class ShiftDAO {
                 // Fetch requirements and assignments for the shift
                 Dictionary<RoleDTO, Integer> requirements = getRequirementsForShift(start);
                 HashMap<RoleDTO, List<EmployeeDTO>> assignments = getAssignmentsForShift(start);
+                SiteDTO site = siteDAO.getSite(rs.getString("siteName"));
+                if (site == null) {
+                    throw new SQLException("Site not found in DB");
+                }
                 ShiftDTO shift = new ShiftDTO(type, start, end, requirements, assignments, null);
                 shifts.add(shift);
             }
