@@ -1,4 +1,4 @@
-package src.main.services;
+package transportDev.src.main.services;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -6,11 +6,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import src.main.entities.Incident;
-import src.main.entities.IncidentResolution;
-import src.main.enums.IncidentStatus;
-import src.main.enums.IncidentType;
-import src.main.entities.Transport;
+import transportDev.src.main.entities.Incident;
+import transportDev.src.main.entities.IncidentResolution;
+import transportDev.src.main.enums.IncidentStatus;
+import transportDev.src.main.enums.IncidentType;
+import transportDev.src.main.entities.Transport;
 
 public class IncidentService {
     private List<Incident> incidents;

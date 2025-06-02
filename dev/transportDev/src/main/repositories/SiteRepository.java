@@ -1,8 +1,8 @@
-package src.main.repositories;
+package transportDev.src.main.repositories;
 
-import src.main.entities.Site;
-import src.main.enums.ShippingZone;
 import java.util.List;
+import transportDev.src.main.entities.Site;
+import transportDev.src.main.enums.ShippingZone;
 
 public interface SiteRepository {
     Site add(String id, String name, String address, String contactPhone, String contactName, ShippingZone zone);

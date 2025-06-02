@@ -1,7 +1,7 @@
-package src.main.dao;
+package transportDev.src.main.dao;
 
-import src.main.entities.Truck;
-import src.main.enums.LicenseType;
+import transportDev.src.main.entities.Truck;
+import transportDev.src.main.enums.LicenseType;
 import java.util.List;
 
 public interface TruckDAO {

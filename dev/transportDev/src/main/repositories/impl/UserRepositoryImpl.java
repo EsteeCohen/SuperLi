@@ -1,9 +1,9 @@
-package src.main.repositories.impl;
+package transportDev.src.main.repositories.impl;
 
-import src.main.repositories.UserRepository;
-import src.main.dao.UserDAO;
-import src.main.entities.User;
-import src.main.enums.UserRole;
+import transportDev.src.main.repositories.UserRepository;
+import transportDev.src.main.dao.UserDAO;
+import transportDev.src.main.entities.User;
+import transportDev.src.main.enums.UserRole;
 import java.util.List;
 
 public class UserRepositoryImpl implements UserRepository {

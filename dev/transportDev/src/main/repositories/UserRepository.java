@@ -1,8 +1,8 @@
-package src.main.repositories;
+package transportDev.src.main.repositories;
 
-import src.main.entities.User;
-import src.main.enums.UserRole;
 import java.util.List;
+import transportDev.src.main.entities.User;
+import transportDev.src.main.enums.UserRole;
 
 public interface UserRepository {
     User add(String id, String username, String password, String fullName, UserRole role);

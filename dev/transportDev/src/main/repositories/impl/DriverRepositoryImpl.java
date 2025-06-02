@@ -1,9 +1,9 @@
-package src.main.repositories.impl;
+package transportDev.src.main.repositories.impl;
 
-import src.main.repositories.DriverRepository;
-import src.main.dao.DriverDAO;
-import src.main.entities.Driver;
-import src.main.enums.LicenseType;
+import transportDev.src.main.repositories.DriverRepository;
+import transportDev.src.main.dao.DriverDAO;
+import transportDev.src.main.entities.Driver;
+import transportDev.src.main.enums.LicenseType;
 import java.util.List;
 
 public class DriverRepositoryImpl implements DriverRepository {

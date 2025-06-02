@@ -1,8 +1,8 @@
-package src.main.dao.impl;
+package transportDev.src.main.dao.impl;
 
-import src.main.dao.TruckDAO;
-import src.main.entities.Truck;
-import src.main.enums.LicenseType;
+import transportDev.src.main.dao.TruckDAO;
+import transportDev.src.main.entities.Truck;
+import transportDev.src.main.enums.LicenseType;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

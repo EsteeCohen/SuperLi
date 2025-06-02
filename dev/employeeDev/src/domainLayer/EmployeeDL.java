@@ -1,12 +1,11 @@
 package employeeDev.src.domainLayer;
 
 import employeeDev.src.domainLayer.Enums.WageType;
-import transportDev.src.main.entities.Site;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import transportDev.src.main.entities.Site;
 
 public class EmployeeDL {
     private final String id;

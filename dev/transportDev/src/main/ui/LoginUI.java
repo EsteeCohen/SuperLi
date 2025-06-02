@@ -1,8 +1,8 @@
-package src.main.ui;
+package transportDev.src.main.ui;
 
 import java.util.Scanner;
 
-import src.main.controllers.FacadeController;
+import transportDev.src.main.controllers.FacadeController;
 
 public class LoginUI {
     private Scanner scanner;

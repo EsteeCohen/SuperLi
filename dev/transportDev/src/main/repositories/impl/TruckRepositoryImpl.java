@@ -1,9 +1,9 @@
-package src.main.repositories.impl;
+package transportDev.src.main.repositories.impl;
 
-import src.main.repositories.TruckRepository;
-import src.main.dao.TruckDAO;
-import src.main.entities.Truck;
-import src.main.enums.LicenseType;
+import transportDev.src.main.repositories.TruckRepository;
+import transportDev.src.main.dao.TruckDAO;
+import transportDev.src.main.entities.Truck;
+import transportDev.src.main.enums.LicenseType;
 import java.util.List;
 
 public class TruckRepositoryImpl implements TruckRepository {

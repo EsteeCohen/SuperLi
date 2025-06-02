@@ -3,6 +3,9 @@ package employeeDev.src.domainLayer;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Map;
+
+import transportDev.src.main.entities.Site;
+
 import java.util.HashMap;
 import java.util.List;
 
@@ -42,11 +45,11 @@ public class EmployeeFacade {
         return null;
     }
 
-    public boolean registerEmployee(String fullName, String password, String id, int wage, char wageTypeChar, int yearlySickDays, int yearlyDaysOff) {
+    public boolean registerEmployee(String fullName, String password, String id, int wage, char wageTypeChar, int yearlySickDays, int yearlyDaysOff, Site site) {
         if (employees.get(id) != null) {
             return false; // Employee with this ID already exists
         }
-        EmployeeDL newEmployee = new EmployeeDL(id, password, fullName, LocalDate.now(), wage, wageTypeChar, yearlySickDays, yearlyDaysOff);
+        EmployeeDL newEmployee = new EmployeeDL(id, password, fullName, LocalDate.now(), wage, wageTypeChar, yearlySickDays, yearlyDaysOff, site);
         employees.put(id, newEmployee);
         return true;
     }

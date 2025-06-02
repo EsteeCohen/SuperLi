@@ -1,8 +1,8 @@
-package src.main.repositories;
+package transportDev.src.main.repositories;
 
-import src.main.entities.Driver;
-import src.main.enums.LicenseType;
 import java.util.List;
+import transportDev.src.main.entities.Driver;
+import transportDev.src.main.enums.LicenseType;
 
 public interface DriverRepository {
     Driver add(String id, String name, String phone, LicenseType licenseType);

@@ -1,12 +1,12 @@
 package employeeDev.src.domainLayer;
 
 import employeeDev.src.domainLayer.Enums.ShiftType;
-import transportDev.src.main.entities.Site;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import transportDev.src.main.entities.Site;
 
 public class ShiftDL {
     private final LocalDateTime startTime;

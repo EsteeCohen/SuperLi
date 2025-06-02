@@ -1,10 +1,10 @@
-package src.main.dao;
+package transportDev.src.main.dao;
 
-import src.main.entities.Order;
-import src.main.enums.OrderStatus;
-import src.main.enums.OrderType;
 import java.time.LocalDate;
 import java.util.List;
+import transportDev.src.main.entities.Order;
+import transportDev.src.main.enums.OrderStatus;
+import transportDev.src.main.enums.OrderType;
 
 public interface OrderDAO {
     void create(Order order);

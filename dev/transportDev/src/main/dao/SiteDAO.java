@@ -1,7 +1,7 @@
-package src.main.dao;
+package transportDev.src.main.dao;
 
-import src.main.entities.Site;
-import src.main.enums.ShippingZone;
+import transportDev.src.main.entities.Site;
+import transportDev.src.main.enums.ShippingZone;
 import java.util.List;
 
 public interface SiteDAO {
