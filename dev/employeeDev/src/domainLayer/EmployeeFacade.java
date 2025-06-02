@@ -69,4 +69,14 @@ public class EmployeeFacade {
     public List<EmployeeDL> getAllEmployees() {
         return new ArrayList<>(employees.values());
     }
+
+    public List<EmployeeDL> getEmployeesBySite(Site site) {
+        List<EmployeeDL> employeesAtSite = new ArrayList<>();
+        for (EmployeeDL employee : employees.values()) {
+            if (employee.getSite().equals(site)) {
+                employeesAtSite.add(employee);
+            }
+        }
+        return employeesAtSite;
+    }
 }
