@@ -84,6 +84,24 @@ public class SiteDAO {
         }
     }
 
+    public List<SiteDTO> getSitesByShippingZone(String shippingZone) throws SQLException {
+        try (Connection conn = DriverManager.getConnection(dbPath)) {
+            String sql = "SELECT * FROM " + TABLE_NAME + " WHERE ShippingZone = ?";
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(1, shippingZone);
+            var rs = stmt.executeQuery();
+            List<SiteDTO> sites = new ArrayList<>();
+            while (rs.next()) {
+                String siteName = rs.getString("SiteName");
+                String address = rs.getString("address");
+                String contactPhone = rs.getString("contactPhone");
+                String contactName = rs.getString("contactName");
+                sites.add(new SiteDTO(siteName, address, contactPhone, contactName, shippingZone));
+            }
+            return sites;
+        }
+    }
+
 
     
 }
