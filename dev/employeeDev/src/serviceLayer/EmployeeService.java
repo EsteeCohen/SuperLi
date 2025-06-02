@@ -46,4 +46,17 @@ public class EmployeeService {
         EmployeeDL employee = employeeFacade.getEmployee(employeeId);
         employee.updateAttributes(attributes);
     }
+
+    public boolean employeeHasRole(String employeeId, String roleName) {
+        var employee = getEmployeeById(employeeId);
+        if (employee == null) return false;
+        return employee.getRoles().stream().anyMatch(role -> role.getName().equals(roleName));
+    }
+
+    public Map<String, EmployeeSL> getAllEmployees() {
+        return employeeFacade.getAllEmployees().stream()
+                .map(EmployeeSL::new)
+                .collect(java.util.stream.Collectors.toMap(EmployeeSL::getId, e -> e));
+    }
 }
+

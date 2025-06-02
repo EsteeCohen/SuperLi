@@ -43,6 +43,19 @@ public class ShiftDL {
     // Assign an employee to a role in the shift
     public void assignEmployee(RoleDL role, EmployeeDL employee) {
         employeesAssignment.computeIfAbsent(role, k -> new ArrayList<>()).add(employee);
+        decrementRequirement(role);
+    }
+
+    private void decrementRequirement(RoleDL role) {
+        if (requirements.containsKey(role)) {
+            int currentQuantity = requirements.get(role);
+            if (currentQuantity > 0) {
+                requirements.put(role, currentQuantity - 1);
+            }
+            if (requirements.get(role) <= 0) {
+                requirements.remove(role);
+            }
+        }
     }
 
     // Unassign an employee from a role in the shift

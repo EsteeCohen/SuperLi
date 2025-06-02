@@ -72,10 +72,11 @@ public class ShiftPL {
         return employeesAssignment;
     }
 
-    public ArrayList<ShiftPL> getShiftRoleRequirements() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getShiftRoleRequirements'");
+    public Site getSite() {
+        return site;
     }
 
-
+    public Map<RolePL, Integer> getShiftRoleRequirements() {
+        return shiftRoleRequirements;
+    }
 }
