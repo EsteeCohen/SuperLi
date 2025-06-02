@@ -10,6 +10,7 @@ public class DBConstants {
     public static final String ASSIGNMENT_TABLE = "ShiftAssignment";
     public static final String SHIFT_REQ_TABLE = "ShiftReq";
     public static final String WEEKLY_SHIFT_REQ_TABLE = "WeeklyShiftReq";
+    public static final String SITE_TABLE = "Sites";
 
     private DBConstants() {
         // Prevent instantiation
