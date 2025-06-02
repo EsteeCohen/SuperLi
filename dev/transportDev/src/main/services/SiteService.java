@@ -1,10 +1,9 @@
-package src.main.services;
+package transportDev.src.main.services;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import src.main.entities.Site;
-import src.main.enums.ShippingZone;
+import transportDev.src.main.entities.Site;
+import transportDev.src.main.enums.ShippingZone;
 
 public class SiteService {
     private List<Site> sites;

@@ -1,6 +1,6 @@
-package src.main.entities;
+package transportDev.src.main.entities;
 
-import src.main.enums.UserRole;
+import transportDev.src.main.enums.UserRole;
 
 public class User {
     private final String id;

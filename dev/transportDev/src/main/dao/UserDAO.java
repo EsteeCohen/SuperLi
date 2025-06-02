@@ -1,8 +1,8 @@
-package src.main.dao;
+package transportDev.src.main.dao;
 
-import src.main.entities.User;
-import src.main.enums.UserRole;
 import java.util.List;
+import transportDev.src.main.entities.User;
+import transportDev.src.main.enums.UserRole;
 
 public interface UserDAO {
     void create(User user);

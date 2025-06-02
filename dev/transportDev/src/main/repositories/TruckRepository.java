@@ -1,8 +1,8 @@
-package src.main.repositories;
+package transportDev.src.main.repositories;
 
-import src.main.entities.Truck;
-import src.main.enums.LicenseType;
 import java.util.List;
+import transportDev.src.main.entities.Truck;
+import transportDev.src.main.enums.LicenseType;
 
 public interface TruckRepository {
     Truck add(String regNumber, String model, double emptyWeight, double maxWeight, LicenseType licenseType);

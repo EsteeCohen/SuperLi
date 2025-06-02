@@ -1,11 +1,11 @@
-package src.main.repositories;
+package transportDev.src.main.repositories;
 
-import src.main.entities.Transport;
-import src.main.enums.TransportStatus;
-import src.main.enums.ShippingZone;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import transportDev.src.main.entities.Transport;
+import transportDev.src.main.enums.ShippingZone;
+import transportDev.src.main.enums.TransportStatus;
 
 public interface TransportRepository {
     Transport createTransport(LocalDate date, LocalTime time, String truckId, String driverId, 

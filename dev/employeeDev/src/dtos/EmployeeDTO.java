@@ -14,9 +14,10 @@ public class EmployeeDTO {
     private int yearlySickDays;
     private int yearlyDaysOff;
     private List<RoleDTO> roles;
+    private SiteDTO site;
 
     public EmployeeDTO(String id, String password, String fullName, LocalDate workStartingDate, int wage,
-            String wageType, int yearlySickDays, int yearlyDaysOff, List<RoleDTO> roles) {
+            String wageType, int yearlySickDays, int yearlyDaysOff, List<RoleDTO> roles, SiteDTO site) {
         this.id = id;
         this.password = password;
         this.fullName = fullName;
@@ -26,10 +27,7 @@ public class EmployeeDTO {
         this.yearlySickDays = yearlySickDays;
         this.yearlyDaysOff = yearlyDaysOff;
         this.roles = roles != null ? roles : new ArrayList<>();
-    }
-
-    public EmployeeDTO(String employeeId) {
-        //TODO Auto-generated constructor stub
+        this.site = site;
     }
 
     public String getId() {
@@ -102,5 +100,13 @@ public class EmployeeDTO {
 
     public void setRoles(List<RoleDTO> roles) {
         this.roles = roles != null ? roles : new ArrayList<>();
+    }
+
+    public SiteDTO getSite() {
+        return site;
+    }
+
+    public void setSite(SiteDTO site) {
+        this.site = site;
     }
 }

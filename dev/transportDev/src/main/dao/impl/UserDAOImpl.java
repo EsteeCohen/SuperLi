@@ -1,8 +1,8 @@
-package src.main.dao.impl;
+package transportDev.src.main.dao.impl;
 
-import src.main.dao.UserDAO;
-import src.main.entities.User;
-import src.main.enums.UserRole;
+import transportDev.src.main.dao.UserDAO;
+import transportDev.src.main.entities.User;
+import transportDev.src.main.enums.UserRole;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

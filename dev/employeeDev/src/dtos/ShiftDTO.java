@@ -11,15 +11,17 @@ public class ShiftDTO {
     private LocalDateTime endTime;
     private Dictionary<RoleDTO, Integer> requirements;
     private Map<RoleDTO, List<EmployeeDTO>> employeesAssignment;
+    private SiteDTO site;
 
     public ShiftDTO(String shiftType, LocalDateTime startTime, LocalDateTime endTime,
                     Dictionary<RoleDTO, Integer> requirements,
-                    Map<RoleDTO, List<EmployeeDTO>> employeesAssignment) {
+                    Map<RoleDTO, List<EmployeeDTO>> employeesAssignment, SiteDTO site) {
         this.shiftType = shiftType;
         this.startTime = startTime;
         this.endTime = endTime;
         this.requirements = requirements;
         this.employeesAssignment = employeesAssignment;
+        this.site = site;
     }
 
     public String getShiftType() {

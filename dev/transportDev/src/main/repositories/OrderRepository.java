@@ -1,11 +1,11 @@
-package src.main.repositories;
+package transportDev.src.main.repositories;
 
-import src.main.entities.Order;
-import src.main.entities.Item;
-import src.main.enums.OrderStatus;
-import src.main.enums.OrderType;
 import java.time.LocalDate;
 import java.util.List;
+import transportDev.src.main.entities.Item;
+import transportDev.src.main.entities.Order;
+import transportDev.src.main.enums.OrderStatus;
+import transportDev.src.main.enums.OrderType;
 
 public interface OrderRepository {
     Order createOrder(LocalDate date, String siteId, List<Item> items, OrderType type);
