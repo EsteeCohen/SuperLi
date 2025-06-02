@@ -1,11 +1,9 @@
 package employeeDev.src.domainLayer;
 
 import employeeDev.src.domainLayer.Enums.ShiftType;
-import employeeDev.src.presentationLayer.RolePL;
-
+import transportDev.src.main.entities.Site;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,22 +14,30 @@ public class ShiftDL {
     private final ShiftType shiftType;
     private final Map<RoleDL, List<EmployeeDL>> employeesAssignment;
     private final Map<RoleDL, Integer> requirements;
+    private final Site site;
 
     // Main constructor
-    public ShiftDL(LocalDateTime startTime, LocalDateTime endTime, ShiftType shiftType) {
+    public ShiftDL(LocalDateTime startTime, LocalDateTime endTime, ShiftType shiftType, Site site) {
         this.startTime = startTime;
         this.endTime = endTime;
         this.shiftType = shiftType;
         this.employeesAssignment = new HashMap<>();
         this.requirements = WeeklyShiftRequirements.getInstance().getRequirements(startTime.toLocalDate().getDayOfWeek(), shiftType);
+        this.site = site;
     }
 
-    public ShiftDL(LocalDateTime startTime, LocalDateTime endTime, String shiftTypeString) {
+    public ShiftDL(LocalDateTime startTime, LocalDateTime endTime, String shiftTypeString, Site site) {
         this.startTime = startTime;
         this.endTime = endTime;
         this.shiftType = ShiftType.valueOf(shiftTypeString.toUpperCase());
         this.employeesAssignment = new HashMap<>();
         this.requirements = new HashMap<>();
+        this.site = site;
+    }
+
+    // Get the site for this shift
+    public Site getSite() {
+        return site;
     }
 
     // Assign an employee to a role in the shift

@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+import transportDev.src.main.entities.Site;
 import employeeDev.src.domainLayer.Enums.ShiftType;
 import employeeDev.src.serviceLayer.EmployeeSL;
 import employeeDev.src.serviceLayer.RoleSL;
@@ -18,6 +18,7 @@ public class ShiftPL {
     private final ShiftType shiftType;
     private final Map<RolePL, List<EmployeePL>> employeesAssignment;
     private final Map<RolePL, Integer> shiftRoleRequirements;
+    private final Site site;
 
     public ShiftPL(ShiftSL shift) {
         this.startTime = shift.getStartTime();
@@ -39,6 +40,7 @@ public class ShiftPL {
                 this.shiftRoleRequirements.put(new RolePL(entry.getKey()), entry.getValue());
             }
         }
+        this.site = shift.getSite();
     }
 
     @Override

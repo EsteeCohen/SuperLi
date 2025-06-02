@@ -1,6 +1,8 @@
 package employeeDev.src.domainLayer;
 
 import employeeDev.src.domainLayer.Enums.WageType;
+import transportDev.src.main.entities.Site;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,9 +18,10 @@ public class EmployeeDL {
     private final List<RoleDL> roles;
     private int yearlySickDays;
     private int yearlyDaysOff;
+    private Site site;
 
     // Main constructor
-    public EmployeeDL(String id, String password, String fullName, LocalDate wordStartingDate, int wage, char wageTypeChar, int yearlySickDays, int yearlyDaysOff) {
+    public EmployeeDL(String id, String password, String fullName, LocalDate wordStartingDate, int wage, char wageTypeChar, int yearlySickDays, int yearlyDaysOff, Site site) {
         this.id = id;
         this.password = password;
         this.fullName = fullName;
@@ -28,11 +31,12 @@ public class EmployeeDL {
         this.roles = new ArrayList<>();
         this.yearlySickDays = yearlySickDays;
         this.yearlyDaysOff = yearlyDaysOff;
+        this.site = site;
     }
 
     // Simplified constructor
     public EmployeeDL(String id, String fullName, LocalDate wordStartingDate, int wage, char wageTypeChar, int yearlySickDays, int yearlyDaysOff) {
-        this(id, null, fullName, wordStartingDate, wage, wageTypeChar, yearlySickDays, yearlyDaysOff);
+        this(id, null, fullName, wordStartingDate, wage, wageTypeChar, yearlySickDays, yearlyDaysOff, null);
     }
 
     // Add a role to the employee
@@ -82,6 +86,14 @@ public class EmployeeDL {
 
     public int getYearlyDaysOff() {
         return yearlyDaysOff;
+    }
+
+    public Site getSite() {
+        return site;
+    }
+
+    public void setSite(Site site) {
+        this.site = site;
     }
 
     public void updateAttributes(Map<String, Object> attributes) {

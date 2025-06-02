@@ -19,7 +19,7 @@ public class EmployeeSL {
     private final int yearlyDaysOff;
     private final Site site;
 
-    public EmployeeSL(String id, String fullName, LocalDate wordStartingDate, int wage, char wageTypeChar, int yearlySickDays, int yearlyDaysOff) {
+    public EmployeeSL(String id, String fullName, LocalDate wordStartingDate, int wage, char wageTypeChar, int yearlySickDays, int yearlyDaysOff, Site site) {
         this.id = id;
         this.fullName = fullName;
         this.wordStartingDate = wordStartingDate;
@@ -28,7 +28,7 @@ public class EmployeeSL {
         this.roles = new ArrayList<>();
         this.yearlySickDays = yearlySickDays;
         this.yearlyDaysOff = yearlyDaysOff;
-        this.site = null;
+        this.site = site;
     }
 
     public EmployeeSL(EmployeeDL edl){
@@ -43,7 +43,7 @@ public class EmployeeSL {
         }
         this.yearlySickDays = edl.getYearlySickDays();
         this.yearlyDaysOff = edl.getYearlyDaysOff();
-        this.site = null;
+        this.site = edl.getSite();
     }
 
     // Getters for the fields (optional, if needed)
@@ -77,5 +77,9 @@ public class EmployeeSL {
 
     public int getYearlyDaysOff() {
         return yearlyDaysOff;
+    }
+
+    public Site getSite() {
+        return site;
     }
 }

@@ -3,7 +3,7 @@ package employeeDev.src.presentationLayer;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-
+import transportDev.src.main.entities.Site;
 import employeeDev.src.serviceLayer.EmployeeSL;
 import employeeDev.src.serviceLayer.RoleSL;
 
@@ -16,8 +16,9 @@ public class EmployeePL {
     private final List<RolePL> roles;
     private final int yearlySickDays;
     private final int yearlyDaysOff;
+    private final Site site;
 
-    public EmployeePL(String id, String password, String fullName, LocalDate wordStartingDate, int wage, char wageTypeChar, int yearlySickDays, int yearlyDaysOff) {
+    public EmployeePL(String id, String password, String fullName, LocalDate wordStartingDate, int wage, char wageTypeChar, int yearlySickDays, int yearlyDaysOff, Site site) {
         this.id = id;
         this.fullName = fullName;
         this.wordStartingDate = wordStartingDate;
@@ -26,8 +27,8 @@ public class EmployeePL {
         this.roles = new ArrayList<>();
         this.yearlySickDays = yearlySickDays;
         this.yearlyDaysOff = yearlyDaysOff;
+        this.site = site; 
     }
-
     public EmployeePL(EmployeeSL employeeSL) {
         this.id = employeeSL.getId();
         this.fullName = employeeSL.getFullName();
@@ -40,7 +41,9 @@ public class EmployeePL {
         }
         this.yearlySickDays = employeeSL.getYearlySickDays();
         this.yearlyDaysOff = employeeSL.getYearlyDaysOff();
+        this.site = employeeSL.getSite();
     }
+    
 
     public List<String> getRoles() {
         return roles.stream()
@@ -51,6 +54,7 @@ public class EmployeePL {
     public String getID() {
         return id;
     }
+
 
     @Override
     public String toString() {
@@ -63,6 +67,7 @@ public class EmployeePL {
                 "Roles: " + roles + "\n" +
                 "Yearly Sick Days: " + yearlySickDays + "\n" +
                 "Yearly Days Off: " + yearlyDaysOff + "\n" +
+                "Site: " + site.getName() + " at " + site.getAddress() + "\n" +
                 "-------------------------------------\n";
     }
 

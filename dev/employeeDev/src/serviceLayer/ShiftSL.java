@@ -4,6 +4,7 @@ import employeeDev.src.domainLayer.EmployeeDL;
 import employeeDev.src.domainLayer.Enums.ShiftType;
 import employeeDev.src.domainLayer.RoleDL;
 import employeeDev.src.domainLayer.ShiftDL;
+import transportDev.src.main.entities.Site;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -15,6 +16,7 @@ public class ShiftSL {
     private final ShiftType shiftType;
     private final Map<RoleSL, List<EmployeeSL>> employeesAssignment;
     private final Map<RoleSL, Integer> shiftRoleRequirements;
+    private final Site site;
 
     public ShiftSL(ShiftDL shift) {
         this.startTime = shift.getStartTime();
@@ -33,6 +35,7 @@ public class ShiftSL {
                     .toList();
             employeesAssignment.put(role, employees);
         }
+        this.site = shift.getSite();
     }
 
     public LocalDateTime getStartTime() {
@@ -43,6 +46,10 @@ public class ShiftSL {
         return endTime;
     }
 
+    public Site getSite() {
+        return site;
+    }  
+    
     public ShiftType getShiftType() {
         return shiftType;
     }
