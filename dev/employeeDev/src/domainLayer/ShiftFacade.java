@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import employeeDev.src.serviceLayer.Interfaces.ITransportScheduleService;
+import transportDev.src.main.entities.Site;
 
 public class ShiftFacade {
     private final Map<String, ShiftDL> shifts;
@@ -19,36 +20,41 @@ public class ShiftFacade {
         this.transportInterface = transportInterface;
     }
 
-    public List<ShiftDL> getAllShifts() {
+    public List<ShiftDL> getAllShiftsFromSite(Site site) {
+        if (site == null) {
+            throw new IllegalArgumentException("Site cannot be null");
+        }
         List<ShiftDL> shiftList = new ArrayList<>();
         for (ShiftDL shift : shifts.values()) {
-            shiftList.add(shift);
+            if (shift.getSite() != null && shift.getSite().equals(site)) {
+                shiftList.add(shift);
+            }
         }
         return shiftList;
     }
 
-    public void assignToShift(EmployeeDL employee, LocalDateTime startTime, String shiftType, RoleDL role) {
-        ShiftDL shift = shifts.get(getShiftKey(startTime, shiftType));
+    public void assignToShift(EmployeeDL employee, LocalDateTime startTime, String shiftType, RoleDL role, String siteName) {
+        ShiftDL shift = shifts.get(getShiftKey(startTime, shiftType, siteName));
         if (shift == null) {
-            throw new IllegalArgumentException("Shift not found for the given start time and type");
+            throw new IllegalArgumentException("Shift not found for the given start time, type, and site");
         }
         shift.assignEmployee(role, employee);
     }
 
-    public void unassignToShift(EmployeeDL employee, LocalDateTime startTime, String shiftType, RoleDL role) {
-        ShiftDL shift = shifts.get(getShiftKey(startTime, shiftType));
+    public void unassignToShift(EmployeeDL employee, LocalDateTime startTime, String shiftType, RoleDL role, String siteName) {
+        ShiftDL shift = shifts.get(getShiftKey(startTime, shiftType, siteName));
         if (shift == null) {
-            throw new IllegalArgumentException("Shift not found for the given start time and type");
+            throw new IllegalArgumentException("Shift not found for the given start time, type, and site");
         }
         shift.unassignEmployee(role, employee);
     }
 
-    public ShiftDL getShiftByStartTimeAndType(LocalDateTime startTime, String shiftType) {
-        return shifts.get(getShiftKey(startTime, shiftType));
+    public ShiftDL getShiftByStartTimeAndType(LocalDateTime startTime, String shiftType, String siteName) {
+        return shifts.get(getShiftKey(startTime, shiftType, siteName));
     }
 
     public void addShift(ShiftDL shift) {
-        shifts.put(getShiftKey(shift.getStartTime(), shift.getShiftType().toString()), shift);
+        shifts.put(getShiftKey(shift.getStartTime(), shift.getShiftType().toString(), shift.getSite().getName()), shift);
     }
 
     public void setRequirements(DayOfWeek day, ShiftType shift, RoleDL role, int quantity) {
@@ -79,8 +85,8 @@ public class ShiftFacade {
     }
 
     // Helper method to generate the key for the shifts map
-    private String getShiftKey(LocalDateTime startTime, String shiftType) {
-        return startTime.toString() + shiftType;
+    private String getShiftKey(LocalDateTime startTime, String shiftType, String siteName) {
+        return startTime.toString() + shiftType + siteName;
     }
 
     // Get the shift at a specific time
