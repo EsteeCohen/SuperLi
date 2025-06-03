@@ -1,6 +1,7 @@
 package transportDev.src.main.controllers;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +17,8 @@ public class FacadeController {
     private final OrderService orderService;
     private final TruckService truckService;
     private final TransportService transportService;
+    private final ITransportScheduleService transportScheduleService;
+
 
     public FacadeController(
             IncidentService incidentService,
@@ -24,7 +27,8 @@ public class FacadeController {
             SiteService siteService,
             OrderService orderService,
             TruckService truckService,
-            TransportService transportService) {
+            TransportService transportService,
+            ITransportScheduleService transportScheduleService) {
         this.incidentService = incidentService;
         this.driverService = driverService;
         this.userService = userService;
@@ -32,6 +36,8 @@ public class FacadeController {
         this.orderService = orderService;
         this.truckService = truckService;
         this.transportService = transportService;
+        this.transportScheduleService = transportScheduleService;
+
     }
 
     // User Management Methods
@@ -313,4 +319,12 @@ public class FacadeController {
             return new ArrayList<>();
         }
     }
+    public boolean areThereArrivalsAtTheShift(LocalDateTime startTime, LocalDateTime endTime, Site site) {
+        return transportScheduleService.areThereArrivalsAtTheShift(startTime, endTime, site);
+    }
+
+    public int getNumberOfDeliveriesInDate(LocalDate date, Site site) {
+        return transportScheduleService.getNumberOfDeliveriesToSiteInDate(date, site);
+    }
+
 } 

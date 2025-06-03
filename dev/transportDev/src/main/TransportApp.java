@@ -18,6 +18,8 @@ public class TransportApp {
         OrderService orderService = new OrderService(siteService, transportService, incidentService);
         transportService.setOrderService(orderService);
         UserService userService = new UserService();
+        ITransportScheduleService transportScheduleService = new TransportScheduleService(transportService);
+
 
         // Initialize facade controller
         FacadeController facadeController = new FacadeController(
@@ -27,7 +29,8 @@ public class TransportApp {
             siteService,
             orderService,
             truckService,
-            transportService
+            transportService,
+                transportScheduleService
         );
 
         // Initialize system with option for demo data
