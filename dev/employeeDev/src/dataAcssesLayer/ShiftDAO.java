@@ -36,10 +36,11 @@ public class ShiftDAO {
     public void insertShift(ShiftDTO shift) throws SQLException {
         try (Connection conn = DriverManager.getConnection(DBPath);
              PreparedStatement stmt = conn.prepareStatement(
-                     "INSERT OR REPLACE INTO " + shiftTableName + " (shiftType, startingTime, endTime) VALUES (?, ?, ?)")) {
+                     "INSERT OR REPLACE INTO " + shiftTableName + " (shiftType, startingTime, endTime, site_name) VALUES (?, ?, ?, ?)")) {
             stmt.setString(1, shift.getShiftType());
             stmt.setLong(2, shift.getStartTime().atZone(ZoneId.systemDefault()).toEpochSecond());
             stmt.setLong(3, shift.getEndTime().atZone(ZoneId.systemDefault()).toEpochSecond());
+            stmt.setString(4, shift.getSite().getName());
             stmt.executeUpdate();
         }
     }

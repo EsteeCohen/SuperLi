@@ -63,4 +63,12 @@ public class ShiftDTO {
     public void setEmployeesAssignment(Map<RoleDTO, List<EmployeeDTO>> employeesAssignment) {
         this.employeesAssignment = employeesAssignment;
     }
+
+    public SiteDTO getSite() {
+        return site;
+    }
+
+    public void setSite(SiteDTO site) {
+        this.site = site;
+    }
 }
