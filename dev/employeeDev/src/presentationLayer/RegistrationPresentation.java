@@ -1,9 +1,8 @@
 package employeeDev.src.presentationLayer;
 
-import java.util.Scanner;
-
 import employeeDev.src.serviceLayer.EmployeeService;
 import employeeDev.src.serviceLayer.ShiftService;
+import java.util.Scanner;
 import transportDev.src.main.entities.Site;
 
 public class RegistrationPresentation extends Form {
@@ -38,7 +37,7 @@ public class RegistrationPresentation extends Form {
         Integer yearlyDaysOff = UserInputManager.promptForInt(scanner, "Yearly Days Off: ", "Registration cancelled.", "q");
         if (yearlyDaysOff == null) return;
 
-        employeeService.registerEmployee(name, password, id, salary, wageType, yearlySickDays, yearlyDaysOff,site);
+        employeeService.registerEmployee(name, password, id, salary, wageType, yearlySickDays, yearlyDaysOff,site.getName(), "1234567890");
         System.out.println("Registration completed successfully!");
     }
 
