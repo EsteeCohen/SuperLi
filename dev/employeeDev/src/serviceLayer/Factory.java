@@ -20,12 +20,12 @@ public class Factory {
         ShiftFacade shiftFacade = new ShiftFacade(transportScheduleService);
         AvailabilityFacade availabilityFacade = new AvailabilityFacade();
         
-        
         // Initialize the services with the facades
         this.employeeService = new EmployeeService(employeeFacade);
         this.shiftService = new ShiftService(shiftFacade, availabilityFacade, employeeFacade);
         this.assigningService = new AssigningService(shiftFacade, employeeFacade, roleFacade);
         this.roleService = new RoleService(roleFacade);
+
     }
 
     public ShiftService getShiftService() {
