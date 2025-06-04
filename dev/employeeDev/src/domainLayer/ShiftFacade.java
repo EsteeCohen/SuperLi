@@ -5,6 +5,7 @@ import employeeDev.src.serviceLayer.Interfaces.ITransportScheduleService;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.SignStyle;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -135,12 +136,11 @@ public class ShiftFacade {
         }
     }
 
-    public List<EmployeeDL> getAllUnassignedEmployeesForShift(LocalDateTime startTime, ShiftType shiftType) {
+    public List<EmployeeDL> getAllUnassignedEmployeesForShift(LocalDateTime startTime, Site site) {
         List<EmployeeDL> unassigned = new ArrayList<>();
-        // Find the shift by startTime and shiftType
         ShiftDL targetShift = null;
         for (ShiftDL shift : shifts.values()) {
-            if (shift.getStartTime().isEqual(startTime) && shift.getShiftType() == shiftType) {
+            if (shift.getStartTime().isEqual(startTime) && shift.getSite().equals(site)) {
                 targetShift = shift;
                 break;
             }
