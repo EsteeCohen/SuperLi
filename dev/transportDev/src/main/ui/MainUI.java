@@ -1,8 +1,9 @@
 package transportDev.src.main.ui;
 
 import java.util.Scanner;
-import transportDev.src.main.controllers.FacadeController;
 
+import transportDev.src.main.controllers.FacadeController;
+import transportDev.src.main.services.Factory;
 public class MainUI {
     // :)
     private Scanner scanner;
@@ -21,8 +22,9 @@ public class MainUI {
     public MainUI(FacadeController facadeController, LoginUI loginUI, TransportUI transportUI, 
                   OrderUI orderUI, FleetUI fleetUI, SiteUI siteUI, 
                   UserManagementUI userManagementUI, ReportsUI reportsUI) {
+        Factory factory = new Factory();
         this.scanner = new Scanner(System.in);
-        this.facadeController = facadeController;
+        this.facadeController = factory.getFacadeController();
         this.loginUI = loginUI;
         this.transportUI = transportUI;
         this.orderUI = orderUI;
