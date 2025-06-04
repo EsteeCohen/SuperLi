@@ -28,10 +28,13 @@ public class RegistrationPresentation extends Form {
         if (password == null) return;
         String id = UserInputManager.promptForString(scanner, "ID: ", "Registration cancelled.", "q");
         if (id == null) return;
+        String phone = UserInputManager.promptForString(scanner, "Phone Number: ", "Registration cancelled.", "q");
+        if (phone == null) return;
         printSiteList();
         String siteString = UserInputManager.promptForString(scanner, "Site number: ", "Registration cancelled.", "q");
         if (siteString == null) return;
         Site site = siteService.getAllSites().get(Integer.parseInt(siteString) - 1);
+        System.out.println("Selected Site: " + site.getName() + " (ID: " + site.getId() + ")");
         Integer salary = UserInputManager.promptForInt(scanner, "Wage: ", "Registration cancelled.", "q");
         if (salary == null) return;
         String wageType = UserInputManager.promptForWageType(scanner, "Registration cancelled.", "q");
@@ -49,8 +52,8 @@ public class RegistrationPresentation extends Form {
             wageType,
             yearlySickDays.intValue(),
             yearlyDaysOff.intValue(),
-            site.getId(),
-            site.getName()
+            site.getName(),
+            phone
         );
         System.out.println("Registration completed successfully!");
     }
