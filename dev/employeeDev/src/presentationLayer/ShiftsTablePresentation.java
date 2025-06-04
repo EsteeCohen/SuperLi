@@ -10,20 +10,23 @@ import java.util.TreeMap;
 import employeeDev.src.serviceLayer.AssigningService;
 import employeeDev.src.serviceLayer.EmployeeService;
 import employeeDev.src.serviceLayer.ShiftService;
+import employeeDev.src.serviceLayer.SiteService;
 import transportDev.src.main.entities.Site;
 
 public class ShiftsTablePresentation extends Form {
     private ShiftService shiftService;
     private EmployeeService employeeService;
+    private SiteService siteService;    
     private AssigningService assigningService;
     private Scanner scanner;
     private ArrayList<ShiftPL> shifts;
 
-    public ShiftsTablePresentation(ShiftService service, Scanner scanner, AssigningService assigningService, EmployeeService employeeService) {
+    public ShiftsTablePresentation(ShiftService service, Scanner scanner, AssigningService assigningService, EmployeeService employeeService, SiteService siteService) {
         super("Weekly Shift Table");
         this.assigningService = assigningService;
         this.employeeService = employeeService;
         this.shiftService = service;
+        this.siteService = siteService;
         this.scanner = scanner;
         
     }
@@ -34,7 +37,7 @@ public class ShiftsTablePresentation extends Form {
             return;
         }LocalDate today = LocalDate.now();
         LocalDate nextSunday = today.plusDays(7 - today.getDayOfWeek().getValue() % 7);
-        shifts = shiftService.getAllSites().stream()
+        shifts = siteService.getAllSites().stream()
     .flatMap(site -> shiftService.getWeeklyShifts(nextSunday, site).stream()
         .map(shiftSL -> new ShiftPL(shiftSL)))
     .collect(java.util.stream.Collectors.toCollection(ArrayList::new));
@@ -176,7 +179,7 @@ public class ShiftsTablePresentation extends Form {
         LocalDate startDate = LocalDate.now();
         LocalDate endDate = startDate.plusDays(6);
         boolean hasMissingWorkersOverall = false;
-        for (Site site : shiftService.getAllSites()) {
+        for (Site site : siteService.getAllSites()) {
             boolean hasMissingWorkers = shiftService.CheckIfThereAreShiftsThatAreNotAssigned(site, startDate, endDate);
             if (hasMissingWorkers) {
                 System.out.println("There are shifts with missing employees!");

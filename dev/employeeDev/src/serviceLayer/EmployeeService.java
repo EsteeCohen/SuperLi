@@ -6,6 +6,7 @@ import employeeDev.src.domainLayer.EmployeeFacade;
 import java.util.List;
 import java.util.Map;
 import transportDev.src.main.entities.Site;
+import transportDev.src.main.enums.ShippingZone;
 
 public class EmployeeService {
     private EmployeeFacade employeeFacade;
@@ -48,9 +49,9 @@ public class EmployeeService {
         return employeeFacade.assignRoleToEmployee(employeeId, roleName);
     }
 
-    public void registerAdmin(){
-        Site defaultSite = null; // TO-DO: Replace with actual site retrieval logic
-        registerEmployee("Bombardino Crocodilo", "3", "admin", 9999, "Hourly", 1000, 1000, defaultSite.getName(), "1234567890");
+    public void registerAdmin(String adminID, Site defaultSite) {
+        // TO-DO: Replace with actual site retrieval logic        
+        registerEmployee("Bombardino Crocodilo", "3", adminID, 9999, "Hourly", 1000, 1000, defaultSite.getName(), "1234567890");
         assignRoleToEmployee("admin", "HrManager");
     }
 
