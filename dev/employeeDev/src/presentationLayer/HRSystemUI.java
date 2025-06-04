@@ -41,7 +41,9 @@ public class HRSystemUI {
         roleService.createRole(WAREHOUSEMAN);
         roleService.createRole(DRIVER);
         employeeService.registerAdmin();
-        shiftService.createShiftsForNextWeek();
+        shiftService.getAllSites().forEach(site -> {
+            shiftService.createShiftsForNextWeek(site);
+        });
         assigningService.initializeRequirements();
     }
 
@@ -131,7 +133,7 @@ public class HRSystemUI {
     private boolean handleHRManagerChoice(int choice, EmployeePL employee) {
         switch (choice) {
             case 1:
-                RegistrationPresentation registration = new RegistrationPresentation(employeeService, scanner);
+                RegistrationPresentation registration = new RegistrationPresentation(employeeService,shiftService, scanner);
                 registration.registerNewEmployee();
                 break;
             case 2:

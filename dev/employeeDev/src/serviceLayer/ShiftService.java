@@ -2,43 +2,45 @@ package employeeDev.src.serviceLayer;
 
 import employeeDev.src.domainLayer.AvailabilityDL;
 import employeeDev.src.domainLayer.AvailabilityFacade;
+import employeeDev.src.domainLayer.DriverDL;
 import employeeDev.src.domainLayer.EmployeeDL;
 import employeeDev.src.domainLayer.EmployeeFacade;
 import employeeDev.src.domainLayer.Enums.ShiftType;
+import employeeDev.src.presentationLayer.ShiftPL;
 import employeeDev.src.serviceLayer.Interfaces.DriverAvailabilityInfoIT;
 import transportDev.src.main.entities.Site;
 import employeeDev.src.domainLayer.ShiftDL;
 import employeeDev.src.domainLayer.ShiftFacade;
+import employeeDev.src.domainLayer.SiteFacade;
+
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class ShiftService implements DriverAvailabilityInfoIT{
     private ShiftFacade shiftFacade;
+    private SiteFacade siteFacade;
     private AvailabilityFacade availabilityFacade;
     private EmployeeFacade employeeFacade;
 
-    public ShiftService(ShiftFacade shiftFacade, AvailabilityFacade availabilityFacade, EmployeeFacade employeeFacade) {
+    public ShiftService(ShiftFacade shiftFacade, AvailabilityFacade availabilityFacade, EmployeeFacade employeeFacade,
+                        SiteFacade siteFacade) {
         this.shiftFacade = shiftFacade;
         this.availabilityFacade = availabilityFacade;
         this.employeeFacade = employeeFacade;
+        this.siteFacade = siteFacade;
     }
 
-    // checks if there are any shifts where not enough employees are available
-    public boolean checkForProblematicShifts() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'checkShiftsWithMissingWorkers'");
+    public boolean CheckIfThereAreShiftsThatAreNotAssigned(Site site, LocalDate startDate, LocalDate endDate) {
+        return shiftFacade.checkIfThereAreShiftsThatAreNotFullyAssigned(site, startDate, endDate);
     }
 
-    public boolean CheckIfThereAreShiftsThatAreNotAssigned() {
-        return shiftFacade.checkIfThereAreShiftsThatAreNotFullyAssigned();
-    }
-
-    public List<ShiftSL> getAllShift() {
-        List<ShiftDL> allDlShifts  = shiftFacade.getAllShifts();
+    public List<ShiftSL> getWeeklyShifts(LocalDate startDate, Site site) {
+        List<ShiftDL> allDlShifts = shiftFacade.getWeeklyShifts(startDate, site);
         List<ShiftSL> allSlShifts = new ArrayList<>();
         for (ShiftDL dlShift : allDlShifts) {
             allSlShifts.add(new ShiftSL(dlShift));
@@ -46,20 +48,11 @@ public class ShiftService implements DriverAvailabilityInfoIT{
         return allSlShifts;
     }
 
-    public List<ShiftSL> getWeeklyShifts(LocalDate startDate) {
-        List<ShiftDL> allDlShifts = shiftFacade.getWeeklyShifts(startDate);
-        List<ShiftSL> allSlShifts = new ArrayList<>();
-        for (ShiftDL dlShift : allDlShifts) {
-            allSlShifts.add(new ShiftSL(dlShift));
-        }
-        return allSlShifts;
-    }
-
-    // Updated: now uses startTime and shiftType
-    public void setAvailabilityOfEmployeeToShift(String employeeId, LocalDateTime startTime, String shiftType, boolean available) {
-        ShiftDL shift = shiftFacade.getShiftByStartTimeAndType(startTime, shiftType);
+    // Updated: now uses startTime and site
+    public void setAvailabilityOfEmployeeToShift(String employeeId, LocalDateTime startTime, Site site, boolean available) {
+        ShiftDL shift = shiftFacade.getShiftByStartTimeAndType(startTime, site);
         if (shift == null) {
-            throw new IllegalArgumentException("Shift not found for the given start time and type");
+            throw new IllegalArgumentException("Shift not found for the given start time and site");
         }
         EmployeeDL employee = employeeFacade.getEmployee(employeeId);
         if (employee == null) {
@@ -76,8 +69,8 @@ public class ShiftService implements DriverAvailabilityInfoIT{
     }
 
     // Updated: now uses startTime and shiftType
-    public List<EmployeeSL> getAvailableEmployeesForShift(LocalDateTime startTime, String shiftType) {
-        ShiftDL shift = shiftFacade.getShiftByStartTimeAndType(startTime, shiftType);
+    public List<EmployeeSL> getAvailableEmployeesForShift(LocalDateTime startTime, Site site) {
+        ShiftDL shift = shiftFacade.getShiftByStartTimeAndType(startTime, site);
         List<EmployeeDL> availableEmployeesDL = availabilityFacade.getAvailabilitiesForShift(shift);
         List<EmployeeSL> availableEmployeesSL = new ArrayList<>();
         for (EmployeeDL employeeDL : availableEmployeesDL) {
@@ -136,7 +129,7 @@ public class ShiftService implements DriverAvailabilityInfoIT{
     }
 
     public List<EmployeeSL> getAllUnassignedEmployeeForShift(ShiftSL shift) {
-        List<EmployeeDL> unassignedEmployees = shiftFacade.getAllUnassignedEmployeesForShift(shift.getStartTime(), shift.getShiftType());
+        List<EmployeeDL> unassignedEmployees = shiftFacade.getAllUnassignedEmployeesForShift(shift.getStartTime(), shift.getSite());
         List<EmployeeSL> unassignedEmployeeSL = new ArrayList<>();
         for (EmployeeDL employee : unassignedEmployees) {
             unassignedEmployeeSL.add(new EmployeeSL(employee));
@@ -144,8 +137,29 @@ public class ShiftService implements DriverAvailabilityInfoIT{
         return unassignedEmployeeSL;
     }
 
-    public List<EmployeeDL> getAllAssignDriver(LocalDateTime Time, Site site) {
-        ShiftDL = shiftFacade.getShiftAtTime(Time, site);
-        
+    @Override
+    public List<DriverDL> getAllAssignDriver(LocalDateTime time, Site site) {
+        List<DriverDL> drivers = new ArrayList<>();
+        RoleSL role = new RoleSL("Driver");
+        List<EmployeeDL> availableEmployees = availabilityFacade.getAvailabilitiesForShift(shiftFacade.getShiftByStartTimeAndType(time, site), role.getRoleDL());
+        for (EmployeeDL employee : availableEmployees) {
+            if (employee instanceof DriverDL) {
+                drivers.add((DriverDL) employee);
+            }
+        }
+        return drivers;
+    }
+
+    public List<ShiftSL> getAllShiftFromSite(Site site) {
+        Collection<ShiftDL> allShifts = shiftFacade.getAllShiftsFromSite(site);
+        List<ShiftSL> allShiftSL = new ArrayList<>();
+        for (ShiftDL shift : allShifts) {
+            allShiftSL.add(new ShiftSL(shift));
+        }
+        return allShiftSL;
+    }
+
+    public List<Site> getAllSites() {
+        return siteFacade.getSites();
     }
 }

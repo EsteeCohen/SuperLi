@@ -4,7 +4,9 @@ import employeeDev.src.domainLayer.AvailabilityFacade;
 import employeeDev.src.domainLayer.EmployeeFacade;
 import employeeDev.src.domainLayer.RoleFacade;
 import employeeDev.src.domainLayer.ShiftFacade;
+import employeeDev.src.domainLayer.SiteFacade;
 import employeeDev.src.serviceLayer.Interfaces.ITransportScheduleService;
+import transportDev.src.main.entities.Site;
 
 public class Factory {
     public EmployeeService employeeService;
@@ -16,13 +18,14 @@ public class Factory {
         // Initialize the facades
         ITransportScheduleService transportScheduleService = null; // Assuming this is initialized elsewhere any we can inject it later
         RoleFacade roleFacade = new RoleFacade();
-        EmployeeFacade employeeFacade = new EmployeeFacade(roleFacade);
-        ShiftFacade shiftFacade = new ShiftFacade(transportScheduleService);
+        SiteFacade siteFacade = new SiteFacade();
+        EmployeeFacade employeeFacade = new EmployeeFacade(roleFacade, siteFacade);
+        ShiftFacade shiftFacade = new ShiftFacade(transportScheduleService, employeeFacade, siteFacade, roleFacade);
         AvailabilityFacade availabilityFacade = new AvailabilityFacade();
         
         // Initialize the services with the facades
         this.employeeService = new EmployeeService(employeeFacade);
-        this.shiftService = new ShiftService(shiftFacade, availabilityFacade, employeeFacade);
+        this.shiftService = new ShiftService(shiftFacade, availabilityFacade, employeeFacade, siteFacade);
         this.assigningService = new AssigningService(shiftFacade, employeeFacade, roleFacade);
         this.roleService = new RoleService(roleFacade);
 

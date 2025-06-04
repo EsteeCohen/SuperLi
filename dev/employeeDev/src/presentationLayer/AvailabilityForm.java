@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.Scanner;
 
 import employeeDev.src.serviceLayer.ShiftService;
+import transportDev.src.main.entities.Site;
 
 public class AvailabilityForm extends Form {
     private ShiftService shiftService;
@@ -20,8 +21,12 @@ public class AvailabilityForm extends Form {
     public void showAvailabilityForm(String employeeId) {
         LocalDate today = LocalDate.now();
         LocalDate nextSunday = today.plusDays(7 - today.getDayOfWeek().getValue() % 7);
-
-        ArrayList<ShiftPL> workTimes = new ArrayList<>(shiftService.getWeeklyShifts(nextSunday).stream()
+        Site site = pickSite();
+        if (site == null) {
+            System.out.println("Site selection cancelled.");
+            return;
+        }
+        ArrayList<ShiftPL> workTimes = new ArrayList<>(shiftService.getWeeklyShifts(nextSunday,site).stream()
             .map(shiftSL -> new ShiftPL(shiftSL))
             .toList());
         workTimes.sort(Comparator.comparing(ShiftPL::getStartTime, Comparator.naturalOrder()));
@@ -36,7 +41,7 @@ public class AvailabilityForm extends Form {
         String input = getSelectedShiftsInput(workTimes);
         if (input == null) return;
 
-        boolean anyValid = processSelectedShifts(input, workTimes, employeeId);
+        boolean anyValid = processSelectedShifts(input, workTimes, employeeId,site);
 
         if (anyValid) {
             System.out.println("Availability has been set successfully!");
@@ -51,8 +56,20 @@ public class AvailabilityForm extends Form {
             System.out.println((i + 1) + ". " + workTimes.get(i).toStringForAvailabilityForm());
         }
     }
+    private Site pickSite() {
+        System.out.println("Available Sites:");
+        int index = 1;
+        for (Site site : shiftService.getAllSites()) {
+            System.out.println(index + ". " + site.getName() + " (ID: " + site.getId() + ")");
+            index++;
+        }
+        System.out.println("Enter the number corresponding to the site or 'q' to cancel.");
+        String siteString = UserInputManager.promptForString(scanner, "Site number: ", "Registration cancelled.", "q");
+        if (siteString == null) return null;
+        return shiftService.getAllSites().get(Integer.parseInt(siteString) - 1);
+    }
 
-    private boolean processSelectedShifts(String input, ArrayList<ShiftPL> workTimes, String employeeId) {
+    private boolean processSelectedShifts(String input, ArrayList<ShiftPL> workTimes, String employeeId,Site site) {
         boolean anyValid = false;
         for (String number : parseInputNumbers(input)) {
             try {
@@ -63,7 +80,7 @@ public class AvailabilityForm extends Form {
                     shiftService.setAvailabilityOfEmployeeToShift(
                         employeeId,
                         selectedShift.getStartTime(),
-                        selectedShift.getShiftType().toString(),
+                        site,
                         true
                     );
                     anyValid = true;
