@@ -2,11 +2,10 @@ package employeeDev.src.serviceLayer;
 
 import employeeDev.src.domainLayer.EmployeeDL;
 import employeeDev.src.domainLayer.RoleDL;
-import transportDev.src.main.entities.Site;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import transportDev.src.main.entities.Site;
 
 public class EmployeeSL {
     private final String id;
@@ -34,7 +33,7 @@ public class EmployeeSL {
     public EmployeeSL(EmployeeDL edl){
         this.id = edl.getId();
         this.fullName = edl.getFullName();
-        this.wordStartingDate = edl.getWordStartingDate();
+        this.wordStartingDate = edl.getWorkStartingDate();
         this.wage = edl.getWage();
         this.wageType = WageTypeSL.fromChar(edl.getWageType().getChar());
         this.roles = new ArrayList<>();
