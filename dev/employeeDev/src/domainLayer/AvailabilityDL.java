@@ -5,7 +5,7 @@ public class AvailabilityDL {
     private final EmployeeDL employee;
     private boolean isAvailable;
 
-    // Main constructor
+    // Main constructor :)
     public AvailabilityDL(ShiftDL shift, EmployeeDL employee) {
         this.shift = shift;
         this.employee = employee;
