@@ -1,6 +1,10 @@
 package employeeDev.src.domainLayer;
 
+import employeeDev.src.dataAcssesLayer.ShiftDAO;
 import employeeDev.src.domainLayer.Enums.ShiftType;
+import employeeDev.src.dtos.EmployeeDTO;
+import employeeDev.src.dtos.RoleDTO;
+import employeeDev.src.dtos.ShiftDTO;
 import employeeDev.src.serviceLayer.Interfaces.ITransportScheduleService;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -15,11 +19,15 @@ public class ShiftFacade {
     private final Map<String, ShiftDL> shifts;
     private final ITransportScheduleService transportInterface;
     private final EmployeeFacade employeeFacade;
+    private final RoleFacade roleFacade;
+    private final SiteFacade siteFacade;
 
-    public ShiftFacade(ITransportScheduleService transportInterface, EmployeeFacade employeeFacade) {
+    public ShiftFacade(ITransportScheduleService transportInterface, EmployeeFacade employeeFacade, SiteFacade siteFacade, RoleFacade roleFacade) {
         this.shifts = new HashMap<>();
         this.transportInterface = transportInterface;
         this.employeeFacade = employeeFacade;
+        this.siteFacade = siteFacade;
+        this.roleFacade = roleFacade;
     }
 
     public List<ShiftDL> getAllShiftsFromSite(Site site) {
@@ -154,6 +162,67 @@ public class ShiftFacade {
             }
         }
         return unassigned;
+    }
+
+    // Load shifts from the database and add them to the internal map
+    public void loadShiftsFromDB() {
+        ShiftDAO shiftDAO = new ShiftDAO();
+        List<ShiftDTO> shiftList = shiftDAO.getAllShifts();
+        for (ShiftDTO shiftDTO : shiftList) {
+            addShiftDTO(shiftDTO);
+        }
+    }
+
+    private void addShiftDTO(ShiftDTO shiftDTO){
+        Site site = siteFacade.getSiteByName(shiftDTO.getSite().getName());
+        if (site == null) {
+            throw new IllegalArgumentException("Site not found during loading of shifts: " + shiftDTO.getSite().getName());
+        }
+        Map<RoleDL, Integer> requirements = convertFromDTORequirements(shiftDTO.getRequirements());
+        Map<RoleDL, List<EmployeeDL>> assignments = convertFromDTOAssignments(shiftDTO.getEmployeesAssignment());
+        ShiftDL shift = new ShiftDL(
+            shiftDTO.getStartTime(),
+            shiftDTO.getEndTime(),
+            shiftDTO.getShiftType(),
+            site,
+            requirements,
+            assignments
+        );
+        addShift(shift);
+    }
+
+    private Map<RoleDL, Integer> convertFromDTORequirements(Map<RoleDTO, Integer> dtoRequirements) {
+        Map<RoleDL, Integer> requirements = new HashMap<>();
+        for (Map.Entry<RoleDTO, Integer> entry : dtoRequirements.entrySet()) {
+            RoleDL role = roleFacade.getRoleByName(entry.getKey().getName());
+            if (role == null) {
+                throw new IllegalArgumentException("Role not found during loading of shift req: " + entry.getKey().getName());
+            }
+            requirements.put(role, entry.getValue());
+        }
+        return requirements;
+    }
+
+    private Map<RoleDL, List<EmployeeDL>> convertFromDTOAssignments(Map<RoleDTO, List<EmployeeDTO>> dtoAssignments) {
+        Map<RoleDL, List<EmployeeDL>> assignments = new HashMap<>();
+        for (Map.Entry<RoleDTO, List<EmployeeDTO>> entry : dtoAssignments.entrySet()) {
+            RoleDL role = roleFacade.getRoleByName(entry.getKey().getName());
+            if (role == null) {
+                throw new IllegalArgumentException("Role not found during loading of shift assignments: " + entry.getKey().getName());
+            }
+            List<EmployeeDL> employees = new ArrayList<>();
+            for (EmployeeDTO employeeDTO : entry.getValue()) {
+                EmployeeDL employee = employeeFacade.getEmployee(employeeDTO.getId());
+                if (employee != null) {
+                    employees.add(employee);
+                }
+                else {
+                    throw new IllegalArgumentException("Employee not found during loading of shift assignments: " + employeeDTO.getId());
+                }
+            }
+            assignments.put(role, employees);
+        }
+        return assignments;
     }
 
 }
