@@ -1,18 +1,17 @@
 package employeeDev.src.presentationLayer;
 
+import employeeDev.src.serviceLayer.ShiftService;
+import employeeDev.src.serviceLayer.SiteService;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Scanner;
-
-import employeeDev.src.serviceLayer.ShiftService;
-import employeeDev.src.serviceLayer.SiteService;
 import transportDev.src.main.entities.Site;
 
 public class AvailabilityForm extends Form {
-    private ShiftService shiftService;
-    private SiteService siteService;
-    private Scanner scanner;
+    private final ShiftService shiftService;
+    private final SiteService siteService;
+    private final Scanner scanner;
 
     public AvailabilityForm(Scanner scanner, ShiftService shiftService, SiteService siteService) {
         super("Availability Form");
@@ -63,7 +62,7 @@ public class AvailabilityForm extends Form {
         System.out.println("Available Sites:");
         int index = 1;
         for (Site site : siteService.getAllSites()) {
-            System.out.println(index + ". " + site.getName() + " (ID: " + site.getId() + ")");
+            System.out.println(index + ". " + site.getName());
             index++;
         }
         System.out.println("Enter the number corresponding to the site or 'q' to cancel.");
@@ -101,7 +100,7 @@ public class AvailabilityForm extends Form {
         return input.trim().split("\\s+");
     }
 
-    private String getSelectedShiftsInput(ArrayList<ShiftPL> workTimes) {
+    private String getSelectedShiftsInput(ArrayList<ShiftPL> workTimes) { // im not sure why do we need workTimes here O_o
         System.out.println("Choose your work times: (numbers separated by space, or type 'q' to cancel)");
         return UserInputManager.getUserInputOrCancel(scanner, "Operation cancelled.", "q");
     }

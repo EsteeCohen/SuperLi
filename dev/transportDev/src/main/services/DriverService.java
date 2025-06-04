@@ -14,7 +14,6 @@ public class DriverService {
         this.drivers = new ArrayList<>();
     }
     //------------- methods -------------
-    // ####
     public Driver addDriver(String id, String name, String phone, LicenseType licenseType){
         if (id == null || name == null || phone == null || licenseType == null) {
             throw new IllegalArgumentException("All fields are required");

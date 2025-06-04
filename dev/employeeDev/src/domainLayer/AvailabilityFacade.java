@@ -1,18 +1,29 @@
 package employeeDev.src.domainLayer;
 
+import employeeDev.src.dataAcssesLayer.AvilibilityDAO;
+import employeeDev.src.dtos.AvilibilityDTO;
+import employeeDev.src.mappers.AvilibilityMapper;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 public class AvailabilityFacade {
     private final List<AvailabilityDL> availabilities;
+    private final ShiftFacade shiftFacade;
+    private final EmployeeFacade employeeFacade;
+    private final SiteFacade siteFacade;
+    
 
-    public AvailabilityFacade() {
+    public AvailabilityFacade(ShiftFacade shiftFacade, EmployeeFacade employeeFacade, SiteFacade siteFacade) {
         this.availabilities = new ArrayList<>();
+        this.shiftFacade = shiftFacade;
+        this.employeeFacade = employeeFacade;
+        this.siteFacade = siteFacade;
     }
 
     public void addAvailability(AvailabilityDL availability) {
         this.availabilities.add(availability);
+        availability.presistIntoDB();
     }
 
     public List<EmployeeDL> getAvailabilitiesForShift(ShiftDL shift) {
@@ -59,5 +70,17 @@ public class AvailabilityFacade {
             }
         }
         return result;
+    }
+
+    public void LoadAvailabilitiesFromDB() {
+        AvilibilityDAO availabilityDAO = new AvilibilityDAO();
+        List<AvilibilityDTO> availabilityDTOs = availabilityDAO.getAllAvailabilities();
+        for (AvilibilityDTO dto : availabilityDTOs) {
+            AvailabilityDL availability = AvilibilityMapper.fromDTO(dto, shiftFacade, siteFacade, employeeFacade);
+            if (availability != null) {
+                availabilities.add(availability);
+            }
+        }
+        
     }
 }

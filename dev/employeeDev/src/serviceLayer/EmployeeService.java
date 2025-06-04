@@ -55,8 +55,7 @@ public class EmployeeService implements UserManagmentInteface {
     }
 
     public void updateEmployeeAttributes(String employeeId, Map<String, Object> attributes){
-        EmployeeDL employee = employeeFacade.getEmployee(employeeId);
-        employee.updateAttributes(attributes);
+        employeeFacade.updateEmployeeAttributes(employeeId, attributes);
     }
 
     public boolean employeeHasRole(String employeeId, String roleName) {

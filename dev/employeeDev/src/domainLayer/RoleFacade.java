@@ -20,6 +20,7 @@ public class RoleFacade{
         RoleDL role = new RoleDL(roleName);
         if (!roles.containsKey(role.getName())) {
             roles.put(role.getName(), role);
+            role.presistIntoDB();
             return true;
         }
         return false;
@@ -32,6 +33,8 @@ public class RoleFacade{
     public void delete(String name) {
         if (roles.containsKey(name)) {
             roles.remove(name);
+            RoleDAO roleDAO = new RoleDAO();
+            roleDAO.deleteRole(name);
         }
     }
 

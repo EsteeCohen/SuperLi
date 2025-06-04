@@ -22,6 +22,7 @@ public class SiteFacade {
     public void addSite(Site site) {
         if (site != null && !sites.contains(site)) {
             sites.add(site);
+            site.presistIntoDB();
         } else {
             throw new IllegalArgumentException("Site is null or already exists.");
         }
@@ -30,6 +31,8 @@ public class SiteFacade {
     public void removeSite(Site site) {
         if (site != null && sites.contains(site)) {
             sites.remove(site);
+            SiteDAO siteDAO = new SiteDAO();
+            siteDAO.deleteSite(site.getName());
         } else {
             throw new IllegalArgumentException("Site is null or does not exist.");
         }
@@ -50,7 +53,7 @@ public class SiteFacade {
         List<SiteDTO> siteDTOs = siteDAO.getAllSites();
         for (SiteDTO siteDTO : siteDTOs) {
             Site site = SiteMapper.fromDTO(siteDTO);
-            addSite(site);
+            sites.add(site);
         }
     }
 
@@ -83,13 +86,7 @@ public class SiteFacade {
     }
 
     public void deleteSite(String name) {
-        Site siteToDelete = null;
-        for (Site site : sites) {
-            if (site.getName().equalsIgnoreCase(name)) {
-                siteToDelete = site;
-                break;
-            }
-        }
+        Site siteToDelete = getSiteByName(name);
         if (siteToDelete != null) {
             removeSite(siteToDelete);
         } else {

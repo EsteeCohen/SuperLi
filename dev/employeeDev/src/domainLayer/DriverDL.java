@@ -1,5 +1,7 @@
 package employeeDev.src.domainLayer;
 
+import employeeDev.src.dataAcssesLayer.EmployeeDAO;
+import employeeDev.src.mappers.EmployeeMapper;
 import java.time.LocalDate;
 import transportDev.src.main.entities.Site;
 import transportDev.src.main.enums.LicenseType;
@@ -40,6 +42,18 @@ public class DriverDL extends EmployeeDL {
     @Override
     public boolean isDriver() {
         return true;
+    }
+
+    @Override
+    public void insertIntoDB() {
+        EmployeeDAO employeeDAO = new EmployeeDAO();
+        employeeDAO.instertDriver(EmployeeMapper.toDriverDTO(this));
+    }
+
+    @Override
+    public void updateInDB() {
+        EmployeeDAO employeeDAO = new EmployeeDAO();
+        employeeDAO.updateDriver(EmployeeMapper.toDriverDTO(this));
     }
 
     

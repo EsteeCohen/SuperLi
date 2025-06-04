@@ -3,12 +3,13 @@ package employeeDev.src.domainLayer;
 import employeeDev.src.dataAcssesLayer.ShiftDAO;
 import employeeDev.src.domainLayer.Enums.ShiftType;
 import employeeDev.src.dtos.ShiftDTO;
+import employeeDev.src.mappers.EmployeeMapper;
+import employeeDev.src.mappers.RoleMapper;
 import employeeDev.src.mappers.ShiftMapper;
 import employeeDev.src.serviceLayer.Interfaces.ITransportScheduleService;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.SignStyle;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,14 +18,12 @@ import transportDev.src.main.entities.Site;
 
 public class ShiftFacade {
     private final Map<String, ShiftDL> shifts;
-    private final ITransportScheduleService transportInterface;
     private final EmployeeFacade employeeFacade;
     private final RoleFacade roleFacade;
     private final SiteFacade siteFacade;
 
-    public ShiftFacade(ITransportScheduleService transportInterface, EmployeeFacade employeeFacade, SiteFacade siteFacade, RoleFacade roleFacade) {
+    public ShiftFacade(EmployeeFacade employeeFacade, SiteFacade siteFacade, RoleFacade roleFacade) {
         this.shifts = new HashMap<>();
-        this.transportInterface = transportInterface;
         this.employeeFacade = employeeFacade;
         this.siteFacade = siteFacade;
         this.roleFacade = roleFacade;
@@ -49,6 +48,8 @@ public class ShiftFacade {
             throw new IllegalArgumentException("Shift not found for the given start time and site");
         }
         shift.assignEmployee(role, employee);
+        ShiftDAO shiftDAO = new ShiftDAO();
+        shiftDAO.insertAssignmentForShift(ShiftMapper.toDTO(shift), RoleMapper.toDTO(role), EmployeeMapper.toDTO(employee));
     }
 
     public void unassignToShift(EmployeeDL employee, LocalDateTime startTime, Site site,  RoleDL role) {
@@ -57,14 +58,18 @@ public class ShiftFacade {
             throw new IllegalArgumentException("Shift not found for the given start time and site");
         }
         shift.unassignEmployee(role, employee);
+        ShiftDAO shiftDAO = new ShiftDAO();
+        shiftDAO.deleteAssignmentForShift(startTime, shift.getSite().getName(), RoleMapper.toDTO(role), EmployeeMapper.toDTO(employee));
     }
 
-    public ShiftDL getShiftByStartTimeAndType(LocalDateTime startTime, Site site) {
+    public ShiftDL getShiftByStartTimeAndSite(LocalDateTime startTime, Site site) {
         return shifts.get(getShiftKey(startTime, site.getName()));
     }
 
     public void addShift(ShiftDL shift) {
         shifts.put(getShiftKey(shift.getStartTime(), shift.getSite().getName()), shift);
+        ShiftDAO shiftDAO = new ShiftDAO();
+        shiftDAO.insertShift(ShiftMapper.toDTO(shift));
     }
 
     public void setWeeklyRequirements(DayOfWeek day, ShiftType shift, RoleDL role, int quantity) {
@@ -76,6 +81,8 @@ public class ShiftFacade {
             throw new IllegalArgumentException("Shift and role cannot be null");
         }
         shift.setIntoRequirements(role, quantity);
+        ShiftDAO shiftDAO = new ShiftDAO();
+        shiftDAO.insertRequirementForShift(ShiftMapper.toDTO(shift), RoleMapper.toDTO(role), quantity);
     }
 
     public boolean checkIfThereAreShiftsThatAreNotFullyAssigned(Site site, LocalDate startDate, LocalDate endDate) {
@@ -135,10 +142,10 @@ public class ShiftFacade {
     }
 
     // makes sure that every shift where a delivery is expected to arrive has at least one warehouseman required
-    public void intergrateShiftToDeliveries(Site site, RoleDL warehousemanRole) {
+    public void intergrateShiftToDeliveries(Site site, RoleDL warehousemanRole, ITransportScheduleService transportInterface) {
         for (ShiftDL shift : shifts.values()) {
             if (transportInterface.areThereArivelesBetween(shift.getStartTime(), shift.getEndTime(), site) && shift.getRequiredEmployeeCount(warehousemanRole) < 1) {
-                shift.addToRequirements(warehousemanRole, 1);
+                setRequirementForShift(shift, warehousemanRole, 1);
             }
         }
     }
@@ -168,7 +175,10 @@ public class ShiftFacade {
         ShiftDAO shiftDAO = new ShiftDAO();
         List<ShiftDTO> shiftList = shiftDAO.getAllShifts();
         for (ShiftDTO shiftDTO : shiftList) {
-            addShift(ShiftMapper.fromDTO(shiftDTO, siteFacade, roleFacade, employeeFacade));
+            ShiftDL shift = ShiftMapper.fromDTO(shiftDTO, siteFacade, roleFacade, employeeFacade);
+            if (shift != null) {
+                shifts.put(getShiftKey(shift.getStartTime(), shift.getSite().getName()), shift);
+            }
         }
     }
 

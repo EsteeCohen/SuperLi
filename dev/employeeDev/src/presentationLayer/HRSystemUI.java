@@ -1,29 +1,28 @@
 package employeeDev.src.presentationLayer;
 
-import java.util.Scanner;
 import employeeDev.src.serviceLayer.AssigningService;
 import employeeDev.src.serviceLayer.EmployeeService;
 import employeeDev.src.serviceLayer.Factory;
 import employeeDev.src.serviceLayer.RoleService;
 import employeeDev.src.serviceLayer.ShiftService;
 import employeeDev.src.serviceLayer.SiteService;
+import java.util.Scanner;
 import transportDev.src.main.entities.Site;
 import transportDev.src.main.enums.ShippingZone;
 
 public class HRSystemUI {
 
-    private RoleService roleService;
-    private ShiftService shiftService;
-    private EmployeeService employeeService;
-    private AssigningService assigningService;
-    private SiteService siteService;
+    private final RoleService roleService;
+    private final ShiftService shiftService;
+    private final EmployeeService employeeService;
+    private final AssigningService assigningService;
+    private final SiteService siteService;
 
     private final String ADMIN_ROLE_NAME = "HrManager";
     private final String SHIFT_MNG_ROLE = "Shift Manager";
     private final String WAREHOUSEMAN = "Warehouseman";
     private final String DRIVER = "Driver";
     private final String SITE_NAME = "MainSite";
-    private final String SITE_ID = "1";
     private final String ADMIN_ID = "admin";
 
 
@@ -48,7 +47,7 @@ public class HRSystemUI {
         roleService.createRole(SHIFT_MNG_ROLE);
         roleService.createRole(WAREHOUSEMAN);
         roleService.createRole(DRIVER);
-        siteService.addSite(SITE_ID,SITE_NAME, "Main Warehouse", "123 Main St", "123-456-7890", ShippingZone.CENTER.name());
+        siteService.addSite(SITE_NAME, "Main Warehouse", "123 Main St", "123-456-7890", ShippingZone.CENTER.name());
         Site defSite = siteService.getSiteByName(SITE_NAME);
         employeeService.registerAdmin(ADMIN_ID,defSite);
         siteService.getAllSites().forEach(site -> {
@@ -143,7 +142,7 @@ public class HRSystemUI {
     private boolean handleHRManagerChoice(int choice, EmployeePL employee) {
         switch (choice) {
             case 1:
-                RegistrationPresentation registration = new RegistrationPresentation(employeeService,shiftService,siteService, scanner);
+                RegistrationPresentation registration = new RegistrationPresentation(employeeService,siteService, scanner);
                 registration.registerNewEmployee();
                 break;
             case 2:

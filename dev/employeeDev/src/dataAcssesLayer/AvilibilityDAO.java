@@ -24,12 +24,12 @@ public class AvilibilityDAO {
 
     public void saveAvailability(AvilibilityDTO availability) {
         try (Connection conn = DriverManager.getConnection(dbPath)) {
-            String sql = "INSERT OR REPLACE INTO " +  TABLE_NAME  + " (shift_startingTime, employee_id, IsAvailable) " +
-                         "VALUES (?, ?, ?)";
+            String sql = "INSERT OR REPLACE INTO " +  TABLE_NAME  + " (shift_startingTime, employee_id, IsAvailable, shift_siteName) VALUES (?, ?, ?, ?)";
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setLong(1, availability.getShift().getStartTime().atZone(ZoneId.systemDefault()).toEpochSecond());
             stmt.setString(2, availability.getEmployee().getId());
             stmt.setInt(3, availability.isAvailable() ? 1 : 0);
+            stmt.setString(4, availability.getShift().getSite().getName());
             stmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -40,9 +40,10 @@ public class AvilibilityDAO {
         List<AvilibilityDTO> results = new ArrayList<>();
         try (Connection conn = DriverManager.getConnection(dbPath)) {
             String sql = "SELECT employee_id, IsAvailable FROM " + TABLE_NAME  +
-                         " WHERE shift_startingTime = ?";
+                         " WHERE shift_startingTime = ? AND shift_siteName = ?";
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setLong(1, shift.getStartTime().atZone(ZoneId.systemDefault()).toEpochSecond());
+            stmt.setString(2, shift.getSite().getName());
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 String empId = rs.getString("employee_id");
@@ -64,10 +65,11 @@ public class AvilibilityDAO {
     public AvilibilityDTO getAvailabilityForEmployeeAndShift(EmployeeDTO employee, ShiftDTO shift) {
         try (Connection conn = DriverManager.getConnection(dbPath)) {
             String sql = "SELECT IsAvailable FROM " + TABLE_NAME +
-                         " WHERE shift_startingTime = ? AND employee_id = ?";
+                         " WHERE shift_startingTime = ? AND employee_id = ? AND shift_siteName = ?";
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setLong(1, shift.getStartTime().atZone(ZoneId.systemDefault()).toEpochSecond());
             stmt.setString(2, employee.getId());
+            stmt.setString(3, shift.getSite().getName());
 
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
@@ -83,7 +85,7 @@ public class AvilibilityDAO {
     public List<AvilibilityDTO> getAllAvailabilities() {
         List<AvilibilityDTO> results = new ArrayList<>();
         try (Connection conn = DriverManager.getConnection(dbPath)) {
-            String sql = "SELECT shift_startingTime, employee_id, IsAvailable FROM " + TABLE_NAME;
+            String sql = "SELECT * FROM " + TABLE_NAME;
             PreparedStatement stmt = conn.prepareStatement(sql);
             ResultSet rs = stmt.executeQuery();
 
@@ -91,8 +93,9 @@ public class AvilibilityDAO {
                 LocalDateTime start = Instant.ofEpochSecond(rs.getLong("shift_startingTime")).atZone(ZoneId.systemDefault()).toLocalDateTime();
                 String empId = rs.getString("employee_id");
                 boolean isAvailable = rs.getInt("IsAvailable") == 1;
-
-                ShiftDTO shift = shiftDAO.getShift(start);
+                String siteName = rs.getString("shift_siteName");
+                
+                ShiftDTO shift = shiftDAO.getShift(start, siteName);
                 if (shift == null) {
                     throw new SQLException("Shift starting at " + start.toString() + " not found while pulling all avilibilities.");
                 }

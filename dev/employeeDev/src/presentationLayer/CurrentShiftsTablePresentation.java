@@ -1,16 +1,15 @@
 package employeeDev.src.presentationLayer;
 
-import java.util.List;
-import java.util.Scanner;
-
 import employeeDev.src.serviceLayer.ShiftService;
 import employeeDev.src.serviceLayer.SiteService;
+import java.util.List;
+import java.util.Scanner;
 import transportDev.src.main.entities.Site;
 
 public class CurrentShiftsTablePresentation extends Form {
-    private ShiftService shiftService;
-    private SiteService siteService;
-    private Scanner scanner;
+    private final ShiftService shiftService;
+    private final SiteService siteService;
+    private final Scanner scanner;
 
     public CurrentShiftsTablePresentation(ShiftService shiftService,SiteService siteService, Scanner scanner) {
         super("Weekly Shift Table");
@@ -53,7 +52,7 @@ public class CurrentShiftsTablePresentation extends Form {
         System.out.println("Available Sites:");
         int index = 1;
         for (Site site : siteService.getAllSites()) {
-            System.out.println(index + ". " + site.getName() + " (ID: " + site.getId() + ")");
+            System.out.println(index + ". " + site.getName());
             index++;
         }
         System.out.println("Enter the number corresponding to the site or 'q' to cancel.");

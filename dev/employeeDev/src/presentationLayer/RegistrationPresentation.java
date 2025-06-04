@@ -1,22 +1,18 @@
 package employeeDev.src.presentationLayer;
 
-import java.util.Scanner;
-
 import employeeDev.src.serviceLayer.EmployeeService;
-import employeeDev.src.serviceLayer.ShiftService;
 import employeeDev.src.serviceLayer.SiteService;
+import java.util.Scanner;
 import transportDev.src.main.entities.Site;
 
 public class RegistrationPresentation extends Form {
-    private EmployeeService employeeService;
-    private ShiftService shiftService;
-    private SiteService siteService;
-    private Scanner scanner;
+    private final EmployeeService employeeService;
+    private final SiteService siteService;
+    private final Scanner scanner;
 
-    public RegistrationPresentation(EmployeeService service,ShiftService shiftService,SiteService siteService, Scanner scanner) {
+    public RegistrationPresentation(EmployeeService service,SiteService siteService, Scanner scanner) {
         super("Add New Employee");
         this.employeeService = service;
-        this.shiftService = shiftService;
         this.siteService = siteService;
         this.scanner = scanner;
     }
@@ -34,7 +30,7 @@ public class RegistrationPresentation extends Form {
         String siteString = UserInputManager.promptForString(scanner, "Site number: ", "Registration cancelled.", "q");
         if (siteString == null) return;
         Site site = siteService.getAllSites().get(Integer.parseInt(siteString) - 1);
-        System.out.println("Selected Site: " + site.getName() + " (ID: " + site.getId() + ")");
+        System.out.println("Selected Site: " + site.getName());
         Integer salary = UserInputManager.promptForInt(scanner, "Wage: ", "Registration cancelled.", "q");
         if (salary == null) return;
         String wageType = UserInputManager.promptForWageType(scanner, "Registration cancelled.", "q");
@@ -48,10 +44,10 @@ public class RegistrationPresentation extends Form {
             name,
             password,
             id,
-            salary.intValue(),
+            salary,
             wageType,
-            yearlySickDays.intValue(),
-            yearlyDaysOff.intValue(),
+            yearlySickDays,
+            yearlyDaysOff,
             site.getName(),
             phone
         );
@@ -62,7 +58,7 @@ public class RegistrationPresentation extends Form {
         System.out.println("Available Sites:");
         int index = 1;
         for (Site site : siteService.getAllSites()) {
-            System.out.println(index + ". " + site.getName() + " (ID: " + site.getId() + ")");
+            System.out.println(index + ". " + site.getName());
             index++;
         }
         System.out.println("Enter the number corresponding to the site or 'q' to cancel.");

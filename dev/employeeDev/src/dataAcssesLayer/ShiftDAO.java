@@ -47,11 +47,12 @@ public class ShiftDAO {
         }
     }
 
-    public ShiftDTO getShift(LocalDateTime startingTime) {
+    public ShiftDTO getShift(LocalDateTime startingTime, String siteName) {
         try (Connection conn = DriverManager.getConnection(DBPath);
              PreparedStatement stmt = conn.prepareStatement(
-                     "SELECT * FROM " + shiftTableName + " WHERE startingTime = ?")) {
-            stmt.setString(1, startingTime.toString());
+                     "SELECT * FROM " + shiftTableName + " WHERE startingTime = ? AND site_name = ?")) {
+            stmt.setLong(1, startingTime.atZone(ZoneId.systemDefault()).toEpochSecond());
+            stmt.setString(2, siteName);
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
@@ -59,11 +60,17 @@ public class ShiftDAO {
                 String shiftType = rs.getString("shiftType");
 
                 // need to fetch requirements and assignments
-                Map<RoleDTO, Integer> requirements = getRequirementsForShift(startingTime);
-                Map<RoleDTO, List<EmployeeDTO>> assignments = getAssignmentsForShift(startingTime);
-                SiteDTO site = siteDAO.getSite(rs.getString("siteName"));
+                SiteDTO site = siteDAO.getSite(siteName);
                 if (site == null) {
                     throw new SQLException("Site not found in DB");
+                }
+                Map<RoleDTO, Integer> requirements = getRequirementsForShift(startingTime, site.getName());
+                if (requirements == null) {
+                    throw new SQLException("Requirements not found for shift at " + startingTime.toString() + " at site " + site.getName());
+                }
+                Map<RoleDTO, List<EmployeeDTO>> assignments = getAssignmentsForShift(startingTime, site.getName());
+                if (assignments == null) {
+                    throw new SQLException("Assignments not found for shift at " + startingTime.toString() + " at site " + site.getName());
                 }
                 return new ShiftDTO(shiftType, startingTime, endTime, requirements, assignments, site);
             }
@@ -74,11 +81,12 @@ public class ShiftDAO {
         return null;
     }
 
-    public void deleteShift(String shiftType, LocalDateTime startingTime) {
+    public void deleteShift(String shiftType, LocalDateTime startingTime, String siteName) {
         try (Connection conn = DriverManager.getConnection(DBPath);
              PreparedStatement stmt = conn.prepareStatement(
-                     "DELETE FROM " + shiftTableName + " WHERE startingTime = ?")) {
+                     "DELETE FROM " + shiftTableName + " WHERE startingTime = ? AND site_name = ?")) {
             stmt.setString(1, startingTime.toString());
+            stmt.setString(2, siteName);
             stmt.executeUpdate();
         }
         catch (SQLException e) {
@@ -98,12 +106,19 @@ public class ShiftDAO {
                 LocalDateTime end = Instant.ofEpochSecond(rs.getLong("endTime")).atZone(ZoneId.systemDefault()).toLocalDateTime();
                 
                 // Fetch requirements and assignments for the shift
-                Map<RoleDTO, Integer> requirements = getRequirementsForShift(start);
-                Map<RoleDTO, List<EmployeeDTO>> assignments = getAssignmentsForShift(start);
                 SiteDTO site = siteDAO.getSite(rs.getString("siteName"));
                 if (site == null) {
                     throw new SQLException("Site not found in DB");
                 }
+                Map<RoleDTO, Integer> requirements = getRequirementsForShift(start, site.getName());
+                if (requirements == null) {
+                    throw new SQLException("Requirements not found for shift at " + start.toString() + " at site " + site.getName());
+                }
+                Map<RoleDTO, List<EmployeeDTO>> assignments = getAssignmentsForShift(start, site.getName());
+                if (assignments == null) {
+                    throw new SQLException("Assignments not found for shift at " + start.toString() + " at site " + site.getName());
+                }
+
                 ShiftDTO shift = new ShiftDTO(type, start, end, requirements, assignments, null);
                 shifts.add(shift);
             }
@@ -114,13 +129,14 @@ public class ShiftDAO {
         return shifts;
     }
 
-    public Map<RoleDTO, Integer> getRequirementsForShift(LocalDateTime startingTime) {
+    public Map<RoleDTO, Integer> getRequirementsForShift(LocalDateTime startingTime, String siteName) {
         Map<RoleDTO, Integer> requirements = new HashMap<>();
         try (Connection conn = DriverManager.getConnection(DBPath)) {
             String query = "SELECT role_roleName, quantity FROM " + requirementsTableName +
-                           " WHERE shift_startingTime = ?";
+                           " WHERE shift_startingTime = ? AND shift_siteName = ?";
             PreparedStatement stmt = conn.prepareStatement(query);
             stmt.setLong(1, startingTime.atZone(ZoneId.systemDefault()).toEpochSecond());
+            stmt.setString(2, siteName);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 String roleName = rs.getString("role_roleName");
@@ -134,13 +150,14 @@ public class ShiftDAO {
         return requirements;
     }
 
-    public Map<RoleDTO, List<EmployeeDTO>> getAssignmentsForShift(LocalDateTime startingTime) {
+    public Map<RoleDTO, List<EmployeeDTO>> getAssignmentsForShift(LocalDateTime startingTime, String siteName) {
         HashMap<RoleDTO, List<EmployeeDTO>> assignments = new HashMap<>();
         try (Connection conn = DriverManager.getConnection(DBPath)) {
             String query = "SELECT employee_id, role_roleName FROM " + assignmentsTableName +
-                           " WHERE shift_start_time = ?";
+                           " WHERE shift_start_time = ? AND shift_siteName = ?";
             PreparedStatement stmt = conn.prepareStatement(query);
             stmt.setLong(1, startingTime.atZone(ZoneId.systemDefault()).toEpochSecond());
+            stmt.setString(2, siteName);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 String roleName = rs.getString("role_roleName");
@@ -156,5 +173,59 @@ public class ShiftDAO {
             e.printStackTrace();
         }
         return assignments;
+    }
+
+    public void insertRequirementForShift(ShiftDTO shift, RoleDTO role, int quantity) {
+        try (Connection conn = DriverManager.getConnection(DBPath);
+             PreparedStatement stmt = conn.prepareStatement(
+                     "INSERT OR REPLACE INTO " + requirementsTableName + " (shift_startingTime, role_roleName, quantity) VALUES (?, ?, ?)")) {
+            stmt.setLong(1, shift.getStartTime().atZone(ZoneId.systemDefault()).toEpochSecond());
+            stmt.setString(2, role.getName());
+            stmt.setInt(3, quantity);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void deleteRequirementForShift(LocalDateTime startingTime, String siteName, RoleDTO role) {
+        try (Connection conn = DriverManager.getConnection(DBPath);
+             PreparedStatement stmt = conn.prepareStatement(
+                     "DELETE FROM " + requirementsTableName + " WHERE shift_startingTime = ? AND shift_siteName = ? AND role_roleName = ?")) {
+            stmt.setLong(1, startingTime.atZone(ZoneId.systemDefault()).toEpochSecond());
+            stmt.setString(2, siteName);
+            stmt.setString(3, role.getName());
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void insertAssignmentForShift(ShiftDTO shift, RoleDTO role, EmployeeDTO employee) {
+        try (Connection conn = DriverManager.getConnection(DBPath);
+             PreparedStatement stmt = conn.prepareStatement(
+                     "INSERT OR REPLACE INTO " + assignmentsTableName + " (shift_start_time, shift_siteName, role_roleName, employee_id) VALUES (?, ?, ?, ?)")) {
+            stmt.setLong(1, shift.getStartTime().atZone(ZoneId.systemDefault()).toEpochSecond());
+            stmt.setString(2, shift.getSite().getName());
+            stmt.setString(3, role.getName());
+            stmt.setString(4, employee.getId());
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void deleteAssignmentForShift(LocalDateTime startingTime, String siteName, RoleDTO role, EmployeeDTO employee) {
+        try (Connection conn = DriverManager.getConnection(DBPath);
+             PreparedStatement stmt = conn.prepareStatement(
+                     "DELETE FROM " + assignmentsTableName + " WHERE shift_start_time = ? AND shift_siteName = ? AND role_roleName = ? AND employee_id = ?")) {
+            stmt.setLong(1, startingTime.atZone(ZoneId.systemDefault()).toEpochSecond());
+            stmt.setString(2, siteName);
+            stmt.setString(3, role.getName());
+            stmt.setString(4, employee.getId());
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }

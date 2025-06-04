@@ -21,12 +21,18 @@ public class Factory {
 
     public Factory() {
         // Initialize the facades
-        ITransportScheduleService transportScheduleService = null; // Assuming this is initialized elsewhere any we can inject it later
         RoleFacade roleFacade = new RoleFacade();
         SiteFacade siteFacade = new SiteFacade();
         EmployeeFacade employeeFacade = new EmployeeFacade(roleFacade, siteFacade);
-        ShiftFacade shiftFacade = new ShiftFacade(transportScheduleService, employeeFacade, siteFacade, roleFacade);
-        AvailabilityFacade availabilityFacade = new AvailabilityFacade();
+        ShiftFacade shiftFacade = new ShiftFacade(employeeFacade, siteFacade, roleFacade);
+        AvailabilityFacade availabilityFacade = new AvailabilityFacade(shiftFacade, employeeFacade, siteFacade);
+
+        // load the data from the database
+        roleFacade.loadRolesFromDB();
+        siteFacade.loadSitesFromDB();
+        employeeFacade.loadEmployeesFromDB();
+        shiftFacade.loadShiftsFromDB();
+        availabilityFacade.LoadAvailabilitiesFromDB();
         
         // Initialize the services with the facades
         this.employeeService = new EmployeeService(employeeFacade);
@@ -67,6 +73,10 @@ public class Factory {
 
     public UserManagmentInteface getUserManagmentInteface(){
         return employeeService;
+    }
+
+    public void setTransportScheduleService(ITransportScheduleService transportInterface) {
+        assigningService.setTransportScheduleService(transportInterface);
     }
     
 }

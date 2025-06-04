@@ -1,5 +1,7 @@
 package transportDev.src.main.entities;
 
+import employeeDev.src.dataAcssesLayer.SiteDAO;
+import employeeDev.src.mappers.SiteMapper;
 import transportDev.src.main.enums.ShippingZone;
 
 public class Site {
@@ -67,5 +69,8 @@ public class Site {
         return name.equals(((Site) o).name); //name is unique
 
     }
-    // :)
+    public void presistIntoDB() {
+        SiteDAO siteDAO = new SiteDAO();
+        siteDAO.addSite(SiteMapper.toDTO(this));
+    }
 }

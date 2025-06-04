@@ -18,4 +18,4 @@ public class TransportDBConstants {
     private TransportDBConstants() {
         // Prevent instantiation
     }
-} 
+} // :)

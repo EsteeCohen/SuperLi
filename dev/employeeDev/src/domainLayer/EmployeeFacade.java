@@ -27,6 +27,7 @@ public class EmployeeFacade {
     public void addEmployee(EmployeeDL e) {
         if (e != null) {
             employees.put(e.getId(), e);
+            e.insertIntoDB();
         }
     }
 
@@ -56,7 +57,7 @@ public class EmployeeFacade {
             return false; // Employee with this ID already exists
         }
         EmployeeDL newEmployee = new EmployeeDL(id, password, fullName, LocalDate.now(), wage, wageTypeChar, yearlySickDays, yearlyDaysOff, siteFacade.getSiteByName(siteName), phoneNumber);
-        employees.put(id, newEmployee);
+        addEmployee(newEmployee);
         return true;
     }
 
@@ -65,7 +66,7 @@ public class EmployeeFacade {
             return false; // Employee with this ID already exists
         }
         DriverDL newDriver = new DriverDL(id, password, fullName, LocalDate.now(), wage, wageTypeChar, yearlySickDays, yearlyDaysOff, siteFacade.getSiteByName(siteName), phoneNumber, licenseType, roleFacade.getRoleByName("Driver"), true);
-        employees.put(id, newDriver);
+        addEmployee(newDriver);
         return true;
     }
 
@@ -75,6 +76,8 @@ public class EmployeeFacade {
             RoleDL role = roleFacade.getRoleByName(roleName);
             if (role != null) {
                 employee.getRoles().add(role);
+                EmployeeDAO employeeDAO = new EmployeeDAO();
+                employeeDAO.assignRoleToEmployee(employeeId, roleName);
                 return true;
             }
         }
@@ -115,6 +118,14 @@ public class EmployeeFacade {
             } else {
                addEmployee(EmployeeMapper.fromDTO(employeeDTO, roleFacade, siteFacade));
             }
+        }
+    }
+
+    public void updateEmployeeAttributes(String employeeId, Map<String, Object> attributes) {
+        EmployeeDL employee = employees.get(employeeId);
+        if (employee != null) {
+            employee.updateAttributes(attributes);
+            employee.updateInDB();
         }
     }
 }

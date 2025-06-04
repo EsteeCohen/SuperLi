@@ -1,5 +1,9 @@
 package employeeDev.src.presentationLayer;
 
+import employeeDev.src.serviceLayer.AssigningService;
+import employeeDev.src.serviceLayer.EmployeeService;
+import employeeDev.src.serviceLayer.ShiftService;
+import employeeDev.src.serviceLayer.SiteService;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -7,18 +11,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.TreeMap;
-import employeeDev.src.serviceLayer.AssigningService;
-import employeeDev.src.serviceLayer.EmployeeService;
-import employeeDev.src.serviceLayer.ShiftService;
-import employeeDev.src.serviceLayer.SiteService;
 import transportDev.src.main.entities.Site;
 
 public class ShiftsTablePresentation extends Form {
-    private ShiftService shiftService;
-    private EmployeeService employeeService;
-    private SiteService siteService;    
-    private AssigningService assigningService;
-    private Scanner scanner;
+    private final ShiftService shiftService;
+    private final EmployeeService employeeService;
+    private final SiteService siteService;    
+    private final AssigningService assigningService;
+    private final Scanner scanner;
     private ArrayList<ShiftPL> shifts;
 
     public ShiftsTablePresentation(ShiftService service, Scanner scanner, AssigningService assigningService, EmployeeService employeeService, SiteService siteService) {
@@ -77,11 +77,11 @@ public class ShiftsTablePresentation extends Form {
                             .map(roleSL -> new RolePL(roleSL))
                             .toList();
                         for (RolePL role : roles) {
-                            if (role.getName() == "Driver"){
+                            if (role.getName().equals("Driver")){
                                 employeeService.getAllDrivers().stream()
                                     .filter(driver -> driver.getId().equals(employee.getId()))
                                     .findFirst()
-                                    .ifPresent(driver -> System.out.println("    - " + role.toString() + " (License: " + driver.getLicenseTypes().toString() + ")"));
+                                    .ifPresent(driver -> System.out.println("    - " + role.toString() + " (License: " + driver.getLicenseType().toString() + ")"));
                             }
                             else
                                 System.out.println("      - " + role.toString());

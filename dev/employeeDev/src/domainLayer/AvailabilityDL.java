@@ -1,5 +1,8 @@
 package employeeDev.src.domainLayer;
 
+import employeeDev.src.dataAcssesLayer.AvilibilityDAO;
+import employeeDev.src.mappers.AvilibilityMapper;
+
 public class AvailabilityDL {
     private final ShiftDL shift;
     private final EmployeeDL employee;
@@ -27,6 +30,7 @@ public class AvailabilityDL {
     // Setter for availability
     public void setAvailability(boolean available) {
         isAvailable = available;
+        presistIntoDB();
     }
 
     // Getter for shift
@@ -64,5 +68,10 @@ public class AvailabilityDL {
                 ", employee=" + employee +
                 ", isAvailable=" + isAvailable +
                 '}';
+    }
+
+    public void presistIntoDB() {
+        AvilibilityDAO avilibilityDAO = new AvilibilityDAO();
+        avilibilityDAO.saveAvailability(AvilibilityMapper.toDTO(this));
     }
 }

@@ -14,7 +14,7 @@ public class SiteDAO {
     private final String dbPath = DBConstants.DB_PATH;
     private final String TABLE_NAME = DBConstants.SITE_TABLE;
 
-    public void addSite(SiteDTO site) throws SQLException{
+    public void addSite(SiteDTO site){
          try (Connection conn = DriverManager.getConnection(dbPath)) {
             String sql = "INSERT OR REPLACE INTO " + TABLE_NAME + " (SiteName, address, contactPhone, contactName, ShippingZone) VALUES (?, ?, ?, ?, ?)";
             PreparedStatement stmt = conn.prepareStatement(sql);

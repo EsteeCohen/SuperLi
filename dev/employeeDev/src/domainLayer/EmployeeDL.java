@@ -1,6 +1,8 @@
 package employeeDev.src.domainLayer;
 
+import employeeDev.src.dataAcssesLayer.EmployeeDAO;
 import employeeDev.src.domainLayer.Enums.WageType;
+import employeeDev.src.mappers.EmployeeMapper;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -142,5 +144,15 @@ public class EmployeeDL {
 
     public boolean isDriver(){
         return false; // This method should be overridden in DriverDL or other subclasses
+    }
+
+    public void insertIntoDB() {
+        EmployeeDAO employeeDAO = new EmployeeDAO();
+        employeeDAO.instertEmployee(EmployeeMapper.toDTO(this));
+    }
+
+    public void updateInDB() {
+        EmployeeDAO employeeDAO = new EmployeeDAO();
+        employeeDAO.updateEmployee(EmployeeMapper.toDTO(this));
     }
 }

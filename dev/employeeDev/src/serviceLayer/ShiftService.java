@@ -22,15 +22,16 @@ import transportDev.src.main.entities.Site;
 import transportDev.src.main.enums.LicenseType;
 
 public class ShiftService implements DriverInfoInterface{
-    private ShiftFacade shiftFacade;
-    private AvailabilityFacade availabilityFacade;
-    private EmployeeFacade employeeFacade;
-    private RoleFacade roleFacade;
+    private final ShiftFacade shiftFacade;
+    private final AvailabilityFacade availabilityFacade;
+    private final EmployeeFacade employeeFacade;
+    private final RoleFacade roleFacade;
 
     public ShiftService(ShiftFacade shiftFacade, AvailabilityFacade availabilityFacade, EmployeeFacade employeeFacade, RoleFacade roleFacade) {
         this.shiftFacade = shiftFacade;
         this.availabilityFacade = availabilityFacade;
         this.employeeFacade = employeeFacade;
+        this.roleFacade = roleFacade;
     }
 
     public boolean CheckIfThereAreShiftsThatAreNotAssigned(Site site, LocalDate startDate, LocalDate endDate) {
@@ -48,7 +49,7 @@ public class ShiftService implements DriverInfoInterface{
 
     // Updated: now uses startTime and site
     public void setAvailabilityOfEmployeeToShift(String employeeId, LocalDateTime startTime, Site site, boolean available) {
-        ShiftDL shift = shiftFacade.getShiftByStartTimeAndType(startTime, site);
+        ShiftDL shift = shiftFacade.getShiftByStartTimeAndSite(startTime, site);
         if (shift == null) {
             throw new IllegalArgumentException("Shift not found for the given start time and site");
         }
@@ -68,7 +69,7 @@ public class ShiftService implements DriverInfoInterface{
 
     // Updated: now uses startTime and shiftType
     public List<EmployeeSL> getAvailableEmployeesForShift(LocalDateTime startTime, Site site) {
-        ShiftDL shift = shiftFacade.getShiftByStartTimeAndType(startTime, site);
+        ShiftDL shift = shiftFacade.getShiftByStartTimeAndSite(startTime, site);
         List<EmployeeDL> availableEmployeesDL = availabilityFacade.getAvailabilitiesForShift(shift);
         List<EmployeeSL> availableEmployeesSL = new ArrayList<>();
         for (EmployeeDL employeeDL : availableEmployeesDL) {
