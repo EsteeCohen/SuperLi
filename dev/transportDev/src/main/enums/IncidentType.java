@@ -20,4 +20,5 @@ public enum IncidentType {
      * אחר - סוג תקלה שאינו נכלל בקטגוריות הקיימות
      */
     OTHER
+    // :)
 }

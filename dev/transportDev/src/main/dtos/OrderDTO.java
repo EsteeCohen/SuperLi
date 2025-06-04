@@ -79,5 +79,5 @@ public class OrderDTO {
 
     public void setTotalWeight(double totalWeight) {
         this.totalWeight = totalWeight;
-    }
+    } // :)
 } 

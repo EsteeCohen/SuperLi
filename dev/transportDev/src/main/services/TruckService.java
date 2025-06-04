@@ -6,6 +6,7 @@ import src.main.entities.Truck;
 import src.main.enums.LicenseType;
 
 public class TruckService {
+    // :)
     private List<Truck> trucks;
     
     //בנאי ליצירת שירות משאיות חדש

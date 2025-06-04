@@ -4,6 +4,7 @@ import java.util.Scanner;
 import src.main.controllers.FacadeController;
 
 public class MainUI {
+    // :)
     private Scanner scanner;
     private FacadeController facadeController;
     private String sessionId;

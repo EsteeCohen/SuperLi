@@ -1,6 +1,7 @@
 package src.main.enums;
 
 public enum UserRole {
+    // :)
     /**
      * מנהל מערכת - הרשאות מלאות לכל פעולות המערכת
      */

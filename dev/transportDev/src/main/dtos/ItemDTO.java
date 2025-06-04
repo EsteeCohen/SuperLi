@@ -61,4 +61,4 @@ public class ItemDTO {
     public double getTotalWeight() {
         return weight * quantity;
     }
-} 
+} // :)

@@ -1,6 +1,7 @@
 package src.main.enums;
 
 public enum TransportStatus {
+    // :)
     PLANNING("בתכנון"),
     ACTIVE("פעילה"),
     COMPLETED("הושלמה"),

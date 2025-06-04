@@ -76,4 +76,5 @@ public class Site {
         return id.equals(((Site) o).name); //name is unique
 
     }
+    // :)
 }

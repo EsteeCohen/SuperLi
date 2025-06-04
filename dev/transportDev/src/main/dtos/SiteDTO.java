@@ -56,4 +56,4 @@ public class SiteDTO {
     public void setShippingZone(String shippingZone) {
         this.shippingZone = shippingZone;
     }
-} 
+} // :)

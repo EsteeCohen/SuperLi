@@ -69,4 +69,4 @@ public class TruckDTO {
     public void setAvailable(boolean available) {
         this.available = available;
     }
-} 
+} // :)

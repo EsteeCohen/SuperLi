@@ -9,6 +9,7 @@ import src.main.entities.User;
 import src.main.enums.UserRole;
 
 public class UserService {
+    // :)
     private List<User> users;
     private Map<String, String> activeSessions; // sessionId -> userId
     

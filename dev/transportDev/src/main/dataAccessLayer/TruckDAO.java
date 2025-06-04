@@ -1,9 +1,9 @@
 package src.main.dataAccessLayer;
 
-import src.main.dtos.TruckDTO;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import transportDev.src.main.dtos.TruckDTO;
 
 public class TruckDAO {
 
@@ -189,4 +189,4 @@ public class TruckDAO {
             statement.executeUpdate();
         }
     }
-} 
+} // :)
