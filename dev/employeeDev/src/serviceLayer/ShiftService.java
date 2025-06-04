@@ -6,8 +6,7 @@ import employeeDev.src.domainLayer.DriverDL;
 import employeeDev.src.domainLayer.EmployeeDL;
 import employeeDev.src.domainLayer.EmployeeFacade;
 import employeeDev.src.domainLayer.Enums.ShiftType;
-import employeeDev.src.presentationLayer.ShiftPL;
-import employeeDev.src.serviceLayer.Interfaces.DriverAvailabilityInfoIT;
+import employeeDev.src.serviceLayer.Interfaces.DriverInfoInterface;
 import transportDev.src.main.entities.Site;
 import employeeDev.src.domainLayer.ShiftDL;
 import employeeDev.src.domainLayer.ShiftFacade;
@@ -21,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class ShiftService implements DriverAvailabilityInfoIT{
+public class ShiftService implements DriverInfoInterface{
     private ShiftFacade shiftFacade;
     private SiteFacade siteFacade;
     private AvailabilityFacade availabilityFacade;
