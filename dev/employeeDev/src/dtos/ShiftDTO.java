@@ -1,5 +1,6 @@
 package employeeDev.src.dtos;
 
+import employeeDev.src.domainLayer.ShiftDL;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +19,16 @@ public class ShiftDTO {
         this.shiftType = shiftType;
         this.startTime = startTime;
         this.endTime = endTime;
+        this.requirements = requirements;
+        this.employeesAssignment = employeesAssignment;
+        this.site = site;
+    }
+     
+    public ShiftDTO(ShiftDL shift, SiteDTO site, Map<RoleDTO, Integer> requirements,
+                    Map<RoleDTO, List<EmployeeDTO>> employeesAssignment) {
+        this.shiftType = shift.getShiftType().toString();
+        this.startTime = shift.getStartTime();
+        this.endTime = shift.getEndTime();
         this.requirements = requirements;
         this.employeesAssignment = employeesAssignment;
         this.site = site;

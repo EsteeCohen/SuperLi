@@ -2,10 +2,10 @@ package employeeDev.src.domainLayer;
 
 import employeeDev.src.dataAcssesLayer.SiteDAO;
 import employeeDev.src.dtos.SiteDTO;
+import employeeDev.src.mappers.SiteMapper;
 import java.util.ArrayList;
 import java.util.List;
 import transportDev.src.main.entities.Site;
-import transportDev.src.main.enums.ShippingZone;
 
 public class SiteFacade {
     private final List<Site> sites;
@@ -48,9 +48,14 @@ public class SiteFacade {
         SiteDAO siteDAO = new SiteDAO();
         List<SiteDTO> siteDTOs = siteDAO.getAllSites();
         for (SiteDTO siteDTO : siteDTOs) {
-            Site site = new Site("id" ,siteDTO.getName(), siteDTO.getAddress(), siteDTO.getContactPhone(), siteDTO.getContactName(), ShippingZone.getByHebrewName(siteDTO.getShippingZone()));
+            Site site = SiteMapper.fromDTO(siteDTO);
             addSite(site);
         }
+    }
+
+    public SiteDTO getSiteDTOByName(String siteName) {
+        Site site = getSiteByName(siteName);
+        return new SiteDTO(site.getName(), site.getAddress(), site.getContactPhone(), site.getContactName(), site.getShippingZone().toString());
     }
     
 }

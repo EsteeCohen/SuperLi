@@ -143,7 +143,7 @@ public class EmployeeFacade {
                 driverDTO.getYearlySickDays(),
                 driverDTO.getYearlyDaysOff(),
                 site,
-                null,
+                licenseTypes,
                 roleFacade.getRoleByName("Driver")
         );
         addEmployee(driver);

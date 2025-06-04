@@ -18,9 +18,10 @@ public class EmployeeDL {
     private int yearlySickDays;
     private int yearlyDaysOff;
     private Site site;
+    private String phoneNumber;
 
     // Main constructor
-    public EmployeeDL(String id, String password, String fullName, LocalDate workStartingDate, int wage, char wageTypeChar, int yearlySickDays, int yearlyDaysOff, Site site) {
+    public EmployeeDL(String id, String password, String fullName, LocalDate workStartingDate, int wage, char wageTypeChar, int yearlySickDays, int yearlyDaysOff, Site site, String phoneNumber) {
         this.id = id;
         this.password = password;
         this.fullName = fullName;
@@ -31,11 +32,16 @@ public class EmployeeDL {
         this.yearlySickDays = yearlySickDays;
         this.yearlyDaysOff = yearlyDaysOff;
         this.site = site;
+        this.phoneNumber = phoneNumber;
+        
     }
 
-    // Simplified constructor
-    public EmployeeDL(String id, String fullName, LocalDate wordStartingDate, int wage, char wageTypeChar, int yearlySickDays, int yearlyDaysOff) {
-        this(id, null, fullName, wordStartingDate, wage, wageTypeChar, yearlySickDays, yearlyDaysOff, null);
+    // Constructor for creating an employee with roles
+    public EmployeeDL(String id, String password, String fullName, LocalDate workStartingDate, int wage, char wageTypeChar, int yearlySickDays, int yearlyDaysOff, Site site, String phoneNumber, List<RoleDL> roles) {
+        this(id, password, fullName, workStartingDate, wage, wageTypeChar, yearlySickDays, yearlyDaysOff, site, phoneNumber);
+        if (roles != null) {
+            this.roles.addAll(roles);
+        }
     }
 
     // Add a role to the employee
@@ -59,11 +65,15 @@ public class EmployeeDL {
         return this.password != null && this.password.equals(password);
     }
 
+    public String getPassword() {
+        return password;
+    }
+
     public String getFullName() {
         return fullName;
     }
 
-    public LocalDate getWordStartingDate() {
+    public LocalDate getWorkStartingDate() {
         return workStartingDate;
     }
 
@@ -93,6 +103,14 @@ public class EmployeeDL {
 
     public void setSite(Site site) {
         this.site = site;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
     public void updateAttributes(Map<String, Object> attributes) {

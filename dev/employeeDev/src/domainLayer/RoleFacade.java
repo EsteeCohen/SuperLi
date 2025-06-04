@@ -2,6 +2,8 @@ package employeeDev.src.domainLayer;
 
 import employeeDev.src.dataAcssesLayer.RoleDAO;
 import employeeDev.src.dtos.RoleDTO;
+import employeeDev.src.mappers.RoleMapper;
+
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -42,7 +44,7 @@ public class RoleFacade{
         RoleDAO roleDAO = new RoleDAO();
         List<RoleDTO> roleDTOs = roleDAO.getAllRoles();
         for (RoleDTO roleDTO : roleDTOs) {
-            RoleDL role = new RoleDL(roleDTO.getName());
+            RoleDL role = RoleMapper.fromDTO(roleDTO);
             if (!roles.containsKey(role.getName())) {
                 roles.put(role.getName(), role);
             }
