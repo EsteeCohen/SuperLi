@@ -20,7 +20,7 @@ public class Factory {
         RoleFacade roleFacade = new RoleFacade();
         SiteFacade siteFacade = new SiteFacade();
         EmployeeFacade employeeFacade = new EmployeeFacade(roleFacade, siteFacade);
-        ShiftFacade shiftFacade = new ShiftFacade(transportScheduleService, employeeFacade);
+        ShiftFacade shiftFacade = new ShiftFacade(transportScheduleService, employeeFacade, siteFacade, roleFacade);
         AvailabilityFacade availabilityFacade = new AvailabilityFacade();
         
         // Initialize the services with the facades
