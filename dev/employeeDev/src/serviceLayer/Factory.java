@@ -5,7 +5,10 @@ import employeeDev.src.domainLayer.EmployeeFacade;
 import employeeDev.src.domainLayer.RoleFacade;
 import employeeDev.src.domainLayer.ShiftFacade;
 import employeeDev.src.domainLayer.SiteFacade;
+import employeeDev.src.serviceLayer.Interfaces.DriverInfoInterface;
 import employeeDev.src.serviceLayer.Interfaces.ITransportScheduleService;
+import employeeDev.src.serviceLayer.Interfaces.SiteInfoInterface;
+import employeeDev.src.serviceLayer.Interfaces.UserManagmentInteface;
 
 
 
@@ -52,6 +55,18 @@ public class Factory {
 
     public SiteService getSiteService() {
         return siteService;
+    }
+
+    public DriverInfoInterface getDriverInfoService() {
+        return shiftService;
+    }
+
+    public SiteInfoInterface getSiteInfoService() {
+        return siteService;
+    }
+
+    public UserManagmentInteface getUserManagmentInteface(){
+        return employeeService;
     }
     
 }

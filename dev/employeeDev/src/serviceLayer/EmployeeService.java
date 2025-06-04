@@ -3,12 +3,13 @@ package employeeDev.src.serviceLayer;
 import employeeDev.src.domainLayer.DriverDL;
 import employeeDev.src.domainLayer.EmployeeDL;
 import employeeDev.src.domainLayer.EmployeeFacade;
+import employeeDev.src.serviceLayer.Interfaces.UserManagmentInteface;
+
 import java.util.List;
 import java.util.Map;
 import transportDev.src.main.entities.Site;
-import transportDev.src.main.enums.ShippingZone;
 
-public class EmployeeService {
+public class EmployeeService implements UserManagmentInteface {
     private EmployeeFacade employeeFacade;
 
     public EmployeeService(EmployeeFacade employeeFacade) {
@@ -29,7 +30,7 @@ public class EmployeeService {
     
     public List<DriverSL> getAllDrivers() {
         return employeeFacade.getAllEmployees().stream()
-                .filter(employee -> employee instanceof DriverDL)
+                .filter(employee -> employee.isDriver())
                 .map(employee -> (DriverDL) employee)
                 .filter(driver -> driver.getLicenseTypes() != null && !driver.getLicenseTypes().isEmpty())
                 .map(DriverSL::new)
