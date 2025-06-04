@@ -30,7 +30,7 @@ public class Factory {
         
         // Initialize the services with the facades
         this.employeeService = new EmployeeService(employeeFacade);
-        this.shiftService = new ShiftService(shiftFacade, availabilityFacade, employeeFacade);
+        this.shiftService = new ShiftService(shiftFacade, availabilityFacade, employeeFacade, roleFacade);
         this.assigningService = new AssigningService(shiftFacade, employeeFacade, roleFacade);
         this.roleService = new RoleService(roleFacade);
         this.siteService = new SiteService(siteFacade);

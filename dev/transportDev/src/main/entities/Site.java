@@ -3,7 +3,6 @@ package transportDev.src.main.entities;
 import transportDev.src.main.enums.ShippingZone;
 
 public class Site {
-    private String id;
     private String name;
     private String address;
     private String contactPhone;
@@ -11,8 +10,7 @@ public class Site {
     private ShippingZone shippingZone;
 
     //----------------- Constructors -------------------
-    public Site(String id, String name, String address, String contactPhone, String contactName, ShippingZone shippingZone) {
-        this.id = id;
+    public Site(String name, String address, String contactPhone, String contactName, ShippingZone shippingZone) {
         this.name = name;
         this.address = address;
         this.contactPhone = contactPhone;
@@ -20,12 +18,6 @@ public class Site {
         this.shippingZone = shippingZone;
     }
     //----------------- Getters and Setters -------------------
-    public String getId() {
-        return id;
-    }
-    public void setId(String id) {
-        this.id = id;
-    }
     public String getName() {
         return name;
     }
@@ -60,8 +52,7 @@ public class Site {
     @Override
     public String toString() {
         return "Site{" +
-                "id='" + id + '\'' +
-                ", name='" + name + '\'' +
+                "name='" + name + '\'' +
                 ", address='" + address + '\'' +
                 ", contactPhone='" + contactPhone + '\'' +
                 ", contactName='" + contactName + '\'' +
@@ -73,7 +64,7 @@ public class Site {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Site)) return false;
-        return id.equals(((Site) o).name); //name is unique
+        return name.equals(((Site) o).name); //name is unique
 
     }
     // :)

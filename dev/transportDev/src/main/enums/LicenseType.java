@@ -58,4 +58,4 @@ public enum LicenseType {
                 throw new IllegalArgumentException("Unknown license type: " + type);
         }
     }
-}
+} // :)

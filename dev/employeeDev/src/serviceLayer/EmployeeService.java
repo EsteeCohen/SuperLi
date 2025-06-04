@@ -4,7 +4,6 @@ import employeeDev.src.domainLayer.DriverDL;
 import employeeDev.src.domainLayer.EmployeeDL;
 import employeeDev.src.domainLayer.EmployeeFacade;
 import employeeDev.src.serviceLayer.Interfaces.UserManagmentInteface;
-
 import java.util.List;
 import java.util.Map;
 import transportDev.src.main.entities.Site;
@@ -32,7 +31,6 @@ public class EmployeeService implements UserManagmentInteface {
         return employeeFacade.getAllEmployees().stream()
                 .filter(employee -> employee.isDriver())
                 .map(employee -> (DriverDL) employee)
-                .filter(driver -> driver.getLicenseTypes() != null && !driver.getLicenseTypes().isEmpty())
                 .map(DriverSL::new)
                 .collect(java.util.stream.Collectors.toList());
     }
@@ -71,6 +69,27 @@ public class EmployeeService implements UserManagmentInteface {
         return employeeFacade.getAllEmployees().stream()
                 .map(EmployeeSL::new)
                 .collect(java.util.stream.Collectors.toMap(EmployeeSL::getId, e -> e));
+    }
+
+    @Override
+    public EmployeeSL getUserById(String id) {
+        return getEmployeeById(id);
+    }
+
+    @Override
+    public List<EmployeeSL> getAllUsers() {
+        return employeeFacade.getAllEmployees().stream()
+                .map(EmployeeSL::new)
+                .collect(java.util.stream.Collectors.toList());
+    }
+
+    @Override
+    public boolean hasRole(String userId, String roleName) {
+        EmployeeSL employee = getUserById(userId);
+        if (employee == null) {
+            return false; // User not found
+        }
+        return employee.getRoles().stream().anyMatch(role -> role.getName().equals(roleName));
     }
 }
 

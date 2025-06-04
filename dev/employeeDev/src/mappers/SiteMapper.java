@@ -16,7 +16,7 @@ public class SiteMapper {
     }
 
     public static Site fromDTO(SiteDTO siteDTO) {
-        Site site = new Site("id", // Assuming "id" is a placeholder, you might want to change this
+        Site site = new Site(
                 siteDTO.getName(),
                 siteDTO.getAddress(),
                 siteDTO.getContactPhone(),

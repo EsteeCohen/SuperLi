@@ -73,14 +73,7 @@ public class EmployeeMapper {
         if (driverRole == null) {
             throw new IllegalArgumentException("Role 'Driver' not found.");
         }
-        List<LicenseType> licenseTypes = new ArrayList<>();
-        for (String licenseType : driverDTO.getLicenseTypes()) {
-            try {
-                licenseTypes.add(LicenseType.fromString(licenseType.toUpperCase()));
-            } catch (IllegalArgumentException e) {
-                System.err.println("Invalid license type: " + licenseType);
-            }
-        }
+        LicenseType licenseType = LicenseType.fromString(driverDTO.getLicenseType());
         DriverDL driver = new DriverDL(
                 driverDTO.getId(),
                 driverDTO.getPassword(),
@@ -92,17 +85,15 @@ public class EmployeeMapper {
                 driverDTO.getYearlyDaysOff(),
                 site,
                 driverDTO.getPhoneNumber(),
-                licenseTypes,
-                driverRole
+                licenseType,
+                driverRole,
+                driverDTO.isAvailableToDrive()
         );
         return driver;
     }
 
     public static DriverDTO toDriverDTO(DriverDL driver) {
-        List<String> licenseTypes = new ArrayList<>();
-        for (LicenseType licenseType : driver.getLicenseTypes()) {
-            licenseTypes.add(licenseType.toString());
-        }
+        String licenseType = driver.getLicenseType().getTypeInString();
         List<RoleDTO> rolesDTOs = new ArrayList<>();
         for (RoleDL role : driver.getRoles()) {
             rolesDTOs.add(RoleMapper.toDTO(role));
@@ -119,7 +110,8 @@ public class EmployeeMapper {
                 rolesDTOs,
                 SiteMapper.toDTO(driver.getSite()),
                 driver.getPhoneNumber(),
-                licenseTypes
+                licenseType,
+                driver.isAvailableToDrive()
         );
     }
 

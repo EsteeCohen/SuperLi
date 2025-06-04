@@ -60,17 +60,11 @@ public class EmployeeFacade {
         return true;
     }
 
-    public boolean registerDriver(String fullName, String password, String id, int wage, char wageTypeChar, int yearlySickDays, int yearlyDaysOff, String siteName, String phoneNumber, List<LicenseType> licenseTypes) {
+    public boolean registerDriver(String fullName, String password, String id, int wage, char wageTypeChar, int yearlySickDays, int yearlyDaysOff, String siteName, String phoneNumber, LicenseType licenseType) {
         if (employees.get(id) != null) {
             return false; // Employee with this ID already exists
         }
-        DriverDL newDriver;
-        if (licenseTypes == null || licenseTypes.isEmpty()) {
-            newDriver = new DriverDL(id, password, fullName, LocalDate.now(), wage, wageTypeChar, yearlySickDays, yearlyDaysOff, siteFacade.getSiteByName(siteName), phoneNumber, roleFacade.getRoleByName("Driver"));
-        }
-        else {
-            newDriver = new DriverDL(id, password, fullName, LocalDate.now(), wage, wageTypeChar, yearlySickDays, yearlyDaysOff, siteFacade.getSiteByName(siteName), phoneNumber, licenseTypes, roleFacade.getRoleByName("Driver"));
-        }
+        DriverDL newDriver = new DriverDL(id, password, fullName, LocalDate.now(), wage, wageTypeChar, yearlySickDays, yearlyDaysOff, siteFacade.getSiteByName(siteName), phoneNumber, licenseType, roleFacade.getRoleByName("Driver"), true);
         employees.put(id, newDriver);
         return true;
     }

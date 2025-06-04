@@ -1,25 +1,34 @@
 package employeeDev.src.dtos;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 public class DriverDTO extends EmployeeDTO {
-    private List<String> licenseTypes;
+    private String licenseType;
+    private boolean availableToDrive;
 
     public DriverDTO(String id, String password, String fullName, LocalDate workStartingDate, int wage,
                      String wageType, int yearlySickDays, int yearlyDaysOff, List<RoleDTO> roles, SiteDTO site, String phoneNumber,
-                     List<String> licenseTypes) {
+                     String licenseType, boolean availableToDrive) {
         super(id, password, fullName, workStartingDate, wage, wageType, yearlySickDays, yearlyDaysOff, roles, site, phoneNumber);
-        this.licenseTypes = licenseTypes != null ? licenseTypes : new ArrayList<>();
+        this.licenseType = licenseType;
+        this.availableToDrive = availableToDrive;
     }
 
-    public List<String> getLicenseTypes() {
-        return licenseTypes;
+    public String getLicenseType() {
+        return licenseType;
     }
 
-    public void setLicenseTypes(List<String> licenseTypes) {
-        this.licenseTypes = licenseTypes != null ? licenseTypes : new ArrayList<>();
+    public void setLicenseType(String licenseType) {
+        this.licenseType = licenseType;
+    }
+
+    public boolean isAvailableToDrive() {
+        return availableToDrive;
+    }
+
+    public void setAvailableToDrive(boolean availableToDrive) {
+        this.availableToDrive = availableToDrive;
     }
 
     @Override

@@ -13,6 +13,6 @@ public interface SiteInfoInterface {
 
     List<Site> getAllSites();
 
-    
+    List<Site> getSitesByZone(String zone);
 
 }

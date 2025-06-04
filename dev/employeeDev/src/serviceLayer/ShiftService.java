@@ -6,11 +6,11 @@ import employeeDev.src.domainLayer.DriverDL;
 import employeeDev.src.domainLayer.EmployeeDL;
 import employeeDev.src.domainLayer.EmployeeFacade;
 import employeeDev.src.domainLayer.Enums.ShiftType;
-import employeeDev.src.serviceLayer.Interfaces.DriverInfoInterface;
-import transportDev.src.main.entities.Site;
+import employeeDev.src.domainLayer.RoleDL;
+import employeeDev.src.domainLayer.RoleFacade;
 import employeeDev.src.domainLayer.ShiftDL;
 import employeeDev.src.domainLayer.ShiftFacade;
-
+import employeeDev.src.serviceLayer.Interfaces.DriverInfoInterface;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -18,13 +18,16 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import transportDev.src.main.entities.Site;
+import transportDev.src.main.enums.LicenseType;
 
 public class ShiftService implements DriverInfoInterface{
     private ShiftFacade shiftFacade;
     private AvailabilityFacade availabilityFacade;
     private EmployeeFacade employeeFacade;
+    private RoleFacade roleFacade;
 
-    public ShiftService(ShiftFacade shiftFacade, AvailabilityFacade availabilityFacade, EmployeeFacade employeeFacade) {
+    public ShiftService(ShiftFacade shiftFacade, AvailabilityFacade availabilityFacade, EmployeeFacade employeeFacade, RoleFacade roleFacade) {
         this.shiftFacade = shiftFacade;
         this.availabilityFacade = availabilityFacade;
         this.employeeFacade = employeeFacade;
@@ -133,16 +136,33 @@ public class ShiftService implements DriverInfoInterface{
     }
 
     @Override
-    public List<DriverDL> getAllAssignDriver(LocalDateTime time, Site site) {
+    public List<DriverSL> getAvailableDriversWithLicense(LocalDateTime time, Site site, LicenseType licenseType) {
         List<DriverDL> drivers = new ArrayList<>();
-        RoleSL role = new RoleSL("Driver");
-        List<EmployeeDL> availableEmployees = availabilityFacade.getAvailabilitiesForShift(shiftFacade.getShiftByStartTimeAndType(time, site), role.getRoleDL());
-        for (EmployeeDL employee : availableEmployees) {
-            if (employee instanceof DriverDL) {
-                drivers.add((DriverDL) employee);
+        RoleDL role = roleFacade.getRoleByName("Driver");
+        if (role == null) {
+            throw new IllegalArgumentException("Role 'Driver' not found");
+        }
+        ShiftDL shift = shiftFacade.getShiftAtTime(time, site);
+        if (shift == null) {
+            throw new IllegalArgumentException("Shift not found for the given time and site");
+        }
+        List<EmployeeDL> assignedDrivers = shift.getEmployeesAssignment().get(role);
+        // Filter the assigned drivers to only include those who are actually drivers
+        if (assignedDrivers != null) {
+            for (EmployeeDL employee : assignedDrivers) {
+                if (employee.isDriver()) {
+                    DriverDL driver = (DriverDL) employee;
+                    if (driver.isLicensed(licenseType) && driver.isAvailableToDrive()) {
+                        drivers.add(driver);
+                    }
+                }
             }
         }
-        return drivers;
+        List<DriverSL> driverSLs = new ArrayList<>();
+        for (DriverDL driver : drivers) {
+            driverSLs.add(new DriverSL(driver));
+        }
+        return driverSLs;
     }
 
     public List<ShiftSL> getAllShiftFromSite(Site site) {
@@ -152,6 +172,34 @@ public class ShiftService implements DriverInfoInterface{
             allShiftSL.add(new ShiftSL(shift));
         }
         return allShiftSL;
+    }
+
+    @Override
+    public DriverSL getDriverById(String id) {
+        EmployeeDL employee = employeeFacade.getEmployee(id);
+        if (employee == null || !employee.isDriver()) {
+            return null; // or throw an exception
+        }
+        DriverDL driver = (DriverDL) employee;
+        return new DriverSL(driver);
+    }
+
+    @Override
+    public List<DriverSL> getAllDrivers() {
+        List<DriverDL> drivers = employeeFacade.getDrivers();
+        List<DriverSL> driverSLs = new ArrayList<>();
+        for (DriverDL driver : drivers) {
+            driverSLs.add(new DriverSL(driver));
+        }
+        return driverSLs;
+    }
+
+    @Override
+    public List<DriverSL> getDriversByLicenseType(LicenseType licenseType) {
+        List<DriverSL> driverSLs = getAllDrivers();
+        return driverSLs.stream()
+                .filter(driver -> driver.getLicenseType().equals(licenseType))
+                .toList();
     }
 
     

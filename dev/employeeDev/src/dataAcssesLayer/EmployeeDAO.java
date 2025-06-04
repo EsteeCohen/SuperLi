@@ -49,10 +49,11 @@ public class EmployeeDAO {
                             throw new SQLException("Site with name " + rs.getString("siteName") + " not found.");
                         }
                         // Check if the employee is a driver
-                        List<String> licenseTypes = getLicenseTypesOfDriver(id);
-                        if (licenseTypes != null) {
+                        String licenseType = getDriversLicenseType(id);
+                        if (licenseType != null) {
+                            boolean availableToDrive = getDriverAvailability(id);
                             return new DriverDTO(id, password, fullName, workStartingDate, wage,
-                                    wageType, yearlySickDays, yearlyDaysOff, roles, site, phoneNumber, licenseTypes);
+                                    wageType, yearlySickDays, yearlyDaysOff, roles, site, phoneNumber, licenseType, availableToDrive);
                         }
                         // If not a driver, return as a regular employee
                         return new EmployeeDTO(id, password, fullName, workStartingDate, wage,
@@ -112,10 +113,11 @@ public class EmployeeDAO {
                             throw new SQLException("Site with name " + rs.getString("siteName") + " not found.");
                         }
                     // Check if the employee is a driver
-                    List<String> licenseTypes = getLicenseTypesOfDriver(id);
-                    if (licenseTypes != null) {
+                    String licenseType = getDriversLicenseType(id);
+                    if (licenseType != null) {
+                        boolean availableToDrive = getDriverAvailability(id);
                         employees.add(new DriverDTO(id, password, fullName, workStartingDate, wage, wageType,
-                                yearlySickDays, yearlyDaysOff, roles, site, phoneNumber, licenseTypes));
+                                yearlySickDays, yearlyDaysOff, roles, site, phoneNumber, licenseType, availableToDrive));
                         continue;
                     }
                     // If not a driver, return as a regular employee
@@ -129,6 +131,42 @@ public class EmployeeDAO {
             e.printStackTrace();
             return new ArrayList<EmployeeDTO>();
         }
+    }
+
+    private boolean getDriverAvailability(String id) {
+        try (Connection driverConn = DriverManager.getConnection("jdbc:sqlite:" + DBPath)) {
+            String query = "SELECT availableToDrive FROM " + DriversTable + " WHERE employee_id = ?";
+            try (PreparedStatement statement = driverConn.prepareStatement(query)) {
+                statement.setString(1, id);
+                try (ResultSet rs = statement.executeQuery()) {
+                    if (rs.next()) {
+                        return rs.getInt("availableToDrive") == 1;
+                    }
+                }
+            }
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    private String getDriversLicenseType(String id) {
+        try (Connection driverConn = DriverManager.getConnection("jdbc:sqlite:" + DBPath)) {
+            String query = "SELECT licenseType FROM " + DriversTable + " WHERE employee_id = ?";
+            try (PreparedStatement statement = driverConn.prepareStatement(query)) {
+                statement.setString(1, id);
+                try (ResultSet rs = statement.executeQuery()) {
+                    if (rs.next()) {
+                        return rs.getString("licenseType");
+                    }
+                }
+            }
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public void instertEmployee(EmployeeDTO employee) {
@@ -158,13 +196,12 @@ public class EmployeeDAO {
     public void instertDriver(DriverDTO driver) {
         instertEmployee(driver);
         try (Connection driverConn = DriverManager.getConnection("jdbc:sqlite:" + DBPath)) {
-            String query = "INSERT INTO " + DriversTable + " (employee_id, licenseType) VALUES (?, ?)";
-            for (String licenseType : driver.getLicenseTypes()) {
-                try (PreparedStatement statement = driverConn.prepareStatement(query)) {
-                    statement.setString(1, driver.getId());
-                    statement.setString(2, licenseType);
-                    statement.executeUpdate();
-                }
+            String query = "INSERT INTO " + DriversTable + " (employee_id, licenseType, availableToDrive) VALUES (?, ?, ?)";
+            try (PreparedStatement statement = driverConn.prepareStatement(query)) {
+                statement.setString(1, driver.getId());
+                statement.setString(2, driver.getLicenseType());
+                statement.setInt(3, driver.isAvailableToDrive() ? 1 : 0);
+                statement.executeUpdate();
             }
         }
         catch (SQLException e) {
@@ -199,18 +236,13 @@ public class EmployeeDAO {
     public void updateDriver(DriverDTO driver) {
         updateEmployee(driver);
         try (Connection driverConn = DriverManager.getConnection("jdbc:sqlite:" + DBPath)) {
-            String deleteQuery = "DELETE FROM " + DriversTable + " WHERE employee_id = ?";
-            try (PreparedStatement deleteStatement = driverConn.prepareStatement(deleteQuery)) {
-                deleteStatement.setString(1, driver.getId());
-                deleteStatement.executeUpdate();
-            }
-            String insertQuery = "INSERT INTO " + DriversTable + " (employee_id, licenseType) VALUES (?, ?)";
-            for (String licenseType : driver.getLicenseTypes()) {
-                try (PreparedStatement insertStatement = driverConn.prepareStatement(insertQuery)) {
-                    insertStatement.setString(1, driver.getId());
-                    insertStatement.setString(2, licenseType);
-                    insertStatement.executeUpdate();
-                }
+            String updateQuery = "UPDATE " + DriversTable + " SET licenseType = ?, availableToDrive = ? WHERE employee_id = ?";
+            try (PreparedStatement insertStatement = driverConn.prepareStatement(updateQuery)) {
+                insertStatement.setString(1, driver.getLicenseType());
+                insertStatement.setInt(2, driver.isAvailableToDrive() ? 1 : 0);
+                insertStatement.setString(3, driver.getId());
+                insertStatement.executeUpdate();
+                
             }
         }
         catch (SQLException e) {
@@ -279,26 +311,6 @@ public class EmployeeDAO {
         }
         catch (SQLException e) {
             e.printStackTrace();
-        }
-    }
-
-    public List<String> getLicenseTypesOfDriver(String driverId) {
-        try (Connection employeeConn = DriverManager.getConnection("jdbc:sqlite:" + DBPath)) {
-            String query = "SELECT licenseType FROM " + DriversTable + " WHERE employee_id = ?";
-            try (PreparedStatement statement = employeeConn.prepareStatement(query)) {
-                statement.setString(1, driverId);
-                try (ResultSet rs = statement.executeQuery()) {
-                    List<String> licenseTypes = new java.util.ArrayList<>();
-                    while (rs.next()) {
-                        licenseTypes.add(rs.getString("licenseType"));
-                    }
-                    return licenseTypes.isEmpty() ? null : licenseTypes;
-                }
-            }
-        }
-        catch (SQLException e) {
-            e.printStackTrace();
-            return null;
         }
     }
 }

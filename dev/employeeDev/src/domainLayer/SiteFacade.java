@@ -54,7 +54,7 @@ public class SiteFacade {
         }
     }
 
-    public void addSite(String id, String name, String address, String phoneNumber, String email, String zone) {
+    public void addSite(String name, String address, String phoneNumber, String email, String zone) {
         ShippingZone shippingZone;
         try {
             shippingZone = ShippingZone.valueOf(zone.toUpperCase());
@@ -62,24 +62,24 @@ public class SiteFacade {
             throw new IllegalArgumentException("Invalid shipping zone: " + zone);
         }
         
-        Site site = new Site(id,name, address, phoneNumber, email, shippingZone);
+        Site site = new Site(name, address, phoneNumber, email, shippingZone);
         addSite(site);
     }
 
-    public Site getSiteByZone(String zone) {
+    public List<Site> getSiteByZone(String zone) {
         ShippingZone shippingZone;
         try {
             shippingZone = ShippingZone.valueOf(zone.toUpperCase());
         } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("Invalid shipping zone: " + zone);
         }
-        
+        List<Site> filteredSites = new ArrayList<>();
         for (Site site : sites) {
             if (site.getShippingZone() == shippingZone) {
-                return site;
+                filteredSites.add(site);
             }
         }
-        throw new IllegalArgumentException("No site found in the specified shipping zone: " + zone);
+        return filteredSites;
     }
 
     public void deleteSite(String name) {

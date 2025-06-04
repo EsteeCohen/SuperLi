@@ -1,50 +1,40 @@
 package employeeDev.src.domainLayer;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 import transportDev.src.main.entities.Site;
 import transportDev.src.main.enums.LicenseType;
 ;
 
 public class DriverDL extends EmployeeDL {
-    private List<LicenseType> licenseTypes;
+    private LicenseType licenseType;
+    private boolean isAvailableToDrive;
 
-    public DriverDL(String id, String password, String fullName, LocalDate workStartingDate, int wage, char wageTypeChar, int yearlySickDays, int yearlyDaysOff, Site site, String phoneNumber, List<LicenseType> licenseTypes, RoleDL driverRole) {
+    public DriverDL(String id, String password, String fullName, LocalDate workStartingDate, int wage, char wageTypeChar,
+    int yearlySickDays, int yearlyDaysOff, Site site, String phoneNumber, LicenseType licenseType, RoleDL driverRole, boolean isAvailableToDrive) {
         super(id, password, fullName, workStartingDate, wage, wageTypeChar, yearlySickDays, yearlyDaysOff, site, phoneNumber);
-        this.licenseTypes = licenseTypes;
+        this.licenseType = licenseType;
+        this.isAvailableToDrive = isAvailableToDrive;
         this.addRole(driverRole);
     }
 
-    public DriverDL(String id, String password, String fullName, LocalDate workStartingDate, int wage, char wageTypeChar, int yearlySickDays, int yearlyDaysOff, Site site, String phoneNumber, RoleDL driverRole){
-        super(id, password, fullName, workStartingDate, wage, wageTypeChar, yearlySickDays, yearlyDaysOff, site, phoneNumber);
-        this.licenseTypes = new ArrayList<>();
-        this.addRole(driverRole);
+    public LicenseType getLicenseType() {
+        return licenseType;
     }
 
-    public List<LicenseType> getLicenseTypes() {
-        return licenseTypes;
-    }
-
-    public void setLicenseTypes(List<LicenseType> licenseTypes) {
-        this.licenseTypes = licenseTypes;
+    public void setLicenseType(LicenseType licenseType) {
+        this.licenseType = licenseType;
     }
 
     public boolean isLicensed(LicenseType licenseType) {
-        return licenseTypes.contains(licenseType);
+        return this.licenseType.equals(licenseType);
     }
 
-    public void addLicenseType(LicenseType licenseType) {
-        if(!licenseTypes.contains(licenseType)) {
-            licenseTypes.add(licenseType);
-        }
+    public boolean isAvailableToDrive() {
+        return isAvailableToDrive;
     }
 
-    public void removeLicenseType(LicenseType licenseType) {
-        if(licenseTypes.contains(licenseType)) {
-            licenseTypes.remove(licenseType);
-        }
-        throw new IllegalArgumentException("License type not found: " + licenseType);
+    public void setAvailableToDrive(boolean isAvailableToDrive) {
+        this.isAvailableToDrive = isAvailableToDrive;
     }
 
     @Override
