@@ -6,12 +6,10 @@ import employeeDev.src.domainLayer.DriverDL;
 import employeeDev.src.domainLayer.EmployeeDL;
 import employeeDev.src.domainLayer.EmployeeFacade;
 import employeeDev.src.domainLayer.Enums.ShiftType;
-import employeeDev.src.presentationLayer.ShiftPL;
-import employeeDev.src.serviceLayer.Interfaces.DriverAvailabilityInfoIT;
+import employeeDev.src.serviceLayer.Interfaces.DriverInfoInterface;
 import transportDev.src.main.entities.Site;
 import employeeDev.src.domainLayer.ShiftDL;
 import employeeDev.src.domainLayer.ShiftFacade;
-import employeeDev.src.domainLayer.SiteFacade;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -21,18 +19,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class ShiftService implements DriverAvailabilityInfoIT{
+public class ShiftService implements DriverInfoInterface{
     private ShiftFacade shiftFacade;
-    private SiteFacade siteFacade;
     private AvailabilityFacade availabilityFacade;
     private EmployeeFacade employeeFacade;
 
-    public ShiftService(ShiftFacade shiftFacade, AvailabilityFacade availabilityFacade, EmployeeFacade employeeFacade,
-                        SiteFacade siteFacade) {
+    public ShiftService(ShiftFacade shiftFacade, AvailabilityFacade availabilityFacade, EmployeeFacade employeeFacade) {
         this.shiftFacade = shiftFacade;
         this.availabilityFacade = availabilityFacade;
         this.employeeFacade = employeeFacade;
-        this.siteFacade = siteFacade;
     }
 
     public boolean CheckIfThereAreShiftsThatAreNotAssigned(Site site, LocalDate startDate, LocalDate endDate) {
@@ -159,7 +154,5 @@ public class ShiftService implements DriverAvailabilityInfoIT{
         return allShiftSL;
     }
 
-    public List<Site> getAllSites() {
-        return siteFacade.getSites();
-    }
+    
 }

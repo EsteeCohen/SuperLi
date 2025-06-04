@@ -6,6 +6,7 @@ import employeeDev.src.mappers.SiteMapper;
 import java.util.ArrayList;
 import java.util.List;
 import transportDev.src.main.entities.Site;
+import transportDev.src.main.enums.ShippingZone;
 
 public class SiteFacade {
     private final List<Site> sites;
@@ -50,6 +51,49 @@ public class SiteFacade {
         for (SiteDTO siteDTO : siteDTOs) {
             Site site = SiteMapper.fromDTO(siteDTO);
             addSite(site);
+        }
+    }
+
+    public void addSite(String id, String name, String address, String phoneNumber, String email, String zone) {
+        ShippingZone shippingZone;
+        try {
+            shippingZone = ShippingZone.valueOf(zone.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid shipping zone: " + zone);
+        }
+        
+        Site site = new Site(id,name, address, phoneNumber, email, shippingZone);
+        addSite(site);
+    }
+
+    public Site getSiteByZone(String zone) {
+        ShippingZone shippingZone;
+        try {
+            shippingZone = ShippingZone.valueOf(zone.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid shipping zone: " + zone);
+        }
+        
+        for (Site site : sites) {
+            if (site.getShippingZone() == shippingZone) {
+                return site;
+            }
+        }
+        throw new IllegalArgumentException("No site found in the specified shipping zone: " + zone);
+    }
+
+    public void deleteSite(String name) {
+        Site siteToDelete = null;
+        for (Site site : sites) {
+            if (site.getName().equalsIgnoreCase(name)) {
+                siteToDelete = site;
+                break;
+            }
+        }
+        if (siteToDelete != null) {
+            removeSite(siteToDelete);
+        } else {
+            throw new IllegalArgumentException("Site with name " + name + " not found.");
         }
     }
     

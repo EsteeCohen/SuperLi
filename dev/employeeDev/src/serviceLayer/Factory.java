@@ -8,11 +8,13 @@ import employeeDev.src.domainLayer.SiteFacade;
 import employeeDev.src.serviceLayer.Interfaces.ITransportScheduleService;
 
 
+
 public class Factory {
     public EmployeeService employeeService;
     public ShiftService shiftService;
     public AssigningService assigningService;
     public RoleService roleService;
+    public SiteService siteService;
 
     public Factory() {
         // Initialize the facades
@@ -25,9 +27,10 @@ public class Factory {
         
         // Initialize the services with the facades
         this.employeeService = new EmployeeService(employeeFacade);
-        this.shiftService = new ShiftService(shiftFacade, availabilityFacade, employeeFacade, siteFacade);
+        this.shiftService = new ShiftService(shiftFacade, availabilityFacade, employeeFacade);
         this.assigningService = new AssigningService(shiftFacade, employeeFacade, roleFacade);
         this.roleService = new RoleService(roleFacade);
+        this.siteService = new SiteService(siteFacade);
 
     }
 
@@ -47,6 +50,8 @@ public class Factory {
         return roleService;
     }
 
-
+    public SiteService getSiteService() {
+        return siteService;
+    }
     
 }
