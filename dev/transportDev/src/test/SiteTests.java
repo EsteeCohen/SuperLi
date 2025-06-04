@@ -1,10 +1,10 @@
-package src.test;
+package transportDev.src.test;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import src.main.entities.Site;
-import src.main.enums.ShippingZone;
-import src.main.services.SiteService;
+import transportDev.src.main.entities.Site;
+import transportDev.src.main.enums.ShippingZone;
+import transportDev.src.main.services.SiteService;
 
 import java.util.List;
 

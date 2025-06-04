@@ -1,10 +1,10 @@
-package src.test;
+package transportDev.src.test;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import src.main.entities.Truck;
-import src.main.enums.LicenseType;
-import src.main.services.TruckService;
+import transportDev.src.main.entities.Truck;
+import transportDev.src.main.enums.LicenseType;
+import transportDev.src.main.services.TruckService;
 
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;

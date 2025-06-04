@@ -6,15 +6,18 @@ import java.util.Comparator;
 import java.util.Scanner;
 
 import employeeDev.src.serviceLayer.ShiftService;
+import employeeDev.src.serviceLayer.SiteService;
 import transportDev.src.main.entities.Site;
 
 public class AvailabilityForm extends Form {
     private ShiftService shiftService;
+    private SiteService siteService;
     private Scanner scanner;
 
-    public AvailabilityForm(Scanner scanner, ShiftService shiftService) {
+    public AvailabilityForm(Scanner scanner, ShiftService shiftService, SiteService siteService) {
         super("Availability Form");
         this.shiftService = shiftService;
+        this.siteService = siteService;
         this.scanner = scanner;
     }
 
@@ -59,14 +62,14 @@ public class AvailabilityForm extends Form {
     private Site pickSite() {
         System.out.println("Available Sites:");
         int index = 1;
-        for (Site site : shiftService.getAllSites()) {
+        for (Site site : siteService.getAllSites()) {
             System.out.println(index + ". " + site.getName() + " (ID: " + site.getId() + ")");
             index++;
         }
         System.out.println("Enter the number corresponding to the site or 'q' to cancel.");
         String siteString = UserInputManager.promptForString(scanner, "Site number: ", "Registration cancelled.", "q");
         if (siteString == null) return null;
-        return shiftService.getAllSites().get(Integer.parseInt(siteString) - 1);
+        return siteService.getAllSites().get(Integer.parseInt(siteString) - 1);
     }
 
     private boolean processSelectedShifts(String input, ArrayList<ShiftPL> workTimes, String employeeId,Site site) {

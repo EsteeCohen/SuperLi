@@ -6,6 +6,9 @@ import employeeDev.src.serviceLayer.EmployeeService;
 import employeeDev.src.serviceLayer.Factory;
 import employeeDev.src.serviceLayer.RoleService;
 import employeeDev.src.serviceLayer.ShiftService;
+import employeeDev.src.serviceLayer.SiteService;
+import transportDev.src.main.entities.Site;
+import transportDev.src.main.enums.ShippingZone;
 
 public class HRSystemUI {
 
@@ -13,11 +16,15 @@ public class HRSystemUI {
     private ShiftService shiftService;
     private EmployeeService employeeService;
     private AssigningService assigningService;
+    private SiteService siteService;
 
     private final String ADMIN_ROLE_NAME = "HrManager";
     private final String SHIFT_MNG_ROLE = "Shift Manager";
     private final String WAREHOUSEMAN = "Warehouseman";
     private final String DRIVER = "Driver";
+    private final String SITE_NAME = "MainSite";
+    private final String SITE_ID = "1";
+    private final String ADMIN_ID = "admin";
 
 
     private final Scanner scanner;
@@ -28,6 +35,7 @@ public class HRSystemUI {
         this.shiftService = factory.getShiftService();
         this.employeeService = factory.getEmployeeService();
         this.assigningService = factory.getAssigningService();
+        this.siteService = factory.getSiteService();
 
         this.scanner = new Scanner(System.in);
 
@@ -40,8 +48,10 @@ public class HRSystemUI {
         roleService.createRole(SHIFT_MNG_ROLE);
         roleService.createRole(WAREHOUSEMAN);
         roleService.createRole(DRIVER);
-        employeeService.registerAdmin();
-        shiftService.getAllSites().forEach(site -> {
+        siteService.addSite(SITE_ID,SITE_NAME, "Main Warehouse", "123 Main St", "123-456-7890", ShippingZone.CENTER.name());
+        Site defSite = siteService.getSiteByName(SITE_NAME);
+        employeeService.registerAdmin(ADMIN_ID,defSite);
+        siteService.getAllSites().forEach(site -> {
             shiftService.createShiftsForNextWeek(site);
         });
         assigningService.initializeRequirements();
@@ -133,11 +143,11 @@ public class HRSystemUI {
     private boolean handleHRManagerChoice(int choice, EmployeePL employee) {
         switch (choice) {
             case 1:
-                RegistrationPresentation registration = new RegistrationPresentation(employeeService,shiftService, scanner);
+                RegistrationPresentation registration = new RegistrationPresentation(employeeService,shiftService,siteService, scanner);
                 registration.registerNewEmployee();
                 break;
             case 2:
-                AvailabilityForm availabilityForm = new AvailabilityForm(scanner, shiftService);
+                AvailabilityForm availabilityForm = new AvailabilityForm(scanner, shiftService, siteService);
                 availabilityForm.showAvailabilityForm(employee.getID());
                 break;
             case 3:
@@ -149,7 +159,7 @@ public class HRSystemUI {
                 roleCreation.createNewRole();
                 break;
             case 5:
-                ShiftsTablePresentation shiftsTable = new ShiftsTablePresentation(shiftService, scanner, assigningService, employeeService);
+                ShiftsTablePresentation shiftsTable = new ShiftsTablePresentation(shiftService, scanner, assigningService, employeeService, siteService);
                 shiftsTable.showShiftTable();
                 shiftsTable.assignEmployeeToShift();
                 break;
@@ -162,7 +172,7 @@ public class HRSystemUI {
                 employeeUpdate.updateEmployeeDetails();
                 break;
             case 8:
-                CurrentShiftsTablePresentation currentShifts = new CurrentShiftsTablePresentation(shiftService, scanner, assigningService, employeeService);
+                CurrentShiftsTablePresentation currentShifts = new CurrentShiftsTablePresentation(shiftService, siteService, scanner);
                 currentShifts.showCurrentShiftsAndEmployees();
                 break;
             default:
@@ -175,15 +185,15 @@ public class HRSystemUI {
     private boolean handleEmployeeChoice(int choice, EmployeePL employee) {
         switch (choice) {
             case 1:
-                AvailabilityForm availabilityForm = new AvailabilityForm(scanner, shiftService);
+                AvailabilityForm availabilityForm = new AvailabilityForm(scanner, shiftService, siteService);
                 availabilityForm.showAvailabilityForm(employee.getID());
                 break;
             case 2:
-                ShiftsTablePresentation shiftsTable = new ShiftsTablePresentation(shiftService, scanner, assigningService, employeeService);
+                ShiftsTablePresentation shiftsTable = new ShiftsTablePresentation(shiftService, scanner, assigningService, employeeService, siteService);
                 shiftsTable.showShiftTable();
                 break;
             case 3:
-                CurrentShiftsTablePresentation currentShifts = new CurrentShiftsTablePresentation(shiftService, scanner, assigningService, employeeService);
+                CurrentShiftsTablePresentation currentShifts = new CurrentShiftsTablePresentation(shiftService, siteService, scanner);
                 currentShifts.showCurrentShiftsAndEmployees();
                 break;
             default:

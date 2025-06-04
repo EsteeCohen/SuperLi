@@ -6,7 +6,7 @@
 ```bash
 cd dev
 javac -d out src/main/**/*.java
-java -cp out src.main.Main
+java -cp out transportDev.src.main.Main
 ```
 
 ### 2. Initialize Demo Data
