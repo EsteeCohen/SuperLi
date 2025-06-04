@@ -14,6 +14,7 @@ public class DriverService {
         this.drivers = new ArrayList<>();
     }
     //------------- methods -------------
+    // ####
     public Driver addDriver(String id, String name, String phone, LicenseType licenseType){
         if (id == null || name == null || phone == null || licenseType == null) {
             throw new IllegalArgumentException("All fields are required");
@@ -26,6 +27,7 @@ public class DriverService {
         return driver;
     }
 
+    // ####
     public Driver getDriverById(String id) {
         for (Driver driver : drivers) {
             if (driver.getId().equals(id)) {
@@ -35,10 +37,12 @@ public class DriverService {
         return null;
     }
 
+    // ####
     public List<Driver> getAllDrivers() {
         return new ArrayList<>(drivers);
     }
 
+    // ####
     public List<Driver> getDriversByLicenseType(LicenseType licenseType) {
         if (licenseType == null) {
             throw new IllegalArgumentException("License type is required");
@@ -51,6 +55,7 @@ public class DriverService {
         }
         return filteredDrivers;
     }
+    
 
     public List<Driver> getEligibleDriversForTruck(Truck truck) {
         if (truck == null) {
@@ -81,6 +86,7 @@ public class DriverService {
         }
     }
 
+
     public boolean deleteDriver(String id) {
         Driver driver = getDriverById(id);
         if (driver == null) {
@@ -94,6 +100,7 @@ public class DriverService {
         drivers.clear();
     }
 
+    // ####
     public List<Driver> getAvailableDriversWithLicense(LicenseType requiredLicense, TransportService transportService) {
         return drivers.stream()
             .filter(driver -> driver.getLicenseType() == requiredLicense)
