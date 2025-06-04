@@ -73,7 +73,7 @@ public class Site {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Site)) return false;
-        return id.equals(((Site) o).id); //id is unique
+        return id.equals(((Site) o).name); //name is unique
 
     }
 }
