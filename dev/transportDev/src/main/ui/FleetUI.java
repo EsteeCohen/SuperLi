@@ -2,13 +2,12 @@ package transportDev.src.main.ui;
 
 import java.util.List;
 import java.util.Scanner;
-
 import transportDev.src.main.controllers.FacadeController;
-import transportDev.src.main.entities.Truck;
 import transportDev.src.main.entities.Driver;
-import transportDev.src.main.entities.User;
+import transportDev.src.main.entities.Truck;
 
 public class FleetUI {
+    // :)
     private Scanner scanner;
     private FacadeController facadeController;
     private String sessionId;

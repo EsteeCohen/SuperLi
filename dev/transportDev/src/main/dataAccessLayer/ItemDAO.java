@@ -1,9 +1,9 @@
 package transportDev.src.main.dataAccessLayer;
 
-import transportDev.src.main.dtos.ItemDTO;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import transportDev.src.main.dtos.ItemDTO;
 
 public class ItemDAO {
 
@@ -161,4 +161,4 @@ public class ItemDAO {
             e.printStackTrace();
         }
     }
-} 
+} // :)

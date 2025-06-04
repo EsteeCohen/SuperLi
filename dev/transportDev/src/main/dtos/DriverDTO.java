@@ -58,4 +58,4 @@ public class DriverDTO {
     public void setAvailable(boolean available) {
         this.available = available;
     }
-} 
+} // :)

@@ -92,5 +92,5 @@ public class Truck {
         if (!model.equals(truck.model)) return false;
         return licenseType == truck.licenseType;
     }
-    
+    // :)
 }

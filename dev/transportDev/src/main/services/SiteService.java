@@ -6,6 +6,7 @@ import transportDev.src.main.entities.Site;
 import transportDev.src.main.enums.ShippingZone;
 
 public class SiteService {
+    // :)
     private List<Site> sites;
     
     //בנאי ליצירת שירות אתרים חדש

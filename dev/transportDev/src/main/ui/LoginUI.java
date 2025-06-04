@@ -1,10 +1,10 @@
 package transportDev.src.main.ui;
 
 import java.util.Scanner;
-
 import transportDev.src.main.controllers.FacadeController;
 
 public class LoginUI {
+    // :)
     private Scanner scanner;
     private FacadeController facadeController;
     

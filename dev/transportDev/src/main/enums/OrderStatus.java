@@ -1,6 +1,7 @@
 package transportDev.src.main.enums;
 
 public enum OrderStatus {
+    // :)
     /**
      * נוצר - הזמנה חדשה שנוצרה במערכת
      */
@@ -17,7 +18,7 @@ public enum OrderStatus {
     DONE,
     
     /**
-     * בוטל - הזמנה שבוטלה
+     * בוטל - הזמנה שבוטלה 
      */
     CANCELLED
-}
+} 

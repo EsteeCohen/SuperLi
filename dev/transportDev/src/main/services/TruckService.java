@@ -6,6 +6,7 @@ import transportDev.src.main.entities.Truck;
 import transportDev.src.main.enums.LicenseType;
 
 public class TruckService {
+    // :)
     private List<Truck> trucks;
     
     //בנאי ליצירת שירות משאיות חדש

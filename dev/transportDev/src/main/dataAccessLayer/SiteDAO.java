@@ -1,9 +1,9 @@
 package transportDev.src.main.dataAccessLayer;
 
-import transportDev.src.main.dtos.SiteDTO;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import transportDev.src.main.dtos.SiteDTO;
 
 public class SiteDAO {
 
@@ -122,4 +122,4 @@ public class SiteDAO {
         }
         return sites;
     }
-} 
+} // :)

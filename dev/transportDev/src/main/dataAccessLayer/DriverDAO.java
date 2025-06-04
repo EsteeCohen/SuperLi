@@ -1,9 +1,9 @@
 package transportDev.src.main.dataAccessLayer;
 
-import transportDev.src.main.dtos.DriverDTO;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import transportDev.src.main.dtos.DriverDTO;
 
 public class DriverDAO {
 
@@ -181,4 +181,4 @@ public class DriverDAO {
             statement.executeUpdate();
         }
     }
-} 
+} // :)

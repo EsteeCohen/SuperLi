@@ -20,4 +20,6 @@ public enum IncidentStatus {
      * בוטל - הדיווח על התקלה בוטל (למשל, דיווח שגוי)
      */
     CANCELLED
+    // :)
 }
+

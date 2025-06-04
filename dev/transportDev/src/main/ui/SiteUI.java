@@ -2,12 +2,11 @@ package transportDev.src.main.ui;
 
 import java.util.List;
 import java.util.Scanner;
-
 import transportDev.src.main.controllers.FacadeController;
 import transportDev.src.main.entities.Site;
-import transportDev.src.main.enums.ShippingZone;
 
 public class SiteUI {
+    // :)
     private Scanner scanner;
     private FacadeController facadeController;
 

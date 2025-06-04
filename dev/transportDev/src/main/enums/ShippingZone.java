@@ -1,6 +1,7 @@
 package transportDev.src.main.enums;
 
 public enum ShippingZone {
+    // :)
     NORTH("צפון"),
     CENTER("מרכז"),
     SOUTH("דרום"),
