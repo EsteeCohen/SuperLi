@@ -14,10 +14,9 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Dictionary;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
 public class ShiftDAO {
     private final String DBPath = DBConstants.DB_PATH;
@@ -33,7 +32,7 @@ public class ShiftDAO {
         this.siteDAO = new SiteDAO();
     }
 
-    public void insertShift(ShiftDTO shift) throws SQLException {
+    public void insertShift(ShiftDTO shift) {
         try (Connection conn = DriverManager.getConnection(DBPath);
              PreparedStatement stmt = conn.prepareStatement(
                      "INSERT OR REPLACE INTO " + shiftTableName + " (shiftType, startingTime, endTime, site_name) VALUES (?, ?, ?, ?)")) {
@@ -43,9 +42,12 @@ public class ShiftDAO {
             stmt.setString(4, shift.getSite().getName());
             stmt.executeUpdate();
         }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
-    public ShiftDTO getShift(LocalDateTime startingTime) throws SQLException {
+    public ShiftDTO getShift(LocalDateTime startingTime) {
         try (Connection conn = DriverManager.getConnection(DBPath);
              PreparedStatement stmt = conn.prepareStatement(
                      "SELECT * FROM " + shiftTableName + " WHERE startingTime = ?")) {
@@ -57,8 +59,8 @@ public class ShiftDAO {
                 String shiftType = rs.getString("shiftType");
 
                 // need to fetch requirements and assignments
-                Dictionary<RoleDTO, Integer> requirements = getRequirementsForShift(startingTime);
-                HashMap<RoleDTO, List<EmployeeDTO>> assignments = getAssignmentsForShift(startingTime);
+                Map<RoleDTO, Integer> requirements = getRequirementsForShift(startingTime);
+                Map<RoleDTO, List<EmployeeDTO>> assignments = getAssignmentsForShift(startingTime);
                 SiteDTO site = siteDAO.getSite(rs.getString("siteName"));
                 if (site == null) {
                     throw new SQLException("Site not found in DB");
@@ -66,19 +68,25 @@ public class ShiftDAO {
                 return new ShiftDTO(shiftType, startingTime, endTime, requirements, assignments, site);
             }
         }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
         return null;
     }
 
-    public void deleteShift(String shiftType, LocalDateTime startingTime) throws SQLException {
+    public void deleteShift(String shiftType, LocalDateTime startingTime) {
         try (Connection conn = DriverManager.getConnection(DBPath);
              PreparedStatement stmt = conn.prepareStatement(
                      "DELETE FROM " + shiftTableName + " WHERE startingTime = ?")) {
             stmt.setString(1, startingTime.toString());
             stmt.executeUpdate();
         }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
-    public List<ShiftDTO> getAllShifts() throws SQLException {
+    public List<ShiftDTO> getAllShifts() {
         List<ShiftDTO> shifts = new ArrayList<>();
         try (Connection conn = DriverManager.getConnection(DBPath);
              Statement stmt = conn.createStatement();
@@ -90,8 +98,8 @@ public class ShiftDAO {
                 LocalDateTime end = Instant.ofEpochSecond(rs.getLong("endTime")).atZone(ZoneId.systemDefault()).toLocalDateTime();
                 
                 // Fetch requirements and assignments for the shift
-                Dictionary<RoleDTO, Integer> requirements = getRequirementsForShift(start);
-                HashMap<RoleDTO, List<EmployeeDTO>> assignments = getAssignmentsForShift(start);
+                Map<RoleDTO, Integer> requirements = getRequirementsForShift(start);
+                Map<RoleDTO, List<EmployeeDTO>> assignments = getAssignmentsForShift(start);
                 SiteDTO site = siteDAO.getSite(rs.getString("siteName"));
                 if (site == null) {
                     throw new SQLException("Site not found in DB");
@@ -100,11 +108,14 @@ public class ShiftDAO {
                 shifts.add(shift);
             }
         }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
         return shifts;
     }
 
-    public Dictionary<RoleDTO, Integer> getRequirementsForShift(LocalDateTime startingTime) {
-        Dictionary<RoleDTO, Integer> requirements = new Hashtable<>();
+    public Map<RoleDTO, Integer> getRequirementsForShift(LocalDateTime startingTime) {
+        Map<RoleDTO, Integer> requirements = new HashMap<>();
         try (Connection conn = DriverManager.getConnection(DBPath)) {
             String query = "SELECT role_roleName, quantity FROM " + requirementsTableName +
                            " WHERE shift_startingTime = ?";
@@ -123,7 +134,7 @@ public class ShiftDAO {
         return requirements;
     }
 
-    public HashMap<RoleDTO, List<EmployeeDTO>> getAssignmentsForShift(LocalDateTime startingTime) {
+    public Map<RoleDTO, List<EmployeeDTO>> getAssignmentsForShift(LocalDateTime startingTime) {
         HashMap<RoleDTO, List<EmployeeDTO>> assignments = new HashMap<>();
         try (Connection conn = DriverManager.getConnection(DBPath)) {
             String query = "SELECT employee_id, role_roleName FROM " + assignmentsTableName +

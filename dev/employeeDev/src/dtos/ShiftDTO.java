@@ -1,7 +1,6 @@
 package employeeDev.src.dtos;
 
 import java.time.LocalDateTime;
-import java.util.Dictionary;
 import java.util.List;
 import java.util.Map;
 
@@ -9,12 +8,12 @@ public class ShiftDTO {
     private String shiftType;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
-    private Dictionary<RoleDTO, Integer> requirements;
+    private Map<RoleDTO, Integer> requirements;
     private Map<RoleDTO, List<EmployeeDTO>> employeesAssignment;
     private SiteDTO site;
 
     public ShiftDTO(String shiftType, LocalDateTime startTime, LocalDateTime endTime,
-                    Dictionary<RoleDTO, Integer> requirements,
+                    Map<RoleDTO, Integer> requirements,
                     Map<RoleDTO, List<EmployeeDTO>> employeesAssignment, SiteDTO site) {
         this.shiftType = shiftType;
         this.startTime = startTime;
@@ -48,11 +47,11 @@ public class ShiftDTO {
         this.endTime = endTime;
     }
 
-    public Dictionary<RoleDTO, Integer> getRequirements() {
+    public Map<RoleDTO, Integer> getRequirements() {
         return requirements;
     }
 
-    public void setRequirements(Dictionary<RoleDTO, Integer> requirements) {
+    public void setRequirements(Map<RoleDTO, Integer> requirements) {
         this.requirements = requirements;
     }
 
@@ -71,4 +70,6 @@ public class ShiftDTO {
     public void setSite(SiteDTO site) {
         this.site = site;
     }
+
+    
 }

@@ -26,12 +26,14 @@ public class ShiftDL {
         this.site = site;
     }
 
-    public ShiftDL(LocalDateTime startTime, LocalDateTime endTime, String shiftTypeString, Site site) {
+    // constractor for loading from database (requirments are not loaded from WeeklyShiftRequirements)
+    public ShiftDL(LocalDateTime startTime, LocalDateTime endTime, String shiftTypeString, Site site, 
+                   Map<RoleDL, Integer> requirements, Map<RoleDL, List<EmployeeDL>> employeesAssignment) {
         this.startTime = startTime;
         this.endTime = endTime;
         this.shiftType = ShiftType.valueOf(shiftTypeString.toUpperCase());
-        this.employeesAssignment = new HashMap<>();
-        this.requirements = new HashMap<>();
+        this.employeesAssignment = employeesAssignment != null ? employeesAssignment : new HashMap<>();
+        this.requirements = requirements != null ? requirements : new HashMap<>();
         this.site = site;
     }
 
