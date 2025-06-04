@@ -1,9 +1,9 @@
-package transportDev.src.main.services;
+package src.main.services;
 
 import java.util.ArrayList;
 import java.util.List;
-import transportDev.src.main.entities.Truck;
-import transportDev.src.main.enums.LicenseType;
+import src.main.entities.Truck;
+import src.main.enums.LicenseType;
 
 public class TruckService {
     private List<Truck> trucks;

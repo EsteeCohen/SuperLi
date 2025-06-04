@@ -1,4 +1,4 @@
-package transportDev.src.main.dataAccessLayer;
+package src.main.dataAccessLayer;
 
 public class TransportDBConstants {
     public static final String DB_PATH = "../../db.db";

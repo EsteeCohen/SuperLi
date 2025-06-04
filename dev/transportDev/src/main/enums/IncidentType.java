@@ -1,4 +1,4 @@
-package transportDev.src.main.enums;
+package src.main.enums;
 
 public enum IncidentType {
     /**

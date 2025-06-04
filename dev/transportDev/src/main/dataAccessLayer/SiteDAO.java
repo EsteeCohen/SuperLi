@@ -1,6 +1,6 @@
-package transportDev.src.main.dataAccessLayer;
+package src.main.dataAccessLayer;
 
-import transportDev.src.main.dtos.SiteDTO;
+import src.main.dtos.SiteDTO;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;

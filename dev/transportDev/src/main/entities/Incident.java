@@ -1,8 +1,8 @@
-package transportDev.src.main.entities;
+package src.main.entities;
 
 import java.time.LocalDateTime;
-import transportDev.src.main.enums.IncidentStatus;
-import transportDev.src.main.enums.IncidentType;
+import src.main.enums.IncidentStatus;
+import src.main.enums.IncidentType;
 
 public class Incident {
     private final String id;

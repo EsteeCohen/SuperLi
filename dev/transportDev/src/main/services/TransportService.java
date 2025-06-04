@@ -1,13 +1,13 @@
-package transportDev.src.main.services;
+package src.main.services;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import transportDev.src.main.entities.*;
-import transportDev.src.main.enums.ShippingZone;
-import transportDev.src.main.enums.TransportStatus;
+import src.main.entities.*;
+import src.main.enums.ShippingZone;
+import src.main.enums.TransportStatus;
 
 public class TransportService {
     private List<Transport> transports = new ArrayList<>();

@@ -1,4 +1,4 @@
-package transportDev.src.main.dtos;
+package src.main.dtos;
 
 public class ItemDTO {
     private int id;

@@ -1,10 +1,10 @@
-package transportDev.src.main.services;
+package src.main.services;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import transportDev.src.main.entities.Site;
-import transportDev.src.main.entities.Transport;
-import transportDev.src.main.services.TransportService;
+import src.main.entities.Site;
+import src.main.entities.Transport;
+import src.main.services.TransportService;
 
 
 public class TransportScheduleService implements ITransportScheduleService {

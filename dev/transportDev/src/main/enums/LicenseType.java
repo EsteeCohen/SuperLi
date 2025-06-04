@@ -1,4 +1,4 @@
-package transportDev.src.main.enums;
+package src.main.enums;
 
 /**
  * Enum representing different types of licenses.

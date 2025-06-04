@@ -1,8 +1,8 @@
-package transportDev.src.main;
+package src.main;
 
-import transportDev.src.main.services.*;
-import transportDev.src.main.controllers.*;
-import transportDev.src.main.ui.*;
+import src.main.services.*;
+import src.main.controllers.*;
+import src.main.ui.*;
 
 public class TransportApp {
     public static void main(String[] args) {

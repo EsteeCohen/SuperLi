@@ -1,6 +1,6 @@
-package transportDev.src.main.entities;
+package src.main.entities;
 
-import transportDev.src.main.enums.LicenseType;
+import src.main.enums.LicenseType;
 
 public class Truck {
     private String regNumber;

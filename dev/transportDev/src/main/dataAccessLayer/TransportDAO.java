@@ -1,6 +1,6 @@
-package transportDev.src.main.dataAccessLayer;
+package src.main.dataAccessLayer;
 
-import transportDev.src.main.dtos.*;
+import src.main.dtos.*;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalTime;

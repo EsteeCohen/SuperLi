@@ -1,9 +1,9 @@
-package transportDev.src.main.entities;
+package src.main.entities;
 
 import java.time.LocalDate;
 import java.util.List;
-import transportDev.src.main.enums.OrderStatus;
-import transportDev.src.main.enums.OrderType;
+import src.main.enums.OrderStatus;
+import src.main.enums.OrderType;
 
 
 public class Order {

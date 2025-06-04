@@ -1,7 +1,7 @@
-package transportDev.src.main.ui;
+package src.main.ui;
 
 import java.util.Scanner;
-import transportDev.src.main.controllers.FacadeController;
+import src.main.controllers.FacadeController;
 
 public class ReportsUI {
     private Scanner scanner;

@@ -1,4 +1,4 @@
-package transportDev.src.main.dtos;
+package src.main.dtos;
 
 import java.util.List;
 

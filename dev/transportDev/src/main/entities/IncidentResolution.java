@@ -1,4 +1,4 @@
-package transportDev.src.main.entities;
+package src.main.entities;
 
 import java.time.LocalDateTime;
 

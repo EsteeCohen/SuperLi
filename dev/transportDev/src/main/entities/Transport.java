@@ -1,4 +1,4 @@
-package transportDev.src.main.entities;
+package src.main.entities;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -6,8 +6,8 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-import transportDev.src.main.enums.ShippingZone;
-import transportDev.src.main.enums.TransportStatus;
+import src.main.enums.ShippingZone;
+import src.main.enums.TransportStatus;
 
 public class Transport {
     private final int id;

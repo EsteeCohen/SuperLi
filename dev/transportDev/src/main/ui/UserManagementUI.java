@@ -1,11 +1,11 @@
-package transportDev.src.main.ui;
+package src.main.ui;
 
 import java.util.List;
 import java.util.Scanner;
 
-import transportDev.src.main.controllers.FacadeController;
-import transportDev.src.main.entities.User;
-import transportDev.src.main.enums.UserRole;
+import src.main.controllers.FacadeController;
+import src.main.entities.User;
+import src.main.enums.UserRole;
 
 public class UserManagementUI {
     private Scanner scanner;
