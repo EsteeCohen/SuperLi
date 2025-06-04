@@ -1,12 +1,12 @@
-package src.main.services;
+package transportDev.src.main.services;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import src.main.entities.User;
-import src.main.enums.UserRole;
+import transportDev.src.main.entities.User;
+import transportDev.src.main.enums.UserRole;
 
 public class UserService {
     // :)

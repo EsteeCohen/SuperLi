@@ -1,4 +1,4 @@
-package src.main.ui;
+package transportDev.src.main.ui;
 
 import java.util.List;
 import java.util.Scanner;

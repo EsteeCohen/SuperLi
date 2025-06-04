@@ -1,6 +1,6 @@
-package src.main.entities;
+package transportDev.src.main.entities;
 
-import src.main.enums.LicenseType;
+import transportDev.src.main.enums.LicenseType;
 
 public class Driver {
     private String id;

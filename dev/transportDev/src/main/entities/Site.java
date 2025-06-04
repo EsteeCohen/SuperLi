@@ -1,6 +1,6 @@
-package src.main.entities;
+package transportDev.src.main.entities;
 
-import src.main.enums.ShippingZone;
+import transportDev.src.main.enums.ShippingZone;
 
 public class Site {
     private String id;

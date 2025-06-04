@@ -1,4 +1,4 @@
-package src.main.entities;
+package transportDev.src.main.entities;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

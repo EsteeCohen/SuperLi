@@ -1,4 +1,4 @@
-package src.main.dtos;
+package transportDev.src.main.dtos;
 
 public class SiteDTO {
     private String name;

@@ -38,7 +38,17 @@ public class RegistrationPresentation extends Form {
         Integer yearlyDaysOff = UserInputManager.promptForInt(scanner, "Yearly Days Off: ", "Registration cancelled.", "q");
         if (yearlyDaysOff == null) return;
 
-        employeeService.registerEmployee(name, password, id, salary, wageType, yearlySickDays, yearlyDaysOff,site);
+        employeeService.registerEmployee(
+            name,
+            password,
+            id,
+            salary.intValue(),
+            wageType,
+            yearlySickDays.intValue(),
+            yearlyDaysOff.intValue(),
+            site.getId(),
+            site.getName()
+        );
         System.out.println("Registration completed successfully!");
     }
 
