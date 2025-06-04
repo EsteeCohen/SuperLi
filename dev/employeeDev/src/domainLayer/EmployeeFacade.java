@@ -1,22 +1,21 @@
 package employeeDev.src.domainLayer;
 
-import java.sql.Driver;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Map;
-
-import transportDev.src.main.entities.Site;
-
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import transportDev.src.main.entities.Site;
+import transportDev.src.main.enums.LicenseType;
 
 public class EmployeeFacade {
-    private Map<String, EmployeeDL> employees;
-    private RoleFacade roleFacade;
+    private final Map<String, EmployeeDL> employees;
+    private final RoleFacade roleFacade;
 
     public EmployeeFacade(RoleFacade roleFacade) {
         this.roleFacade = roleFacade;
-        this.employees = new HashMap<String, EmployeeDL>();
+        this.employees = new HashMap<>();
     }
 
     public void addEmployee(EmployeeDL e) {
@@ -52,6 +51,21 @@ public class EmployeeFacade {
         }
         EmployeeDL newEmployee = new EmployeeDL(id, password, fullName, LocalDate.now(), wage, wageTypeChar, yearlySickDays, yearlyDaysOff, site);
         employees.put(id, newEmployee);
+        return true;
+    }
+
+    public boolean registerDriver(String fullName, String password, String id, int wage, char wageTypeChar, int yearlySickDays, int yearlyDaysOff, Site site, List<LicenseType> licenseTypes) {
+        if (employees.get(id) != null) {
+            return false; // Employee with this ID already exists
+        }
+        DriverDL newDriver;
+        if (licenseTypes == null || licenseTypes.isEmpty()) {
+            newDriver = new DriverDL(id, password, fullName, LocalDate.now(), wage, wageTypeChar, yearlySickDays, yearlyDaysOff, site, roleFacade.getRoleByName("Driver"));
+        }
+        else {
+            newDriver = new DriverDL(id, password, fullName, LocalDate.now(), wage, wageTypeChar, yearlySickDays, yearlyDaysOff, site, licenseTypes, roleFacade.getRoleByName("Driver"));
+        }
+        employees.put(id, newDriver);
         return true;
     }
 

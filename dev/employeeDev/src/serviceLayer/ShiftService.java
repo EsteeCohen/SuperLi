@@ -5,6 +5,7 @@ import employeeDev.src.domainLayer.AvailabilityFacade;
 import employeeDev.src.domainLayer.EmployeeDL;
 import employeeDev.src.domainLayer.EmployeeFacade;
 import employeeDev.src.domainLayer.Enums.ShiftType;
+import employeeDev.src.serviceLayer.Interfaces.DriverAvailabilityInfoIT;
 import transportDev.src.main.entities.Site;
 import employeeDev.src.domainLayer.ShiftDL;
 import employeeDev.src.domainLayer.ShiftFacade;
@@ -15,7 +16,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ShiftService {
+public class ShiftService implements DriverAvailabilityInfoIT{
     private ShiftFacade shiftFacade;
     private AvailabilityFacade availabilityFacade;
     private EmployeeFacade employeeFacade;
@@ -141,5 +142,10 @@ public class ShiftService {
             unassignedEmployeeSL.add(new EmployeeSL(employee));
         }
         return unassignedEmployeeSL;
+    }
+
+    public List<EmployeeDL> getAllAssignDriver(LocalDateTime Time, Site site) {
+        ShiftDL = shiftFacade.getShiftAtTime(Time, site);
+        
     }
 }

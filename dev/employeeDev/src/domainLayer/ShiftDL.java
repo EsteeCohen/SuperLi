@@ -112,6 +112,14 @@ public class ShiftDL {
         }
     }
 
+    public void setIntoRequirements(RoleDL role, int quantity) {
+        if (requirements != null) {
+            requirements.put(role, quantity);
+        } else {
+            throw new IllegalArgumentException("Requirements not initialized for this shift.");
+        }
+    }
+
     // Get the required number of employees for a specific role
     public int getRequiredEmployeeCount(RoleDL role) {
         if (requirements != null && requirements.get(role) != null) {

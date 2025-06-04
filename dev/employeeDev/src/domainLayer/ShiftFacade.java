@@ -1,6 +1,7 @@
 package employeeDev.src.domainLayer;
 
 import employeeDev.src.domainLayer.Enums.ShiftType;
+import employeeDev.src.serviceLayer.Interfaces.ITransportScheduleService;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -8,7 +9,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import employeeDev.src.serviceLayer.Interfaces.ITransportScheduleService;
 import transportDev.src.main.entities.Site;
 
 public class ShiftFacade {
@@ -33,36 +33,47 @@ public class ShiftFacade {
         return shiftList;
     }
 
-    public void assignToShift(EmployeeDL employee, LocalDateTime startTime, String shiftType, RoleDL role, String siteName) {
-        ShiftDL shift = shifts.get(getShiftKey(startTime, shiftType, siteName));
+    public void assignToShift(EmployeeDL employee, LocalDateTime startTime, Site site, RoleDL role) {
+        ShiftDL shift = shifts.get(getShiftKey(startTime, site.getName()));
         if (shift == null) {
-            throw new IllegalArgumentException("Shift not found for the given start time, type, and site");
+            throw new IllegalArgumentException("Shift not found for the given start time and site");
         }
         shift.assignEmployee(role, employee);
     }
 
-    public void unassignToShift(EmployeeDL employee, LocalDateTime startTime, String shiftType, RoleDL role, String siteName) {
-        ShiftDL shift = shifts.get(getShiftKey(startTime, shiftType, siteName));
+    public void unassignToShift(EmployeeDL employee, LocalDateTime startTime, Site site,  RoleDL role) {
+        ShiftDL shift = shifts.get(getShiftKey(startTime, site.getName()));
         if (shift == null) {
-            throw new IllegalArgumentException("Shift not found for the given start time, type, and site");
+            throw new IllegalArgumentException("Shift not found for the given start time and site");
         }
         shift.unassignEmployee(role, employee);
     }
 
-    public ShiftDL getShiftByStartTimeAndType(LocalDateTime startTime, String shiftType, String siteName) {
-        return shifts.get(getShiftKey(startTime, shiftType, siteName));
+    public ShiftDL getShiftByStartTimeAndType(LocalDateTime startTime, Site site) {
+        return shifts.get(getShiftKey(startTime, site.getName()));
     }
 
     public void addShift(ShiftDL shift) {
-        shifts.put(getShiftKey(shift.getStartTime(), shift.getShiftType().toString(), shift.getSite().getName()), shift);
+        shifts.put(getShiftKey(shift.getStartTime(), shift.getSite().getName()), shift);
     }
 
-    public void setRequirements(DayOfWeek day, ShiftType shift, RoleDL role, int quantity) {
+    public void setWeeklyRequirements(DayOfWeek day, ShiftType shift, RoleDL role, int quantity) {
         WeeklyShiftRequirements.getInstance().setRequirements(day, shift, role, quantity);
     }
 
-    public boolean checkIfThereAreShiftsThatAreNotFullyAssigned() {
-        for (ShiftDL shift : shifts.values()) {
+    public void setRequirementForShift(ShiftDL shift, RoleDL role, int quantity) {
+        if (shift == null || role == null) {
+            throw new IllegalArgumentException("Shift and role cannot be null");
+        }
+        shift.setIntoRequirements(role, quantity);
+    }
+
+    public boolean checkIfThereAreShiftsThatAreNotFullyAssigned(Site site, LocalDate startDate, LocalDate endDate) {
+        if (site == null || startDate == null || endDate == null) {
+            throw new IllegalArgumentException("Site and dates cannot be null");
+        }
+        List<ShiftDL> shiftList = getAllShiftsInRange(startDate, endDate, site);
+        for (ShiftDL shift : shiftList) {
             if (!shift.meetTheRequirements()) {
                 return true; // Found a shift that does not meet the requirements
             }
@@ -70,13 +81,27 @@ public class ShiftFacade {
         return false; // All shifts have at least one assigned employee
     }
 
-    public List<ShiftDL> getWeeklyShifts(LocalDate startDay) {
+    public List<ShiftDL> getAllShiftsInRange(LocalDate startDate, LocalDate endDate, Site site) {
+        if (startDate == null || endDate == null) {
+            throw new IllegalArgumentException("Start date and end date cannot be null");
+        }
+        List<ShiftDL> shiftList = new ArrayList<>();
+        for (ShiftDL shift : shifts.values()) {
+            LocalDate shiftDate = shift.getStartTime().toLocalDate();
+            if (!shiftDate.isBefore(startDate) && !shiftDate.isAfter(endDate) && shift.getSite().equals(site)) {
+                shiftList.add(shift);
+            }
+        }
+        return shiftList;
+    }
+
+    public List<ShiftDL> getWeeklyShifts(LocalDate startDay, Site site) {
         List<ShiftDL> weeklyShifts = new ArrayList<>();
         LocalDate endDay = startDay.plusDays(6);
 
         for (ShiftDL shift : shifts.values()) {
             LocalDate shiftDate = shift.getStartTime().toLocalDate();
-            if (!shiftDate.isBefore(startDay) && !shiftDate.isAfter(endDay)) {
+            if (!shiftDate.isBefore(startDay) && !shiftDate.isAfter(endDay) && shift.getSite().equals(site)) {
                 weeklyShifts.add(shift);
             }
         }
@@ -85,14 +110,14 @@ public class ShiftFacade {
     }
 
     // Helper method to generate the key for the shifts map
-    private String getShiftKey(LocalDateTime startTime, String shiftType, String siteName) {
-        return startTime.toString() + shiftType + siteName;
+    private String getShiftKey(LocalDateTime startTime, String siteName) {
+        return startTime.toString() + siteName;
     }
 
     // Get the shift at a specific time
-    public ShiftDL getShiftAtTime(LocalDateTime time) {
+    public ShiftDL getShiftAtTime(LocalDateTime time, Site site) {
         for (ShiftDL shift : shifts.values()) {
-            if (shift.getStartTime().isEqual(time) || (time.isAfter(shift.getStartTime()) && time.isBefore(shift.getEndTime()))) {
+            if ((shift.getStartTime().isEqual(time) || (time.isAfter(shift.getStartTime()) && time.isBefore(shift.getEndTime()))) && shift.getSite().equals(site)) {
                 return shift;
             }
         }
@@ -100,9 +125,9 @@ public class ShiftFacade {
     }
 
     // makes sure that every shift where a delivery is expected to arrive has at least one warehouseman required
-    public void intergrateShiftToDeliveries(RoleDL warehousemanRole) {
+    public void intergrateShiftToDeliveries(Site site, RoleDL warehousemanRole) {
         for (ShiftDL shift : shifts.values()) {
-            if (transportInterface.areThereArivelesBetween(shift.getStartTime(), shift.getEndTime()) && shift.getRequiredEmployeeCount(warehousemanRole) < 1) {
+            if (transportInterface.areThereArivelesBetween(shift.getStartTime(), shift.getEndTime(), site) && shift.getRequiredEmployeeCount(warehousemanRole) < 1) {
                 shift.addToRequirements(warehousemanRole, 1);
             }
         }

@@ -1,6 +1,7 @@
 package employeeDev.src.serviceLayer.Interfaces;
 
 import java.time.LocalDateTime;
+import transportDev.src.main.entities.Site;
 
 public interface ITransportScheduleService {
     /**
@@ -10,5 +11,5 @@ public interface ITransportScheduleService {
      * @param endDate the end of the time range
      * @return a list of upcoming deliveries scheduled between startDate and endDate
      */
-    boolean areThereArivelesBetween(LocalDateTime startDate, LocalDateTime endDate);
+    boolean areThereArivelesBetween(LocalDateTime startDate, LocalDateTime endDate, Site site);
 }
