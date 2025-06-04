@@ -28,4 +28,34 @@ public enum LicenseType {
                 throw new IllegalStateException("Unexpected value: " + this);
         }
     }
+
+    public String getTypeInString() {
+        switch (this) {
+            case C1:
+                return "C1";
+            case C:
+                return "C";
+            case CE:
+                return "CE";
+            case C1E:
+                return "C1E";
+            default:
+                throw new IllegalStateException("Unexpected value: " + this);
+        }
+    }
+
+    public static LicenseType fromString(String type) {
+        switch (type.toUpperCase()) {
+            case "C1":
+                return C1;
+            case "C":
+                return C;
+            case "CE":
+                return CE;
+            case "C1E":
+                return C1E;
+            default:
+                throw new IllegalArgumentException("Unknown license type: " + type);
+        }
+    }
 }

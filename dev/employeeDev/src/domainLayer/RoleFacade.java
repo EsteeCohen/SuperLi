@@ -1,5 +1,7 @@
 package employeeDev.src.domainLayer;
 
+import employeeDev.src.dataAcssesLayer.RoleDAO;
+import employeeDev.src.dtos.RoleDTO;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -33,5 +35,17 @@ public class RoleFacade{
 
     public List<RoleDL> getAllRoles() {
         return new ArrayList<>(roles.values());
+    }
+
+    // loads all roles from the database and adds them to the roles hashtable in the facade
+    public void loadRolesFromDB() {
+        RoleDAO roleDAO = new RoleDAO();
+        List<RoleDTO> roleDTOs = roleDAO.getAllRoles();
+        for (RoleDTO roleDTO : roleDTOs) {
+            RoleDL role = new RoleDL(roleDTO.getName());
+            if (!roles.containsKey(role.getName())) {
+                roles.put(role.getName(), role);
+            }
+        }
     }
 }

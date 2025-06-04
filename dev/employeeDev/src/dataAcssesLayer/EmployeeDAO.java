@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.List;
 
 public class EmployeeDAO {
@@ -26,7 +27,7 @@ public class EmployeeDAO {
         this.siteDAO = new SiteDAO();
     }
 
-    public EmployeeDTO getEmployeeById(String id) throws SQLException {
+    public EmployeeDTO getEmployeeById(String id) {
         try (Connection employeeConn = DriverManager.getConnection("jdbc:sqlite:" + DBPath)) {
             String query = "SELECT * FROM " + employeeTableName + " WHERE id = ?";
             try (PreparedStatement statement = employeeConn.prepareStatement(query)) {
@@ -62,9 +63,13 @@ public class EmployeeDAO {
                 }
             }
         }
+        catch (SQLException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
-    private List<RoleDTO> getRolesForEmployee(String employeeId) throws SQLException {
+    private List<RoleDTO> getRolesForEmployee(String employeeId) {
         List<RoleDTO> roles = new java.util.ArrayList<>();
         try (Connection roleConn = DriverManager.getConnection("jdbc:sqlite:" + DBPath)) {
             String query = "SELECT * FROM " + roleTableName + " WHERE employee_id = ?";
@@ -78,15 +83,18 @@ public class EmployeeDAO {
                 }
             }
         }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
         return roles;
     }
 
-    public List<EmployeeDTO> getAllEmployees() throws SQLException {
+    public List<EmployeeDTO> getAllEmployees() {
         try (Connection employeeConn = DriverManager.getConnection("jdbc:sqlite:" + DBPath)) {
             String query = "SELECT * FROM " + employeeTableName;
             try (PreparedStatement statement = employeeConn.prepareStatement(query);
                     ResultSet rs = statement.executeQuery()) {
-                List<EmployeeDTO> employees = new java.util.ArrayList<>();
+                List<EmployeeDTO> employees = new ArrayList<>();
                 while (rs.next()) {
                     String id = rs.getString("id");
                     String password = rs.getString("password");
@@ -117,9 +125,13 @@ public class EmployeeDAO {
                 return employees;
             }
         }
+        catch (SQLException e) {
+            e.printStackTrace();
+            return new ArrayList<EmployeeDTO>();
+        }
     }
 
-    public void instertEmployee(EmployeeDTO employee) throws SQLException {
+    public void instertEmployee(EmployeeDTO employee) {
         try (Connection employeeConn = DriverManager.getConnection("jdbc:sqlite:" + DBPath)) {
             String query = "INSERT INTO " + employeeTableName
                     + " (id, password, fullName, workStartingDate, wage, wageType, yearlySickDays, yearlyDaysOff, site_name, phoneNumber) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -138,9 +150,12 @@ public class EmployeeDAO {
                 statement.executeUpdate();
             }
         }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
-    public void instertDriver(DriverDTO driver) throws SQLException {
+    public void instertDriver(DriverDTO driver) {
         instertEmployee(driver);
         try (Connection driverConn = DriverManager.getConnection("jdbc:sqlite:" + DBPath)) {
             String query = "INSERT INTO " + DriversTable + " (employee_id, licenseType) VALUES (?, ?)";
@@ -152,9 +167,12 @@ public class EmployeeDAO {
                 }
             }
         }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
-    public void updateEmployee(EmployeeDTO employee) throws SQLException {
+    public void updateEmployee(EmployeeDTO employee) {
         try (Connection employeeConn = DriverManager.getConnection("jdbc:sqlite:" + DBPath)) {
             String query = "UPDATE " + employeeTableName
                     + " SET password = ?, fullName = ?, workStartingDate = ?, wage = ?, wageType = ?, yearlySickDays = ?, yearlyDaysOff = ?, site_name = ?, phoneNumber = ? WHERE id = ?";
@@ -173,9 +191,12 @@ public class EmployeeDAO {
                 statement.executeUpdate();
             }
         }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
-    public void updateDriver(DriverDTO driver) throws SQLException {
+    public void updateDriver(DriverDTO driver) {
         updateEmployee(driver);
         try (Connection driverConn = DriverManager.getConnection("jdbc:sqlite:" + DBPath)) {
             String deleteQuery = "DELETE FROM " + DriversTable + " WHERE employee_id = ?";
@@ -192,9 +213,12 @@ public class EmployeeDAO {
                 }
             }
         }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
-    public void deleteEmployee(String id) throws SQLException {
+    public void deleteEmployee(String id) {
         EmployeeDTO employee = getEmployeeById(id);
         if (employee != null) {
             try (Connection employeeConn = DriverManager.getConnection("jdbc:sqlite:" + DBPath)) {
@@ -204,10 +228,14 @@ public class EmployeeDAO {
                     statement.executeUpdate();
                 }
             }
+            catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
+        
     }
 
-    public void deleteDriver(String id) throws SQLException {
+    public void deleteDriver(String id) {
         try (Connection driverConn = DriverManager.getConnection("jdbc:sqlite:" + DBPath)) {
             String deleteDriverQuery = "DELETE FROM " + DriversTable + " WHERE employee_id = ?";
             try (PreparedStatement deleteStatement = driverConn.prepareStatement(deleteDriverQuery)) {
@@ -220,10 +248,13 @@ public class EmployeeDAO {
                 deleteEmployeeStatement.executeUpdate();
             }
         }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
 
     }
 
-    public void assignRoleToEmployee(String employeeId, String roleName) throws SQLException {
+    public void assignRoleToEmployee(String employeeId, String roleName) {
         try (Connection employeeConn = DriverManager.getConnection("jdbc:sqlite:" + DBPath)) {
             String query = "INSERT INTO " + roleTableName + " (employee_id, role_roleName) VALUES (?, ?)";
             try (PreparedStatement statement = employeeConn.prepareStatement(query)) {
@@ -232,9 +263,12 @@ public class EmployeeDAO {
                 statement.executeUpdate();
             }
         }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
-    public void removeRoleFromEmployee(String employeeId, String roleName) throws SQLException {
+    public void removeRoleFromEmployee(String employeeId, String roleName) {
         try (Connection employeeConn = DriverManager.getConnection("jdbc:sqlite:" + DBPath)) {
             String query = "DELETE FROM " + roleTableName + " WHERE employee_id = ? AND role_roleName = ?";
             try (PreparedStatement statement = employeeConn.prepareStatement(query)) {
@@ -243,9 +277,12 @@ public class EmployeeDAO {
                 statement.executeUpdate();
             }
         }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
-    public List<String> getLicenseTypesOfDriver(String driverId) throws SQLException {
+    public List<String> getLicenseTypesOfDriver(String driverId) {
         try (Connection employeeConn = DriverManager.getConnection("jdbc:sqlite:" + DBPath)) {
             String query = "SELECT licenseType FROM " + DriversTable + " WHERE employee_id = ?";
             try (PreparedStatement statement = employeeConn.prepareStatement(query)) {
@@ -258,6 +295,10 @@ public class EmployeeDAO {
                     return licenseTypes.isEmpty() ? null : licenseTypes;
                 }
             }
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+            return null;
         }
     }
 }

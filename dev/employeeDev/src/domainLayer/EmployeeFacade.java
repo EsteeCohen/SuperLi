@@ -1,6 +1,9 @@
 package employeeDev.src.domainLayer;
 
 
+import employeeDev.src.dataAcssesLayer.EmployeeDAO;
+import employeeDev.src.dtos.DriverDTO;
+import employeeDev.src.dtos.EmployeeDTO;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -12,9 +15,11 @@ import transportDev.src.main.enums.LicenseType;
 public class EmployeeFacade {
     private final Map<String, EmployeeDL> employees;
     private final RoleFacade roleFacade;
+    private final SiteFacade siteFacade;
 
-    public EmployeeFacade(RoleFacade roleFacade) {
+    public EmployeeFacade(RoleFacade roleFacade, SiteFacade siteFacade) {
         this.roleFacade = roleFacade;
+        this.siteFacade = siteFacade;
         this.employees = new HashMap<>();
     }
 
@@ -103,5 +108,59 @@ public class EmployeeFacade {
             }
         }
         return drivers;
+    }
+
+    // Load employees from the database
+    public void loadEmployeesFromDB() {
+        EmployeeDAO employeeDAO = new EmployeeDAO();
+        List<EmployeeDTO> employeeList = employeeDAO.getAllEmployees();
+        for (EmployeeDTO employeeDTO : employeeList) {
+            Site site = siteFacade.getSiteByName(employeeDTO.getSite().getName());
+            if (employeeDTO.isDriver()) {
+               loadDriver((DriverDTO) employeeDTO, site);
+            } else {
+                LoadEmployee(employeeDTO, site);
+            }
+        }
+    }
+
+    private void loadDriver(DriverDTO driverDTO, Site site) {
+        List<LicenseType> licenseTypes = new ArrayList<>();
+        for (String licenseType : driverDTO.getLicenseTypes()) {
+            try {
+                licenseTypes.add(LicenseType.fromString(licenseType.toUpperCase()));
+            } catch (IllegalArgumentException e) {
+                System.err.println("Invalid license type: " + licenseType);
+            }
+        }
+        DriverDL driver = new DriverDL(
+                driverDTO.getId(),
+                driverDTO.getPassword(),
+                driverDTO.getFullName(),
+                driverDTO.getWorkStartingDate(),
+                driverDTO.getWage(),
+                driverDTO.getWageType().toUpperCase().charAt(0),
+                driverDTO.getYearlySickDays(),
+                driverDTO.getYearlyDaysOff(),
+                site,
+                null,
+                roleFacade.getRoleByName("Driver")
+        );
+        addEmployee(driver);
+    }
+
+    private void LoadEmployee(EmployeeDTO employeeDTO, Site site) {
+        EmployeeDL regularEmployee = new EmployeeDL(
+                employeeDTO.getId(),
+                employeeDTO.getPassword(),
+                employeeDTO.getFullName(),
+                employeeDTO.getWorkStartingDate(),
+                employeeDTO.getWage(),
+                employeeDTO.getWageType().toUpperCase().charAt(0),
+                employeeDTO.getYearlySickDays(),
+                employeeDTO.getYearlyDaysOff(),
+                site
+        );
+        addEmployee(regularEmployee);
     }
 }

@@ -25,9 +25,12 @@ public class SiteDAO {
             stmt.setString(5, site.getShippingZone());
             stmt.executeUpdate();
            } 
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
-    public void updateSite(SiteDTO site) throws SQLException{
+    public void updateSite(SiteDTO site) {
         try (Connection conn = DriverManager.getConnection(dbPath)) {
             String sql = "UPDATE " + TABLE_NAME + " SET address = ?, contactPhone = ?, contactName = ?, ShippingZone = ? WHERE SiteName = ?";
             PreparedStatement stmt = conn.prepareStatement(sql);
@@ -38,18 +41,24 @@ public class SiteDAO {
             stmt.setString(5, site.getName());
             stmt.executeUpdate();
         }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
-    public void deleteSite(String siteName) throws SQLException{
+    public void deleteSite(String siteName) {
         try (Connection conn = DriverManager.getConnection(dbPath)) {
             String sql = "DELETE FROM " + TABLE_NAME + " WHERE SiteName = ?";
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setString(1, siteName);
             stmt.executeUpdate();
         }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
-    public SiteDTO getSite(String siteName) throws SQLException{
+    public SiteDTO getSite(String siteName) {
     try (Connection conn = DriverManager.getConnection(dbPath)) {
             String sql = "SELECT * FROM " + TABLE_NAME + " WHERE SiteName = ?";
             PreparedStatement stmt = conn.prepareStatement(sql);
@@ -63,10 +72,14 @@ public class SiteDAO {
                 return new SiteDTO(siteName, address, contactPhone, contactName, shippingZone);
             }
         }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
         return null;
+        
     }
 
-    public List<SiteDTO> getAllSites() throws SQLException{
+    public List<SiteDTO> getAllSites() {
         try (Connection conn = DriverManager.getConnection(dbPath)) {
             String sql = "SELECT * FROM " + TABLE_NAME;
             PreparedStatement stmt = conn.prepareStatement(sql);
@@ -82,9 +95,13 @@ public class SiteDAO {
             }
             return sites;
         }
+        catch (SQLException e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
     }
 
-    public List<SiteDTO> getSitesByShippingZone(String shippingZone) throws SQLException {
+    public List<SiteDTO> getSitesByShippingZone(String shippingZone) {
         try (Connection conn = DriverManager.getConnection(dbPath)) {
             String sql = "SELECT * FROM " + TABLE_NAME + " WHERE ShippingZone = ?";
             PreparedStatement stmt = conn.prepareStatement(sql);
@@ -99,6 +116,10 @@ public class SiteDAO {
                 sites.add(new SiteDTO(siteName, address, contactPhone, contactName, shippingZone));
             }
             return sites;
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+            return new ArrayList<>();
         }
     }
 

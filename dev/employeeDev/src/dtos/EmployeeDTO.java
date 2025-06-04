@@ -119,4 +119,8 @@ public class EmployeeDTO {
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
+
+    public boolean isDriver() {
+        return false; // need to override in subclasses
+    }
 }

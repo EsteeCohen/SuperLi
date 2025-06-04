@@ -21,4 +21,9 @@ public class DriverDTO extends EmployeeDTO {
     public void setLicenseTypes(List<String> licenseTypes) {
         this.licenseTypes = licenseTypes != null ? licenseTypes : new ArrayList<>();
     }
+
+    @Override
+    public boolean isDriver() {
+        return true;
+    }
 }

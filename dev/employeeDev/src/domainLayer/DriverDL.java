@@ -4,7 +4,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import transportDev.src.main.entities.Site;
-import transportDev.src.main.enums.LicenseType;;
+import transportDev.src.main.enums.LicenseType;
+;
 
 public class DriverDL extends EmployeeDL {
     private List<LicenseType> licenseTypes;

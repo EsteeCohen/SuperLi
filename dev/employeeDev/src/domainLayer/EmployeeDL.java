@@ -11,7 +11,7 @@ public class EmployeeDL {
     private final String id;
     private String password;
     private String fullName;
-    private final LocalDate wordStartingDate;
+    private final LocalDate workStartingDate;
     private int wage;
     private WageType wageType;
     private final List<RoleDL> roles;
@@ -20,11 +20,11 @@ public class EmployeeDL {
     private Site site;
 
     // Main constructor
-    public EmployeeDL(String id, String password, String fullName, LocalDate wordStartingDate, int wage, char wageTypeChar, int yearlySickDays, int yearlyDaysOff, Site site) {
+    public EmployeeDL(String id, String password, String fullName, LocalDate workStartingDate, int wage, char wageTypeChar, int yearlySickDays, int yearlyDaysOff, Site site) {
         this.id = id;
         this.password = password;
         this.fullName = fullName;
-        this.wordStartingDate = wordStartingDate;
+        this.workStartingDate = workStartingDate;
         this.wage = wage;
         this.wageType = WageType.fromChar(wageTypeChar);
         this.roles = new ArrayList<>();
@@ -64,7 +64,7 @@ public class EmployeeDL {
     }
 
     public LocalDate getWordStartingDate() {
-        return wordStartingDate;
+        return workStartingDate;
     }
 
     public int getWage() {
