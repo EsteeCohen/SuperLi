@@ -41,6 +41,7 @@ public class EmployeeDAO {
                         String wageType = rs.getString("wageType");
                         int yearlySickDays = rs.getInt("yearlySickDays");
                         int yearlyDaysOff = rs.getInt("yearlyDaysOff");
+                        String phoneNumber = rs.getString("phoneNumber");
                         List<RoleDTO> roles = getRolesForEmployee(id);
                         SiteDTO site = siteDAO.getSite(rs.getString("siteName"));
                         if (site == null) {
@@ -50,11 +51,11 @@ public class EmployeeDAO {
                         List<String> licenseTypes = getLicenseTypesOfDriver(id);
                         if (licenseTypes != null) {
                             return new DriverDTO(id, password, fullName, workStartingDate, wage,
-                                    wageType, yearlySickDays, yearlyDaysOff, roles, site, licenseTypes);
+                                    wageType, yearlySickDays, yearlyDaysOff, roles, site, phoneNumber, licenseTypes);
                         }
                         // If not a driver, return as a regular employee
                         return new EmployeeDTO(id, password, fullName, workStartingDate, wage,
-                                wageType, yearlySickDays, yearlyDaysOff, roles, site);
+                                wageType, yearlySickDays, yearlyDaysOff, roles, site, phoneNumber);
                     } else {
                         return null;
                     }
@@ -96,6 +97,7 @@ public class EmployeeDAO {
                     String wageType = rs.getString("wageType");
                     int yearlySickDays = rs.getInt("yearlySickDays");
                     int yearlyDaysOff = rs.getInt("yearlyDaysOff");
+                    String phoneNumber = rs.getString("phoneNumber");
                     List<RoleDTO> roles = getRolesForEmployee(id);
                     SiteDTO site = siteDAO.getSite(rs.getString("siteName"));
                         if (site == null) {
@@ -105,12 +107,12 @@ public class EmployeeDAO {
                     List<String> licenseTypes = getLicenseTypesOfDriver(id);
                     if (licenseTypes != null) {
                         employees.add(new DriverDTO(id, password, fullName, workStartingDate, wage, wageType,
-                                yearlySickDays, yearlyDaysOff, roles, site, licenseTypes));
+                                yearlySickDays, yearlyDaysOff, roles, site, phoneNumber, licenseTypes));
                         continue;
                     }
                     // If not a driver, return as a regular employee
                     employees.add(new EmployeeDTO(id, password, fullName, workStartingDate, wage, wageType,
-                            yearlySickDays, yearlyDaysOff, roles, site));
+                            yearlySickDays, yearlyDaysOff, roles, site, phoneNumber));
                 }
                 return employees;
             }
@@ -120,7 +122,7 @@ public class EmployeeDAO {
     public void instertEmployee(EmployeeDTO employee) throws SQLException {
         try (Connection employeeConn = DriverManager.getConnection("jdbc:sqlite:" + DBPath)) {
             String query = "INSERT INTO " + employeeTableName
-                    + " (id, password, fullName, workStartingDate, wage, wageType, yearlySickDays, yearlyDaysOff, site_name) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                    + " (id, password, fullName, workStartingDate, wage, wageType, yearlySickDays, yearlyDaysOff, site_name, phoneNumber) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             try (PreparedStatement statement = employeeConn.prepareStatement(query)) {
                 statement.setString(1, employee.getId());
                 statement.setString(2, employee.getPassword());
@@ -132,6 +134,7 @@ public class EmployeeDAO {
                 statement.setInt(7, employee.getYearlySickDays());
                 statement.setInt(8, employee.getYearlyDaysOff());
                 statement.setString(9, employee.getSite().getName());
+                statement.setString(10, employee.getPhoneNumber());
                 statement.executeUpdate();
             }
         }
@@ -154,7 +157,7 @@ public class EmployeeDAO {
     public void updateEmployee(EmployeeDTO employee) throws SQLException {
         try (Connection employeeConn = DriverManager.getConnection("jdbc:sqlite:" + DBPath)) {
             String query = "UPDATE " + employeeTableName
-                    + " SET password = ?, fullName = ?, workStartingDate = ?, wage = ?, wageType = ?, yearlySickDays = ?, yearlyDaysOff = ?, site_name = ? WHERE id = ?";
+                    + " SET password = ?, fullName = ?, workStartingDate = ?, wage = ?, wageType = ?, yearlySickDays = ?, yearlyDaysOff = ?, site_name = ?, phoneNumber = ? WHERE id = ?";
             try (PreparedStatement statement = employeeConn.prepareStatement(query)) {
                 statement.setString(1, employee.getPassword());
                 statement.setString(2, employee.getFullName());
@@ -165,7 +168,8 @@ public class EmployeeDAO {
                 statement.setInt(6, employee.getYearlySickDays());
                 statement.setInt(7, employee.getYearlyDaysOff());
                 statement.setString(8, employee.getSite().getName());
-                statement.setString(9, employee.getId());
+                statement.setString(9, employee.getPhoneNumber());
+                statement.setString(10, employee.getId());
                 statement.executeUpdate();
             }
         }

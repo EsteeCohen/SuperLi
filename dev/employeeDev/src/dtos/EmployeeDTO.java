@@ -18,7 +18,7 @@ public class EmployeeDTO {
     private SiteDTO site;
 
     public EmployeeDTO(String id, String password, String fullName, LocalDate workStartingDate, int wage,
-            String wageType, int yearlySickDays, int yearlyDaysOff, List<RoleDTO> roles, SiteDTO site) {
+            String wageType, int yearlySickDays, int yearlyDaysOff, List<RoleDTO> roles, SiteDTO site, String phoneNumber) {
         this.id = id;
         this.password = password;
         this.fullName = fullName;
@@ -29,6 +29,7 @@ public class EmployeeDTO {
         this.yearlyDaysOff = yearlyDaysOff;
         this.roles = roles != null ? roles : new ArrayList<>();
         this.site = site;
+        this.phoneNumber = phoneNumber;
     }
 
     public String getId() {
@@ -109,5 +110,13 @@ public class EmployeeDTO {
 
     public void setSite(SiteDTO site) {
         this.site = site;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 }
