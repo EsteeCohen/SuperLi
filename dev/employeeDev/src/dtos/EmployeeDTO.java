@@ -8,6 +8,7 @@ public class EmployeeDTO {
     private String id;
     private String password;
     private String fullName;
+    private String phoneNumber;
     private LocalDate workStartingDate;
     private int wage;
     private String wageType;

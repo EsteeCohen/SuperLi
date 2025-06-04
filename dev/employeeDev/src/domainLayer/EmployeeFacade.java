@@ -1,5 +1,6 @@
 package employeeDev.src.domainLayer;
 
+import java.sql.Driver;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Map;
@@ -78,5 +79,15 @@ public class EmployeeFacade {
             }
         }
         return employeesAtSite;
+    }
+
+    public List<DriverDL> getDrivers() {
+        List<DriverDL> drivers = new ArrayList<>();
+        for (EmployeeDL employee : employees.values()) {
+            if (employee.isDriver()) {
+                drivers.add((DriverDL) employee);
+            }
+        }
+        return drivers;
     }
 }

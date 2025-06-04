@@ -121,4 +121,8 @@ public class EmployeeDL {
             }
         }
     }
+
+    public boolean isDriver(){
+        return false; // This method should be overridden in DriverDL or other subclasses
+    }
 }
