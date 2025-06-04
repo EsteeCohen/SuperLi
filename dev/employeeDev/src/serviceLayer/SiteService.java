@@ -3,9 +3,10 @@ package employeeDev.src.serviceLayer;
 import java.util.List;
 
 import employeeDev.src.domainLayer.SiteFacade;
+import employeeDev.src.serviceLayer.Interfaces.SiteInfoInterface;
 import transportDev.src.main.entities.Site;
 
-public class SiteService {
+public class SiteService implements SiteInfoInterface{
     private SiteFacade siteFacade;
     public SiteService(SiteFacade siteFacade) {
         this.siteFacade = siteFacade;
