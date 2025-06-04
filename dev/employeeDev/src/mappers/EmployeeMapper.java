@@ -1,14 +1,17 @@
 package employeeDev.src.mappers;
 
+import employeeDev.src.domainLayer.DriverDL;
 import employeeDev.src.domainLayer.EmployeeDL;
 import employeeDev.src.domainLayer.RoleDL;
 import employeeDev.src.domainLayer.RoleFacade;
 import employeeDev.src.domainLayer.SiteFacade;
+import employeeDev.src.dtos.DriverDTO;
 import employeeDev.src.dtos.EmployeeDTO;
 import employeeDev.src.dtos.RoleDTO;
 import java.util.ArrayList;
 import java.util.List;
 import transportDev.src.main.entities.Site;
+import transportDev.src.main.enums.LicenseType;
 
 public class EmployeeMapper {
 
@@ -59,6 +62,65 @@ public class EmployeeMapper {
                 SiteMapper.toDTO(employee.getSite()),
                 employee.getPhoneNumber()
         );
-    }   
+    }
+
+    public static DriverDL fromDriverDTO(DriverDTO driverDTO, RoleFacade roleFacade, SiteFacade siteFacade) {
+        Site site = siteFacade.getSiteByName(driverDTO.getSite().getName());
+        if (site == null) {
+            throw new IllegalArgumentException("Site with name " + driverDTO.getSite().getName() + " not found.");
+        }
+        RoleDL driverRole = roleFacade.getRoleByName("Driver");
+        if (driverRole == null) {
+            throw new IllegalArgumentException("Role 'Driver' not found.");
+        }
+        List<LicenseType> licenseTypes = new ArrayList<>();
+        for (String licenseType : driverDTO.getLicenseTypes()) {
+            try {
+                licenseTypes.add(LicenseType.fromString(licenseType.toUpperCase()));
+            } catch (IllegalArgumentException e) {
+                System.err.println("Invalid license type: " + licenseType);
+            }
+        }
+        DriverDL driver = new DriverDL(
+                driverDTO.getId(),
+                driverDTO.getPassword(),
+                driverDTO.getFullName(),
+                driverDTO.getWorkStartingDate(),
+                driverDTO.getWage(),
+                driverDTO.getWageType().toUpperCase().charAt(0),
+                driverDTO.getYearlySickDays(),
+                driverDTO.getYearlyDaysOff(),
+                site,
+                driverDTO.getPhoneNumber(),
+                licenseTypes,
+                driverRole
+        );
+        return driver;
+    }
+
+    public static DriverDTO toDriverDTO(DriverDL driver) {
+        List<String> licenseTypes = new ArrayList<>();
+        for (LicenseType licenseType : driver.getLicenseTypes()) {
+            licenseTypes.add(licenseType.toString());
+        }
+        List<RoleDTO> rolesDTOs = new ArrayList<>();
+        for (RoleDL role : driver.getRoles()) {
+            rolesDTOs.add(RoleMapper.toDTO(role));
+        }
+        return new DriverDTO(
+                driver.getId(),
+                driver.getPassword(),
+                driver.getFullName(),
+                driver.getWorkStartingDate(),
+                driver.getWage(),
+                driver.getWageType().toString(),
+                driver.getYearlySickDays(),
+                driver.getYearlyDaysOff(),
+                rolesDTOs,
+                SiteMapper.toDTO(driver.getSite()),
+                driver.getPhoneNumber(),
+                licenseTypes
+        );
+    }
 
 }

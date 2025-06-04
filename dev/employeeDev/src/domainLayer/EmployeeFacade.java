@@ -4,6 +4,7 @@ package employeeDev.src.domainLayer;
 import employeeDev.src.dataAcssesLayer.EmployeeDAO;
 import employeeDev.src.dtos.DriverDTO;
 import employeeDev.src.dtos.EmployeeDTO;
+import employeeDev.src.mappers.EmployeeMapper;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -50,25 +51,25 @@ public class EmployeeFacade {
         return null;
     }
 
-    public boolean registerEmployee(String fullName, String password, String id, int wage, char wageTypeChar, int yearlySickDays, int yearlyDaysOff, Site site) {
+    public boolean registerEmployee(String fullName, String password, String id, int wage, char wageTypeChar, int yearlySickDays, int yearlyDaysOff, String siteName, String phoneNumber) {
         if (employees.get(id) != null) {
             return false; // Employee with this ID already exists
         }
-        EmployeeDL newEmployee = new EmployeeDL(id, password, fullName, LocalDate.now(), wage, wageTypeChar, yearlySickDays, yearlyDaysOff, site);
+        EmployeeDL newEmployee = new EmployeeDL(id, password, fullName, LocalDate.now(), wage, wageTypeChar, yearlySickDays, yearlyDaysOff, siteFacade.getSiteByName(siteName), phoneNumber);
         employees.put(id, newEmployee);
         return true;
     }
 
-    public boolean registerDriver(String fullName, String password, String id, int wage, char wageTypeChar, int yearlySickDays, int yearlyDaysOff, Site site, List<LicenseType> licenseTypes) {
+    public boolean registerDriver(String fullName, String password, String id, int wage, char wageTypeChar, int yearlySickDays, int yearlyDaysOff, String siteName, String phoneNumber, List<LicenseType> licenseTypes) {
         if (employees.get(id) != null) {
             return false; // Employee with this ID already exists
         }
         DriverDL newDriver;
         if (licenseTypes == null || licenseTypes.isEmpty()) {
-            newDriver = new DriverDL(id, password, fullName, LocalDate.now(), wage, wageTypeChar, yearlySickDays, yearlyDaysOff, site, roleFacade.getRoleByName("Driver"));
+            newDriver = new DriverDL(id, password, fullName, LocalDate.now(), wage, wageTypeChar, yearlySickDays, yearlyDaysOff, siteFacade.getSiteByName(siteName), phoneNumber, roleFacade.getRoleByName("Driver"));
         }
         else {
-            newDriver = new DriverDL(id, password, fullName, LocalDate.now(), wage, wageTypeChar, yearlySickDays, yearlyDaysOff, site, licenseTypes, roleFacade.getRoleByName("Driver"));
+            newDriver = new DriverDL(id, password, fullName, LocalDate.now(), wage, wageTypeChar, yearlySickDays, yearlyDaysOff, siteFacade.getSiteByName(siteName), phoneNumber, licenseTypes, roleFacade.getRoleByName("Driver"));
         }
         employees.put(id, newDriver);
         return true;
@@ -115,52 +116,11 @@ public class EmployeeFacade {
         EmployeeDAO employeeDAO = new EmployeeDAO();
         List<EmployeeDTO> employeeList = employeeDAO.getAllEmployees();
         for (EmployeeDTO employeeDTO : employeeList) {
-            Site site = siteFacade.getSiteByName(employeeDTO.getSite().getName());
             if (employeeDTO.isDriver()) {
-               loadDriver((DriverDTO) employeeDTO, site);
+               addEmployee(EmployeeMapper.fromDriverDTO((DriverDTO)employeeDTO, roleFacade, siteFacade));
             } else {
-                LoadEmployee(employeeDTO, site);
+               addEmployee(EmployeeMapper.fromDTO(employeeDTO, roleFacade, siteFacade));
             }
         }
-    }
-
-    private void loadDriver(DriverDTO driverDTO, Site site) {
-        List<LicenseType> licenseTypes = new ArrayList<>();
-        for (String licenseType : driverDTO.getLicenseTypes()) {
-            try {
-                licenseTypes.add(LicenseType.fromString(licenseType.toUpperCase()));
-            } catch (IllegalArgumentException e) {
-                System.err.println("Invalid license type: " + licenseType);
-            }
-        }
-        DriverDL driver = new DriverDL(
-                driverDTO.getId(),
-                driverDTO.getPassword(),
-                driverDTO.getFullName(),
-                driverDTO.getWorkStartingDate(),
-                driverDTO.getWage(),
-                driverDTO.getWageType().toUpperCase().charAt(0),
-                driverDTO.getYearlySickDays(),
-                driverDTO.getYearlyDaysOff(),
-                site,
-                licenseTypes,
-                roleFacade.getRoleByName("Driver")
-        );
-        addEmployee(driver);
-    }
-
-    private void LoadEmployee(EmployeeDTO employeeDTO, Site site) {
-        EmployeeDL regularEmployee = new EmployeeDL(
-                employeeDTO.getId(),
-                employeeDTO.getPassword(),
-                employeeDTO.getFullName(),
-                employeeDTO.getWorkStartingDate(),
-                employeeDTO.getWage(),
-                employeeDTO.getWageType().toUpperCase().charAt(0),
-                employeeDTO.getYearlySickDays(),
-                employeeDTO.getYearlyDaysOff(),
-                site
-        );
-        addEmployee(regularEmployee);
     }
 }

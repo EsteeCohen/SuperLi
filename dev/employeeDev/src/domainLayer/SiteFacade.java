@@ -52,10 +52,5 @@ public class SiteFacade {
             addSite(site);
         }
     }
-
-    public SiteDTO getSiteDTOByName(String siteName) {
-        Site site = getSiteByName(siteName);
-        return new SiteDTO(site.getName(), site.getAddress(), site.getContactPhone(), site.getContactName(), site.getShippingZone().toString());
-    }
     
 }

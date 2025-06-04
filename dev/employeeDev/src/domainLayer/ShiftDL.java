@@ -171,4 +171,5 @@ public class ShiftDL {
     public int getAssignedEmployeeCount(RoleDL role) {
         return employeesAssignment.getOrDefault(role, new ArrayList<>()).size();
     }
+
 }

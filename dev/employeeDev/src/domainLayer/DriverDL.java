@@ -10,14 +10,14 @@ import transportDev.src.main.enums.LicenseType;
 public class DriverDL extends EmployeeDL {
     private List<LicenseType> licenseTypes;
 
-    public DriverDL(String id, String password, String fullName, LocalDate wordStartingDate, int wage, char wageTypeChar, int yearlySickDays, int yearlyDaysOff, Site site, List<LicenseType> licenseTypes, RoleDL driverRole) {
-        super(id, password, fullName, wordStartingDate, wage, wageTypeChar, yearlySickDays, yearlyDaysOff, site);
+    public DriverDL(String id, String password, String fullName, LocalDate workStartingDate, int wage, char wageTypeChar, int yearlySickDays, int yearlyDaysOff, Site site, String phoneNumber, List<LicenseType> licenseTypes, RoleDL driverRole) {
+        super(id, password, fullName, workStartingDate, wage, wageTypeChar, yearlySickDays, yearlyDaysOff, site, phoneNumber);
         this.licenseTypes = licenseTypes;
         this.addRole(driverRole);
     }
 
-    public DriverDL(String id, String password, String fullName, LocalDate wordStartingDate, int wage, char wageTypeChar, int yearlySickDays, int yearlyDaysOff, Site site, RoleDL driverRole){
-        super(id, password, fullName, wordStartingDate, wage, wageTypeChar, yearlySickDays, yearlyDaysOff, site);
+    public DriverDL(String id, String password, String fullName, LocalDate workStartingDate, int wage, char wageTypeChar, int yearlySickDays, int yearlyDaysOff, Site site, String phoneNumber, RoleDL driverRole){
+        super(id, password, fullName, workStartingDate, wage, wageTypeChar, yearlySickDays, yearlyDaysOff, site, phoneNumber);
         this.licenseTypes = new ArrayList<>();
         this.addRole(driverRole);
     }
