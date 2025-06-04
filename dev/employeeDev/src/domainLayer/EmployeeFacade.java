@@ -1,6 +1,4 @@
 package employeeDev.src.domainLayer;
-
-import java.sql.Driver;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Map;
