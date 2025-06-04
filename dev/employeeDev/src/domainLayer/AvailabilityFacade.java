@@ -41,7 +41,7 @@ public class AvailabilityFacade {
                 return availability;
             }
         }
-        return null; // No availability found for the employee and shift
+        return null;
     }
 
     public List<AvailabilityDL> getAllAvailabilities() {

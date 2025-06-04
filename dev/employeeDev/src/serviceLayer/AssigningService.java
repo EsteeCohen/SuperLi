@@ -3,6 +3,7 @@ package employeeDev.src.serviceLayer;
 import employeeDev.src.domainLayer.EmployeeDL;
 import employeeDev.src.domainLayer.EmployeeFacade;
 import employeeDev.src.domainLayer.Enums.ShiftType;
+import transportDev.src.main.entities.Site;
 import employeeDev.src.domainLayer.RoleDL;
 import employeeDev.src.domainLayer.RoleFacade;
 import employeeDev.src.domainLayer.ShiftFacade;
@@ -21,7 +22,8 @@ public class AssigningService {
         this.roleFacade = roleFacade;
     }
 
-    public void assignToShift(String employeeId, LocalDateTime startTime, String shiftType, String roleName) {
+    public void assignToShift(String employeeId, LocalDateTime startTime, String shiftType, String roleName,
+                              Site site) {
         RoleDL role = roleFacade.getRoleByName(roleName);
         EmployeeDL employee = employeeFacade.getEmployee(employeeId);
         if (employee == null) {
@@ -30,10 +32,10 @@ public class AssigningService {
         if (role == null) {
             throw new IllegalArgumentException("Role not found");
         }
-        shiftFacade.assignToShift(employee, startTime, shiftType, role);
+        shiftFacade.assignToShift(employee, startTime, site, role);
     }
 
-    public void unassignToShift(String employeeId, LocalDateTime startTime, String shiftType, String roleName) {
+    public void unassignToShift(String employeeId, LocalDateTime startTime, Site site, String roleName) {
         RoleDL role = roleFacade.getRoleByName(roleName);
         EmployeeDL employee = employeeFacade.getEmployee(employeeId);
         if (employee == null) {
@@ -42,7 +44,7 @@ public class AssigningService {
         if (role == null) {
             throw new IllegalArgumentException("Role not found");
         }
-        shiftFacade.unassignToShift(employee, startTime, shiftType, role);
+        shiftFacade.unassignToShift(employee, startTime, site, role);
     }
 
     public void setShiftRequirement(DayOfWeek day, ShiftType shift, String role, int quantity) {
@@ -50,18 +52,18 @@ public class AssigningService {
         if (roleDL == null) {
             throw new IllegalArgumentException("Role not found");
         }
-        shiftFacade.setRequirements(day, shift, roleDL, quantity);
+        shiftFacade.setWeeklyRequirements(day, shift, roleDL, quantity);
     }
 
     public void initializeRequirements() {
         WeeklyShiftRequirements.getInstance().setRequirementsToAll(roleFacade.getRoleByName("Shift Manager"), 0);
     }
 
-    public void integrateTransportsIntoShiftAssignments() {
+    public void integrateTransportsIntoShiftAssignments(Site site) {
         RoleDL warehousemanRole = roleFacade.getRoleByName("Warehouseman");
         if (warehousemanRole == null) {
             throw new IllegalArgumentException("Warehouseman role not found");
         }
-        shiftFacade.intergrateShiftToDeliveries(warehousemanRole);
+        shiftFacade.intergrateShiftToDeliveries(site, warehousemanRole);
     }
 }

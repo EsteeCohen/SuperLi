@@ -23,4 +23,8 @@ public enum WageTypeSL {
         throw new IllegalArgumentException("Invalid WageType code: " + code);
     }
 
+    public char getChar() {
+        return code;
+    }
+
 }

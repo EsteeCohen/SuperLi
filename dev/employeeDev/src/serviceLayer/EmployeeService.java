@@ -3,12 +3,10 @@ package employeeDev.src.serviceLayer;
 import java.util.List;
 import java.util.Map;
 
+import employeeDev.src.domainLayer.DriverDL;
 import employeeDev.src.domainLayer.EmployeeDL;
 import employeeDev.src.domainLayer.EmployeeFacade;
-import employeeDev.src.domainLayer.RoleDL;
-import transportDev.src.main.entities.Driver;
 import transportDev.src.main.entities.Site;
-import transportDev.src.main.enums.LicenseType;
 
 public class EmployeeService {
     private EmployeeFacade employeeFacade;
@@ -29,17 +27,12 @@ public class EmployeeService {
         return employeeFacade.registerEmployee(fullName, password, id, wage, Character.toUpperCase(wageType.charAt(0)), yearlySickDays, yearlyDaysOff, site);
     }
     
-    public List<Driver> getAllDrivers() {
-        RoleDL driverRole = new RoleDL("Driver");
+    public List<DriverSL> getAllDrivers() {
         return employeeFacade.getAllEmployees().stream()
-                .filter(employee -> employee.hasRole(driverRole))
-                .map(employee -> {
-                    String id = employee.getId();
-                    String name = employee.getFullName();
-                    String phone = employee.getPhone();
-                    LicenseType licenseType = employee.getDriverLicenseType();
-                    return new Driver(id, name, phone, licenseType);
-                })
+                .filter(employee -> employee instanceof DriverDL)
+                .map(employee -> (DriverDL) employee)
+                .filter(driver -> driver.getLicenseTypes() != null && !driver.getLicenseTypes().isEmpty())
+                .map(DriverSL::new)
                 .collect(java.util.stream.Collectors.toList());
     }
 

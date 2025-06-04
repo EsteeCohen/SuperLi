@@ -16,4 +16,8 @@ public class RoleSL {
     public String getName() {
         return name;
     }
+
+    public RoleDL getRoleDL() {
+        return new RoleDL(name);
+    }
 }

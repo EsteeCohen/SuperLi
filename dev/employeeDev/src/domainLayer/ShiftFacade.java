@@ -14,10 +14,12 @@ import transportDev.src.main.entities.Site;
 public class ShiftFacade {
     private final Map<String, ShiftDL> shifts;
     private final ITransportScheduleService transportInterface;
+    private final EmployeeFacade employeeFacade;
 
-    public ShiftFacade(ITransportScheduleService transportInterface) {
+    public ShiftFacade(ITransportScheduleService transportInterface, EmployeeFacade employeeFacade) {
         this.shifts = new HashMap<>();
         this.transportInterface = transportInterface;
+        this.employeeFacade = employeeFacade;
     }
 
     public List<ShiftDL> getAllShiftsFromSite(Site site) {
@@ -131,6 +133,27 @@ public class ShiftFacade {
                 shift.addToRequirements(warehousemanRole, 1);
             }
         }
+    }
+
+    public List<EmployeeDL> getAllUnassignedEmployeesForShift(LocalDateTime startTime, ShiftType shiftType) {
+        List<EmployeeDL> unassigned = new ArrayList<>();
+        // Find the shift by startTime and shiftType
+        ShiftDL targetShift = null;
+        for (ShiftDL shift : shifts.values()) {
+            if (shift.getStartTime().isEqual(startTime) && shift.getShiftType() == shiftType) {
+                targetShift = shift;
+                break;
+            }
+        }
+        if (targetShift == null) {
+            throw new IllegalArgumentException("Shift not found for the given start time and type");
+        }
+        for (EmployeeDL employee : employeeFacade.getAllEmployees()) {
+            if (!targetShift.isEmployeeAssigned(employee)) {
+                unassigned.add(employee);
+            }
+        }
+        return unassigned;
     }
 
 }
