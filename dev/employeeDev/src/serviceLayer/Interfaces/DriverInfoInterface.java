@@ -16,8 +16,6 @@ public interface  DriverInfoInterface {
 
     List<DriverSL> getDriversByLicenseType(LicenseType licenseType);
 
-    boolean canDriverDrive(String driverID, LicenseType licenseType);
-
     void setAvailableToDrive(String driverID,boolean isAvailable);
 
     void addDriver(String fullName, String password, String id, int wage, String wageType, int yearlySickDays, int yearlyDaysOff, String siteName, String phoneNumber, LicenseType licenseType);
