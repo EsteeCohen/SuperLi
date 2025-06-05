@@ -5,6 +5,7 @@ import employeeDev.src.domainLayer.EmployeeFacade;
 import employeeDev.src.domainLayer.RoleFacade;
 import employeeDev.src.domainLayer.ShiftFacade;
 import employeeDev.src.domainLayer.SiteFacade;
+import employeeDev.src.presentationLayer.HRSystemUI;
 import employeeDev.src.serviceLayer.Interfaces.DriverInfoInterface;
 import employeeDev.src.serviceLayer.Interfaces.ITransportScheduleService;
 import employeeDev.src.serviceLayer.Interfaces.SiteInfoInterface;
@@ -78,5 +79,12 @@ public class Factory {
     public void setTransportScheduleService(ITransportScheduleService transportInterface) {
         assigningService.setTransportScheduleService(transportInterface);
     }
+
+    public void startSystem() {
+        HRSystemUI hrSystemUI = new HRSystemUI(this);
+        hrSystemUI.start();
+    }
+
+    
     
 }

@@ -1,12 +1,10 @@
 package transportDev.src.main.entities;
 
+import employeeDev.src.serviceLayer.DriverSL;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-
-import employeeDev.src.serviceLayer.DriverSL;
 import transportDev.src.main.enums.ShippingZone;
 import transportDev.src.main.enums.TransportStatus;
 

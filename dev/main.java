@@ -1,25 +1,29 @@
-import java.util.Scanner;
-
 import employeeDev.src.presentationLayer.UserInputManager;
+import employeeDev.src.serviceLayer.Factory;
+import java.util.Scanner;
 import transportDev.src.main.TransportApp;
 
 public class main {
     public static void main(String[] args) {
-       System.out.println("=== please pick a system ===");
-       System.out.println("1. Employee Management System");
-         System.out.println("2. Transport Management System");
-         System.out.println("0. Exit");
-         System.out.print("Enter your choice: ");
-         Scanner scanner = new Scanner(System.in);
-         int choice = Integer.parseInt(UserInputManager.getUserInput(scanner));
+        Factory employeeFactory = new Factory();
+        TransportApp transportApp = new TransportApp(employeeFactory);
+        employeeFactory.setTransportScheduleService(transportApp.getITransportScheduleService());
+
+        System.out.println("=== please pick a system ===");
+        System.out.println("1. Employee Management System");
+        System.out.println("2. Transport Management System");
+        System.out.println("0. Exit");
+        System.out.print("Enter your choice: ");
+        Scanner scanner = new Scanner(System.in);
+        int choice = Integer.parseInt(UserInputManager.getUserInput(scanner));
             switch (choice) {
                 case 1:
                     System.out.println("Starting Employee Management System...");
-                    employeeDev.adss_v0.main(args);
+                    employeeFactory.startSystem();
                     break;
                 case 2:
                     System.out.println("Starting Transport Management System...");
-                    TransportApp.main(args);
+                    transportApp.startSystem();
                     break;
                 case 0:
                     System.out.println("Exiting...");

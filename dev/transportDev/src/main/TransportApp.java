@@ -1,35 +1,56 @@
 package transportDev.src.main;
 
-import employeeDev.src.serviceLayer.Interfaces.DriverInfoInterface;
-import employeeDev.src.serviceLayer.Interfaces.SiteInfoInterface;
 import employeeDev.src.serviceLayer.Factory;
-
+import employeeDev.src.serviceLayer.Interfaces.DriverInfoInterface;
+import employeeDev.src.serviceLayer.Interfaces.ITransportScheduleService;
+import employeeDev.src.serviceLayer.Interfaces.SiteInfoInterface;
 import transportDev.src.main.controllers.*;
 import transportDev.src.main.services.*;
 import transportDev.src.main.ui.*;
 
 public class TransportApp {
-    // :)
-    public static void main(String[] args) {
-        System.out.println("=== Transport Management System for Supermarket Chain ===");
-        System.out.println("Initializing system...");
 
-        Factory employeeFactory = new Factory();
-        
+    // Services for the Transport Management System
+    private DriverInfoInterface driverService;
+    private TruckService truckService;
+    private SiteInfoInterface siteService;
+    private TransportService transportService;
+    private IncidentService incidentService;
+    private OrderService orderService;
+    private UserService userService;
+    private ITransportScheduleService transportScheduleService;
+
+    // facade controller for the Transport Management System
+    private FacadeController facadeController;
+
+    // system initializer for demo data
+    private SystemInitializer initializer;
+
+    // UI for the Transport Management System
+    private LoginUI loginUI;
+    private TransportUI transportUI;
+    private OrderUI orderUI;
+    private FleetUI fleetUI;
+    private SiteUI siteUI;
+    private UserManagementUI userManagementUI;
+    private ReportsUI reportsUI;
+    private MainUI mainUI;
+
+    public TransportApp(Factory employeeFactory) {
         // Initialize services
-        DriverInfoInterface driverService = employeeFactory.getDriverInfoService();
-        TruckService truckService = new TruckService();
-        SiteInfoInterface siteService = employeeFactory.getSiteInfoService();
-        TransportService transportService = new TransportService(truckService, driverService, siteService);
-        IncidentService incidentService = new IncidentService(transportService);
-        OrderService orderService = new OrderService(siteService, transportService, incidentService);
+        driverService = employeeFactory.getDriverInfoService();
+        truckService = new TruckService();
+        siteService = employeeFactory.getSiteInfoService();
+        transportService = new TransportService(truckService, driverService, siteService);
+        incidentService = new IncidentService(transportService);
+        orderService = new OrderService(siteService, transportService, incidentService);
         transportService.setOrderService(orderService);
-        UserService userService = new UserService();
-        ITransportScheduleService transportScheduleService = new TransportScheduleService(transportService);
+        userService = new UserService();
+        transportScheduleService = new TransportScheduleService(transportService);
 
 
         // Initialize facade controller
-        FacadeController facadeController = new FacadeController(
+        facadeController = new FacadeController(
             incidentService,
             driverService,
             userService,
@@ -41,27 +62,30 @@ public class TransportApp {
         );
 
         // Initialize system with option for demo data
-        SystemInitializer initializer = new SystemInitializer(driverService,truckService, 
+        initializer = new SystemInitializer(driverService,truckService, 
                                                              siteService, transportService, 
                                                              orderService, incidentService, userService);
-        initializer.initializeSystem();
-
-        // Initialize UI components
-        LoginUI loginUI = new LoginUI(facadeController);
-        TransportUI transportUI = new TransportUI(facadeController);
-        OrderUI orderUI = new OrderUI(facadeController);
-        FleetUI fleetUI = new FleetUI(facadeController);
-        SiteUI siteUI = new SiteUI(facadeController);
-        UserManagementUI userManagementUI = new UserManagementUI(facadeController, "admin");
-        ReportsUI reportsUI = new ReportsUI(facadeController);
+        // initializer.initializeSystem();
         
-        MainUI mainUI = new MainUI(facadeController, loginUI, transportUI, orderUI, 
+        // Initialize UI components
+        loginUI = new LoginUI(facadeController);
+        transportUI = new TransportUI(facadeController);
+        orderUI = new OrderUI(facadeController);
+        fleetUI = new FleetUI(facadeController);
+        siteUI = new SiteUI(facadeController);
+        userManagementUI = new UserManagementUI(facadeController, "admin");
+        reportsUI = new ReportsUI(facadeController);
+        
+        mainUI = new MainUI(facadeController, loginUI, transportUI, orderUI, 
                                   fleetUI, siteUI, userManagementUI, reportsUI);
+    }
+    
+    public ITransportScheduleService getITransportScheduleService() {
+        return transportScheduleService;
+    }
 
-        System.out.println("System ready. Please log in.");
-        System.out.println();
-
-        // Start application
+    public void startSystem(){
         mainUI.start();
     }
+    
 }
