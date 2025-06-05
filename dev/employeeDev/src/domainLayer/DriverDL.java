@@ -3,6 +3,7 @@ package employeeDev.src.domainLayer;
 import employeeDev.src.dataAcssesLayer.EmployeeDAO;
 import employeeDev.src.mappers.EmployeeMapper;
 import java.time.LocalDate;
+import java.util.List;
 import transportDev.src.main.entities.Site;
 import transportDev.src.main.enums.LicenseType;
 ;
@@ -17,6 +18,20 @@ public class DriverDL extends EmployeeDL {
         this.licenseType = licenseType;
         this.isAvailableToDrive = isAvailableToDrive;
         this.addRole(driverRole);
+        EmployeeDAO employeeDAO = new EmployeeDAO();
+        employeeDAO.assignRoleToEmployee(id, driverRole.getName());
+
+    }
+
+    // with roles
+    public DriverDL(String id, String password, String fullName, LocalDate workStartingDate, int wage, char wageTypeChar,
+    int yearlySickDays, int yearlyDaysOff, Site site, String phoneNumber, LicenseType licenseType, RoleDL driverRole, boolean isAvailableToDrive, List<RoleDL> roles) {
+        super(id, password, fullName, workStartingDate, wage, wageTypeChar, yearlySickDays, yearlyDaysOff, site, phoneNumber, roles);
+        this.licenseType = licenseType;
+        this.isAvailableToDrive = isAvailableToDrive;
+        this.addRole(driverRole);
+        EmployeeDAO employeeDAO = new EmployeeDAO();
+        employeeDAO.assignRoleToEmployee(id, driverRole.getName());
     }
 
     public LicenseType getLicenseType() {
