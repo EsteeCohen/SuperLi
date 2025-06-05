@@ -21,6 +21,9 @@ public class ShiftsTablePresentation extends Form {
     private final Scanner scanner;
     private ArrayList<ShiftPL> shifts;
 
+    private static final LocalDate TODAY = LocalDate.now();
+    private static final LocalDate NEXT_SUNDAY = TODAY.plusDays(7 - TODAY.getDayOfWeek().getValue() % 7);
+
     public ShiftsTablePresentation(ShiftService service, Scanner scanner, AssigningService assigningService, EmployeeService employeeService, SiteService siteService) {
         super("Weekly Shift Table");
         this.assigningService = assigningService;
@@ -33,12 +36,8 @@ public class ShiftsTablePresentation extends Form {
 
     public void showEmployeeShift(String employeeId) {
         if (employeeId == null) return;
-        LocalDate today = LocalDate.now();
-        LocalDate nextSunday = today.plusDays(7 - today.getDayOfWeek().getValue() % 7);
-        shifts = siteService.getAllSites().stream()
-    .flatMap(site -> shiftService.getWeeklyShifts(nextSunday, site).stream()
-        .map(shiftSL -> new ShiftPL(shiftSL)))
-    .collect(java.util.stream.Collectors.toCollection(ArrayList::new));
+        shifts = siteService.getAllSites().stream().flatMap(site -> shiftService.getWeeklyShifts(NEXT_SUNDAY, site).stream()
+        .map(shiftSL -> new ShiftPL(shiftSL))).collect(java.util.stream.Collectors.toCollection(ArrayList::new));
         shifts.sort(Comparator.comparing(ShiftPL::getStartTime, Comparator.naturalOrder()));
         Map<String, List<ShiftPL>> siteToShifts = groupShiftsBySite();
         List<ShiftPL> employeeShifts = siteToShifts.values().stream()
@@ -65,10 +64,8 @@ public class ShiftsTablePresentation extends Form {
     }
 
     public void showShiftTable() {
-       LocalDate today = LocalDate.now();
-        LocalDate nextSunday = today.plusDays(7 - today.getDayOfWeek().getValue() % 7);
         shifts = siteService.getAllSites().stream()
-    .flatMap(site -> shiftService.getWeeklyShifts(nextSunday, site).stream()
+    .flatMap(site -> shiftService.getWeeklyShifts(NEXT_SUNDAY, site).stream()
         .map(shiftSL -> new ShiftPL(shiftSL)))
     .collect(java.util.stream.Collectors.toCollection(ArrayList::new));
         shifts.sort(Comparator.comparing(ShiftPL::getStartTime, Comparator.naturalOrder()));
@@ -204,16 +201,15 @@ public class ShiftsTablePresentation extends Form {
                 System.out.println("Invalid input. Please enter 'yes' or 'no'.");
             }
         }
-        hasShiftsWithMissingWorkers();
-        handleMissingAvailability();
+        if(hasShiftsWithMissingWorkers()){
+            handleMissingAvailability();
+        }
     }
 
     public boolean hasShiftsWithMissingWorkers() {
-        LocalDate startDate = LocalDate.now();
-        LocalDate endDate = startDate.plusDays(6);
         boolean hasMissingWorkersOverall = false;
         for (Site site : siteService.getAllSites()) {
-            boolean hasMissingWorkers = shiftService.CheckIfThereAreShiftsThatAreNotAssigned(site, startDate, endDate);
+            boolean hasMissingWorkers = shiftService.CheckIfThereAreShiftsThatAreNotAssigned(site, TODAY, NEXT_SUNDAY);
             if (hasMissingWorkers) {
                 System.out.println("There are shifts with missing employees!");
                 hasMissingWorkersOverall = true;
@@ -224,55 +220,48 @@ public class ShiftsTablePresentation extends Form {
         return hasMissingWorkersOverall;
     }
 
-    private boolean hasMissingWorkers() {
-        boolean hasMissingWorkers = false;
-        for (ShiftPL shift : shifts) {
-            Map<RolePL, Integer> requirements = shift.getShiftRoleRequirements();
-            Map<RolePL, List<EmployeePL>> assignments = shift.getEmployeesAssignment();
-            for (Map.Entry<RolePL, Integer> entry : requirements.entrySet()) {
-                int required = entry.getValue();
-                int assigned = assignments.getOrDefault(entry.getKey(), new ArrayList<>()).size();
-                if (assigned < required) {
-                    hasMissingWorkers = true;
-                    break;
-                }
-            }
-            if (hasMissingWorkers) break;
-        }
-        return hasMissingWorkers;
-    }
 
+    private List<ShiftPL> getShiftsWithMissingWorkers() {
+        List<ShiftPL> missingShifts = new ArrayList<>();
+            for (Site site : siteService.getAllSites()) {
+                List<ShiftPL> shiftsWithMissingWorkers = shiftService.getAllShiftsWithMissingAssigns(site, TODAY, NEXT_SUNDAY).stream()
+                    .map(shiftSL -> new ShiftPL(shiftSL))
+                    .toList();
+                if (!shiftsWithMissingWorkers.isEmpty()) {
+                    missingShifts.addAll(shiftsWithMissingWorkers);
+                }
+            }
+        return missingShifts;
+    }
+    
     private void handleMissingAvailability() {
-        if (hasMissingWorkers()) {
-            List<EmployeePL> allEmployees = employeeService.getAllEmployees().values().stream().map(EmployeePL::new).toList();
-            List<EmployeePL> unassignedEmployees = new ArrayList<>();
-            for (EmployeePL employee : allEmployees) {
-                boolean assigned = false;
-                for (ShiftPL shift : shifts) {
-                    for (List<EmployeePL> emps : shift.getEmployeesAssignment().values()) {
-                        if (emps.stream().anyMatch(e -> e.getID().equals(employee.getID()))) {
-                            assigned = true;
-                            break;
-                        }
+        List<ShiftPL> missingShifts = getShiftsWithMissingWorkers();
+        List<EmployeePL> allEmployees = employeeService.getAllEmployees().values().stream().map(EmployeePL::new).toList();
+        List<EmployeePL> unassignedEmployees = new ArrayList<>();
+        for (EmployeePL employee : allEmployees) {
+            boolean assigned = false;
+            for (ShiftPL shift : missingShifts) {
+                for (List<EmployeePL> emps : shift.getEmployeesAssignment().values()) {
+                    if (emps.stream().anyMatch(e -> e.getID().equals(employee.getID()))) {
+                        assigned = true;
+                        break;
                     }
-                    if (assigned) break;
                 }
-                if (!assigned) {
-                    unassignedEmployees.add(employee);
-                }
+                if (assigned) break;
             }
-            if (unassignedEmployees.isEmpty()) {
-                System.out.println("There are shifts with missing workers, but no unassigned employees are available.");
-            } else {
-                System.out.println("The following employees are not assigned to any shift:");
-                for (EmployeePL emp : unassignedEmployees) {
-                    System.out.println("- " + emp.getFullName() + " (ID: " + emp.getID() + ")");
-                }
-                System.out.println("Please assign these employees to the shifts with missing workers.");
-                assignEmployeeToShift();
+            if (!assigned) {
+                unassignedEmployees.add(employee);
             }
+        }
+        if (unassignedEmployees.isEmpty()) {
+            System.out.println("There are shifts with missing workers, but no unassigned employees are available.");
         } else {
-            System.out.println("No shifts with missing workers found.");
+            System.out.println("The following employees are not assigned to the missing shifts:");
+            for (EmployeePL emp : unassignedEmployees) {
+                System.out.println("- " + emp.getFullName() + " (ID: " + emp.getID() + ")");
+            }
+            System.out.println("Please assign these employees to the shifts with missing workers.");
+            assignEmployeeToShift();
         }
     }
 }

@@ -7,6 +7,7 @@ import employeeDev.src.serviceLayer.Interfaces.UserManagmentInteface;
 import java.util.List;
 import java.util.Map;
 import transportDev.src.main.entities.Site;
+import transportDev.src.main.enums.LicenseType;
 
 public class EmployeeService implements UserManagmentInteface {
     private EmployeeFacade employeeFacade;
@@ -89,6 +90,29 @@ public class EmployeeService implements UserManagmentInteface {
             return false; // User not found
         }
         return employee.getRoles().stream().anyMatch(role -> role.getName().equals(roleName));
+    }
+
+    public String[] getAllRoles() {
+        return employeeFacade.getAllRoles().stream()
+                .map(role -> role.getName())
+                .toArray(String[]::new);
+    }
+
+    public void registerEmployeeWithRole(String name, String password, String id, Integer salary, String wageType,
+            Integer yearlySickDays, Integer yearlyDaysOff, String siteName, String phone, String role) {
+        employeeFacade.registerEmployee(name, password, id, salary.intValue(), wageType.charAt(0), yearlySickDays.intValue(), yearlyDaysOff.intValue(), siteName, phone);
+        employeeFacade.assignRoleToEmployee(id, role);
+    }
+
+    public void registerDriver(String name, String password, String id, Integer salary, String wageType,
+            Integer yearlySickDays, Integer yearlyDaysOff, String siteName, String phone, String licenseType) {
+                employeeFacade.registerDriver(name, password, id, salary, wageType.charAt(0), yearlySickDays, yearlyDaysOff, siteName, phone, LicenseType.valueOf(licenseType));
+
+    }
+
+    public String getAllLicensesType(String license) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getLicenseType'");
     }
 }
 

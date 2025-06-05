@@ -2,6 +2,8 @@ package employeeDev.src.presentationLayer;
 
 import java.util.Scanner;
 
+import transportDev.src.main.enums.LicenseType;
+
 public class UserInputManager {
 
     public static String getUserInputOrCancel(Scanner scanner, String cancelMessage, String cancelKeyword) {
@@ -75,6 +77,26 @@ public class UserInputManager {
                 }
             } catch (NumberFormatException e) {
                 System.out.println("Invalid input. Please enter a valid number or '" + cancelKeyword + "' to cancel.");
+            }
+        }
+    }
+
+    public static String promptForLicenseType(Scanner scanner,String prompt, String cancelMessage, String cancelKeyword) {
+        while (true) {
+            System.out.println("Available License Types:");
+            int index = 1;
+            for (LicenseType type : LicenseType.values()) {
+                System.out.println(index + " - " + type.name());
+                index++;
+            }
+            System.out.print(prompt);
+            String input = getUserInputOrCancel(scanner, cancelMessage, cancelKeyword);
+            if (input == null||input==cancelKeyword) return null;
+            input = input.toUpperCase();
+            if (LicenseType.isValidLicenseType(input)) {
+                return input;
+            } else {
+                System.out.println("Invalid license type. Please enter A, B, C, or D, or '" + cancelKeyword + "' to cancel.");
             }
         }
     }

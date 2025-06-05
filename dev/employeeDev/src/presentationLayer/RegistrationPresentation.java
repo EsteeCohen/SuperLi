@@ -31,6 +31,16 @@ public class RegistrationPresentation extends Form {
         if (siteString == null) return;
         Site site = siteService.getAllSites().get(Integer.parseInt(siteString) - 1);
         System.out.println("Selected Site: " + site.getName());
+        printRoleList();
+        String roleString = UserInputManager.promptForString(scanner, "Role number: ", "Registration cancelled.", "q");
+        if (roleString == null) return;
+        String role = employeeService.getAllRoles()[Integer.parseInt(roleString) - 1];
+        String licenseType = null;
+        if( role == "Driver"){
+            String license = UserInputManager.promptForLicenseType(scanner, "License Type (A, B, C, D): ", "Registration cancelled.", "q");
+            if (license == null) return;
+            licenseType = employeeService.getAllLicensesType(license);
+        }
         Integer salary = UserInputManager.promptForInt(scanner, "Wage: ", "Registration cancelled.", "q");
         if (salary == null) return;
         String wageType = UserInputManager.promptForWageType(scanner, "Registration cancelled.", "q");
@@ -39,8 +49,22 @@ public class RegistrationPresentation extends Form {
         if (yearlySickDays == null) return;
         Integer yearlyDaysOff = UserInputManager.promptForInt(scanner, "Yearly Days Off: ", "Registration cancelled.", "q");
         if (yearlyDaysOff == null) return;
-
-        employeeService.registerEmployee(
+        if (role.equals("Driver")) {
+            employeeService.registerDriver(
+                name,
+                password,
+                id,
+                salary,
+                wageType,
+                yearlySickDays,
+                yearlyDaysOff,
+                site.getName(),
+                phone,
+                licenseType
+            );
+        }
+        else{
+        employeeService.registerEmployeeWithRole(
             name,
             password,
             id,
@@ -49,9 +73,21 @@ public class RegistrationPresentation extends Form {
             yearlySickDays,
             yearlyDaysOff,
             site.getName(),
-            phone
+            phone,
+            role
         );
+        }
         System.out.println("Registration completed successfully!");
+    }
+
+    private void printRoleList() {
+        System.out.println("Available Roles:");
+        int index = 1;
+        for (String role : employeeService.getAllRoles()) {
+            System.out.println(index + ". " + role);
+            index++;
+        }
+        System.out.println("Enter the number corresponding to the role or 'q' to cancel.");
     }
 
     private void printSiteList() {

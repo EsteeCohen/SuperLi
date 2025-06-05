@@ -181,4 +181,18 @@ public class ShiftFacade {
         }
     }
 
+    public List<ShiftDL> getAllShiftsWithMissingAssigns(Site site, LocalDate startDate, LocalDate endDate) {
+        if (site == null || startDate == null || endDate == null) {
+            throw new IllegalArgumentException("Site and dates cannot be null");
+        }
+        List<ShiftDL> shiftList = getAllShiftsInRange(startDate, endDate, site);
+        List<ShiftDL> shiftsWithMissingAssigns = new ArrayList<>();
+        for (ShiftDL shift : shiftList) {
+            if (!shift.meetTheRequirements()) {
+                shiftsWithMissingAssigns.add(shift);
+            }
+        }
+        return shiftsWithMissingAssigns;
+    }
+
 }

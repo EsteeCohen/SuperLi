@@ -26,13 +26,13 @@ public class SiteService implements SiteInfoInterface{
     }
 
     @Override
-    public void addSite(String name, String address, String phoneNumber, String email, String zone) {
-        siteFacade.addSite(name, address, phoneNumber, email, zone);
+    public Site addSite(String name, String address, String phoneNumber, String email, String zone) {
+        return siteFacade.addSite(name, address, phoneNumber, email, zone);
     }
 
     @Override
-    public void deleteSite(String name) {
-        siteFacade.deleteSite(name);
+    public boolean deleteSite(String name) {
+        return siteFacade.deleteSite(name);
     }
 
     @Override

@@ -5,9 +5,9 @@ import transportDev.src.main.entities.Site;
 
 public interface SiteInfoInterface {
 
-    void addSite(String name, String address, String contactPhone, String contactName, String zone);
+    Site addSite(String name, String address, String contactPhone, String contactName, String zone);
 
-    void deleteSite(String siteName);
+    boolean deleteSite(String siteName);
 
     Site getSiteByName(String siteName);
 

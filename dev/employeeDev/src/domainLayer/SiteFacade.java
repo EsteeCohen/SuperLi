@@ -57,7 +57,7 @@ public class SiteFacade {
         }
     }
 
-    public void addSite(String name, String address, String phoneNumber, String email, String zone) {
+    public Site addSite(String name, String address, String phoneNumber, String email, String zone) {
         ShippingZone shippingZone;
         try {
             shippingZone = ShippingZone.valueOf(zone.toUpperCase());
@@ -67,6 +67,7 @@ public class SiteFacade {
         
         Site site = new Site(name, address, phoneNumber, email, shippingZone);
         addSite(site);
+        return site;
     }
 
     public List<Site> getSiteByZone(String zone) {
@@ -85,13 +86,14 @@ public class SiteFacade {
         return filteredSites;
     }
 
-    public void deleteSite(String name) {
+    public boolean deleteSite(String name) {
         Site siteToDelete = getSiteByName(name);
         if (siteToDelete != null) {
             removeSite(siteToDelete);
         } else {
             throw new IllegalArgumentException("Site with name " + name + " not found.");
         }
+        return true;
     }
     
 }

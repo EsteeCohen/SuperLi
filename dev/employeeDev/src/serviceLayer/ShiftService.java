@@ -38,6 +38,15 @@ public class ShiftService implements DriverInfoInterface{
         return shiftFacade.checkIfThereAreShiftsThatAreNotFullyAssigned(site, startDate, endDate);
     }
 
+    public List<ShiftSL> getAllShiftsWithMissingAssigns(Site site, LocalDate startDate, LocalDate endDate) {
+        List<ShiftDL> allDlShifts = shiftFacade.getAllShiftsWithMissingAssigns(site, startDate, endDate);
+        List<ShiftSL> allSlShifts = new ArrayList<>();
+        for (ShiftDL dlShift : allDlShifts) {
+            allSlShifts.add(new ShiftSL(dlShift));
+        }
+        return allSlShifts;
+    }
+
     public List<ShiftSL> getWeeklyShifts(LocalDate startDate, Site site) {
         List<ShiftDL> allDlShifts = shiftFacade.getWeeklyShifts(startDate, site);
         List<ShiftSL> allSlShifts = new ArrayList<>();
@@ -202,7 +211,7 @@ public class ShiftService implements DriverInfoInterface{
                 .filter(driver -> driver.getLicenseType().equals(licenseType))
                 .toList();
     }
-    
+
     @Override
     public void setAvailableToDrive(String driverID, boolean isAvailable) {
         employeeFacade.setAvailableToDrive(driverID, isAvailable);

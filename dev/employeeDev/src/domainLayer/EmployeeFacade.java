@@ -5,8 +5,11 @@ import employeeDev.src.dataAcssesLayer.EmployeeDAO;
 import employeeDev.src.dtos.DriverDTO;
 import employeeDev.src.dtos.EmployeeDTO;
 import employeeDev.src.mappers.EmployeeMapper;
+import employeeDev.src.serviceLayer.DriverSL;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -144,5 +147,9 @@ public class EmployeeFacade {
         }
         driver.setAvailableToDrive(isAvailable);
         driver.updateInDB();
+    }
+
+    public List<RoleDL> getAllRoles() {
+        return roleFacade.getAllRoles();
     }
 }

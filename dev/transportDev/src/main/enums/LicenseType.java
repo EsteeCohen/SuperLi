@@ -58,4 +58,13 @@ public enum LicenseType {
                 throw new IllegalArgumentException("Unknown license type: " + type);
         }
     }
+
+    public static boolean isValidLicenseType(String input) {
+        try {
+            LicenseType.valueOf(input.toUpperCase());
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+    }
 } // :)
