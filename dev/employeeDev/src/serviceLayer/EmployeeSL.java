@@ -17,8 +17,9 @@ public class EmployeeSL {
     private final int yearlySickDays;
     private final int yearlyDaysOff;
     private final Site site;
+    private final String phoneNumber;
 
-    public EmployeeSL(String id, String fullName, LocalDate wordStartingDate, int wage, char wageTypeChar, int yearlySickDays, int yearlyDaysOff, Site site) {
+    public EmployeeSL(String id, String fullName, LocalDate wordStartingDate, int wage, char wageTypeChar, int yearlySickDays, int yearlyDaysOff, Site site, String phoneNumber) {
         this.id = id;
         this.fullName = fullName;
         this.wordStartingDate = wordStartingDate;
@@ -28,6 +29,7 @@ public class EmployeeSL {
         this.yearlySickDays = yearlySickDays;
         this.yearlyDaysOff = yearlyDaysOff;
         this.site = site;
+        this.phoneNumber = phoneNumber;
     }
 
     public EmployeeSL(EmployeeDL edl){
@@ -43,6 +45,7 @@ public class EmployeeSL {
         this.yearlySickDays = edl.getYearlySickDays();
         this.yearlyDaysOff = edl.getYearlyDaysOff();
         this.site = edl.getSite();
+        this.phoneNumber = edl.getPhoneNumber();
     }
 
     // Getters for the fields (optional, if needed)

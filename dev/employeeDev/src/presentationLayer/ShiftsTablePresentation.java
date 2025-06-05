@@ -32,10 +32,7 @@ public class ShiftsTablePresentation extends Form {
     }
 
     public void showShiftTable() {
-        if (shifts.isEmpty()) {
-            System.out.println("No shifts available.");
-            return;
-        }LocalDate today = LocalDate.now();
+       LocalDate today = LocalDate.now();
         LocalDate nextSunday = today.plusDays(7 - today.getDayOfWeek().getValue() % 7);
         shifts = siteService.getAllSites().stream()
     .flatMap(site -> shiftService.getWeeklyShifts(nextSunday, site).stream()
@@ -43,7 +40,10 @@ public class ShiftsTablePresentation extends Form {
     .collect(java.util.stream.Collectors.toCollection(ArrayList::new));
         shifts.sort(Comparator.comparing(ShiftPL::getStartTime, Comparator.naturalOrder()));
         Map<String, List<ShiftPL>> siteToShifts = groupShiftsBySite();
-
+ if (shifts.isEmpty()) {
+            System.out.println("No shifts available.");
+            return;
+        }
         for (String siteName : siteToShifts.keySet()) {
             printSiteHeader(siteToShifts, siteName);
             List<ShiftPL> siteShifts = siteToShifts.get(siteName);

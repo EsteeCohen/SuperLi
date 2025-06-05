@@ -128,4 +128,21 @@ public class EmployeeFacade {
             employee.updateInDB();
         }
     }
+
+    public boolean canDriverDrive(String driverID, LicenseType licenseType) {
+        DriverDL driver = (DriverDL) employees.get(driverID);
+        if (driver == null) {
+            return false; // Driver not found
+        }
+        return driver.isAvailableToDrive() && driver.isLicensed(licenseType);
+    }
+
+    public void setAvailableToDrive(String driverID,boolean isAvailable) {
+        DriverDL driver = (DriverDL) employees.get(driverID);
+        if (driver == null) {
+            return; // Driver not found
+        }
+        driver.setAvailableToDrive(isAvailable);
+        driver.updateInDB();
+    }
 }

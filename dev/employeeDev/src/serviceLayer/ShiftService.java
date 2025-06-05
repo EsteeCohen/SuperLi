@@ -203,5 +203,13 @@ public class ShiftService implements DriverInfoInterface{
                 .toList();
     }
 
-    
+    @Override
+    public boolean canDriverDrive(String driverID, LicenseType licenseType) {
+        return employeeFacade.canDriverDrive(driverID, licenseType);
+    }
+
+    @Override
+    public void setAvailableToDrive(String driverID, boolean isAvailable) {
+        employeeFacade.setAvailableToDrive(driverID, isAvailable);
+    }
 }

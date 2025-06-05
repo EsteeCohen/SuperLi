@@ -12,7 +12,7 @@ public class CurrentShiftsTablePresentation extends Form {
     private final Scanner scanner;
 
     public CurrentShiftsTablePresentation(ShiftService shiftService,SiteService siteService, Scanner scanner) {
-        super("Weekly Shift Table");
+        super("Current Shift Table");
         this.shiftService = shiftService;
         this.siteService = siteService;
         this.scanner = scanner;
