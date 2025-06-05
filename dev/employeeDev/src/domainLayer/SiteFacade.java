@@ -57,7 +57,7 @@ public class SiteFacade {
         }
     }
 
-    public Site addSite(String name, String address, String phoneNumber, String email, String zone) {
+    public void addSite(String name, String address, String phoneNumber, String email, String zone) {
         ShippingZone shippingZone;
         try {
             shippingZone = ShippingZone.valueOf(zone.toUpperCase());
@@ -67,7 +67,6 @@ public class SiteFacade {
         
         Site site = new Site(name, address, phoneNumber, email, shippingZone);
         addSite(site);
-        return site;
     }
 
     public List<Site> getSiteByZone(String zone) {
