@@ -1,7 +1,7 @@
 package transportDev.src.main.dataAccessLayer;
 
 public class TransportDBConstants {
-    public static final String DB_PATH = "dev\\db.db";
+    public static final String DB_PATH = "../../db.db";
     
     // Table names
     public static final String TRANSPORT_TABLE = "Transports";
