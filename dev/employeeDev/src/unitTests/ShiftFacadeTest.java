@@ -53,6 +53,16 @@ class ShiftFacadeTest {
     void cleanUp() {
         new employeeDev.src.dataAcssesLayer.EmployeeDAO().deleteEmployee(TEST_EMPLOYEE_ID);
         new employeeDev.src.dataAcssesLayer.SiteDAO().deleteSite(TEST_SITE);
+        // Clean up all test shifts for this site
+        employeeDev.src.dataAcssesLayer.ShiftDAO shiftDAO = new employeeDev.src.dataAcssesLayer.ShiftDAO();
+        List<employeeDev.src.domainLayer.ShiftDL> shifts = shiftFacade.getAllShiftsFromSite(site);
+        for (employeeDev.src.domainLayer.ShiftDL s : shifts) {
+            shiftDAO.deleteShift(s.getShiftType().getDisplayName(), s.getStartTime(), s.getSite().getName());
+        }
+        // Restore required site for main app if needed
+        if (new employeeDev.src.dataAcssesLayer.SiteDAO().getSite(TEST_SITE) == null) {
+            new employeeDev.src.dataAcssesLayer.SiteDAO().addSite(new employeeDev.src.dtos.SiteDTO(TEST_SITE, "Test Address", "123456789", "Contact Name", "CENTER"));
+        }
     }
 
     @Test

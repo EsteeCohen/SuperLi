@@ -93,7 +93,6 @@ class AvailabilityFacadeTest {
         EmployeeDL employee2 = new EmployeeDL(TEST_EMPLOYEE_ID_2, "pass2", "Test Employee2", now.toLocalDate(), 100, 'H', 10, 10, testSite, "0500000001");
         AvailabilityDL availability2 = new AvailabilityDL(employee2, shift2, true);
         availabilityFacade.addAvailability(availability2);
-
         List<AvailabilityDL> result = availabilityFacade.getAllAvailabilities(now.minusHours(2), now.plusHours(2));
         assertTrue(result.contains(availability2));
     }
@@ -106,5 +105,9 @@ class AvailabilityFacadeTest {
         employeeDev.src.dataAcssesLayer.SiteDAO siteDAO = new employeeDev.src.dataAcssesLayer.SiteDAO();
         siteDAO.deleteSite(TEST_SITE_1);
         siteDAO.deleteSite(TEST_SITE_2);
+        // Clean up all test availabilities for these employees
+        employeeDev.src.dataAcssesLayer.AvilibilityDAO availabilityDAO = new employeeDev.src.dataAcssesLayer.AvilibilityDAO();
+        availabilityDAO.deleteAvailability(TEST_EMPLOYEE_ID_1);
+        availabilityDAO.deleteAvailability(TEST_EMPLOYEE_ID_2);
     }
 }

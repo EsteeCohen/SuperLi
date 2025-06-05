@@ -41,7 +41,7 @@ class SiteFacadeTest {
 
     @Test
     void testAddSite() {
-        Site site3 = new Site(TEST_SITE_3, "AddressC", "PhoneC", "EmailC", ShippingZone.SOUTH);
+        Site site3 = new Site(TEST_SITE_3, "AddressC", "PhoneC", "EmailC", transportDev.src.main.enums.ShippingZone.SOUTH);
         siteFacade.addSite(site3);
         assertTrue(siteFacade.getSites().contains(site3));
     }

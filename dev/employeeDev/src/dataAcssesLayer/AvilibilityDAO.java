@@ -116,4 +116,16 @@ public class AvilibilityDAO {
         }
         return results;
     }
+
+    public void deleteAvailability(String testEmployeeId1) {
+        try (Connection conn = DriverManager.getConnection(dbPath)) {
+            String sql = "DELETE FROM " + TABLE_NAME + " WHERE employee_id = ?";
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(1, testEmployeeId1);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            System.err.println("Error deleting availability for employee " + testEmployeeId1 + ": " + e.getMessage());
+            throw new RuntimeException("Error deleting availability for employee " + testEmployeeId1, e);
+        }
+    }
 }

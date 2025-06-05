@@ -69,7 +69,15 @@ class EmployeeFacadeTest {
         dao.deleteEmployee(TEST_EMPLOYEE_ID_1);
         dao.deleteEmployee(TEST_EMPLOYEE_ID_2);
         dao.deleteEmployee(TEST_EMPLOYEE_ID_3);
-        new employeeDev.src.dataAcssesLayer.SiteDAO().deleteSite(TEST_SITE);
+        employeeDev.src.dataAcssesLayer.SiteDAO siteDAO = new employeeDev.src.dataAcssesLayer.SiteDAO();
+        siteDAO.deleteSite(TEST_SITE);
+    }
+
+    // Helper method to determine if the site is required for the main app
+    private boolean isSiteRequiredForMainApp(employeeDev.src.dataAcssesLayer.SiteDAO siteDAO, String siteName) {
+        // You can add logic here to check if the site is required by the main app
+        // For now, always return true to prevent deletion
+        return true;
     }
 
     @Test
