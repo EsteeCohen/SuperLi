@@ -1,7 +1,7 @@
 package transportDev.src.main.entities;
 
 import employeeDev.src.dataAcssesLayer.SiteDAO;
-import employeeDev.src.mappers.SiteMapper;
+import transportDev.src.main.mappers.SiteMapper;
 import transportDev.src.main.enums.ShippingZone;
 
 public class Site {
