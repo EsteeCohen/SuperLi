@@ -1,92 +1,81 @@
 package employeeDev.src.unitTests;
 
 import employeeDev.src.domainLayer.*;
-import employeeDev.src.dataAcssesLayer.RoleDAO;
-import employeeDev.src.dtos.RoleDTO;
-import employeeDev.src.mappers.RoleMapper;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.MockedStatic;
 
-import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 class RoleFacadeTest {
+    private static final String TEST_ROLE_1 = "tests";
+    private static final String TEST_ROLE_2 = "tests2";
 
     private RoleFacade roleFacade;
-
+    private SiteFacade siteFacade;
+    private EmployeeFacade employeeFacade;
+    private ShiftFacade shiftFacade;
+    
     @BeforeEach
     void setUp() {
         roleFacade = new RoleFacade();
+        siteFacade = new SiteFacade();
+        employeeFacade = new EmployeeFacade(roleFacade, siteFacade);
+        shiftFacade = new ShiftFacade(employeeFacade, siteFacade, roleFacade);
+        new AvailabilityFacade(shiftFacade, employeeFacade, siteFacade);
+    }
+
+    @AfterEach
+    void cleanUp() {
+        employeeDev.src.dataAcssesLayer.RoleDAO dao = new employeeDev.src.dataAcssesLayer.RoleDAO();
+        dao.deleteRole(TEST_ROLE_1);
+        dao.deleteRole(TEST_ROLE_2);
     }
 
     @Test
     void testAddRoleSuccess() {
-        assertTrue(roleFacade.add("Manager"));
-        assertNotNull(roleFacade.getRoleByName("Manager"));
+        assertTrue(roleFacade.add(TEST_ROLE_1));
+        assertNotNull(roleFacade.getRoleByName(TEST_ROLE_1));
     }
 
     @Test
     void testAddRoleDuplicate() {
-        assertTrue(roleFacade.add("Cashier"));
-        assertFalse(roleFacade.add("Cashier"));
+        assertTrue(roleFacade.add(TEST_ROLE_1));
+        assertFalse(roleFacade.add(TEST_ROLE_1));
     }
 
     @Test
     void testGetRoleByName() {
-        roleFacade.add("Worker");
-        assertNotNull(roleFacade.getRoleByName("Worker"));
+        roleFacade.add(TEST_ROLE_1);
+        assertNotNull(roleFacade.getRoleByName(TEST_ROLE_1));
         assertNull(roleFacade.getRoleByName("NotExist"));
     }
 
     @Test
     void testDeleteRole() {
-        roleFacade.add("Cleaner");
-        assertNotNull(roleFacade.getRoleByName("Cleaner"));
-
-        // Mock RoleDAO for delete
-        try (MockedStatic<RoleDAO> mockedDAO = mockStatic(RoleDAO.class)) {
-            roleFacade.delete("Cleaner");
-            assertNull(roleFacade.getRoleByName("Cleaner"));
-        }
+        roleFacade.add(TEST_ROLE_1);
+        assertNotNull(roleFacade.getRoleByName(TEST_ROLE_1));
+        roleFacade.delete(TEST_ROLE_1);
+        assertNull(roleFacade.getRoleByName(TEST_ROLE_1));
     }
 
     @Test
     void testGetAllRoles() {
-        roleFacade.add("A");
-        roleFacade.add("B");
+        roleFacade.add(TEST_ROLE_1);
+        roleFacade.add(TEST_ROLE_2);
         List<RoleDL> roles = roleFacade.getAllRoles();
         assertEquals(2, roles.size());
     }
 
     @Test
     void testLoadRolesFromDB() {
-        // Mock RoleDAO and RoleMapper
-        RoleDTO dto1 = mock(RoleDTO.class);
-        RoleDTO dto2 = mock(RoleDTO.class);
-        List<RoleDTO> dtos = Arrays.asList(dto1, dto2);
-
-        RoleDAO mockDao = mock(RoleDAO.class);
-        when(mockDao.getAllRoles()).thenReturn(dtos);
-
-        RoleDL role1 = mock(RoleDL.class);
-        RoleDL role2 = mock(RoleDL.class);
-        when(role1.getName()).thenReturn("Role1");
-        when(role2.getName()).thenReturn("Role2");
-
-        try (MockedStatic<RoleDAO> mockedDAO = mockStatic(RoleDAO.class);
-             MockedStatic<RoleMapper> mockedMapper = mockStatic(RoleMapper.class)) {
-            mockedDAO.when(RoleDAO::new).thenReturn(mockDao);
-            mockedMapper.when(() -> RoleMapper.fromDTO(dto1)).thenReturn(role1);
-            mockedMapper.when(() -> RoleMapper.fromDTO(dto2)).thenReturn(role2);
-
-            roleFacade.loadRolesFromDB();
-
-            assertNotNull(roleFacade.getRoleByName("Role1"));
-            assertNotNull(roleFacade.getRoleByName("Role2"));
-        }
+        roleFacade.add(TEST_ROLE_1);
+        roleFacade.add(TEST_ROLE_2);
+        roleFacade = new RoleFacade();
+        roleFacade.loadRolesFromDB();
+        assertNotNull(roleFacade.getRoleByName(TEST_ROLE_1));
+        assertNotNull(roleFacade.getRoleByName(TEST_ROLE_2));
     }
 }
