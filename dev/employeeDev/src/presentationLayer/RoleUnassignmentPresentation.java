@@ -1,12 +1,9 @@
 package employeeDev.src.presentationLayer;
 
-import java.util.Scanner;
-
 import employeeDev.src.serviceLayer.EmployeeService;
-import employeeDev.src.serviceLayer.RoleService;
 import employeeDev.src.serviceLayer.ShiftService;
 import employeeDev.src.serviceLayer.SiteService;
-import transportDev.src.main.entities.Site;
+import java.util.Scanner;
 
 public class RoleUnassignmentPresentation extends Form {
     private EmployeeService employeeService;
@@ -37,7 +34,10 @@ public class RoleUnassignmentPresentation extends Form {
         if (success) {
             System.out.println("Role '" + roleName + "' successfully unassigned from employee with ID: " + employeeId);
         } else {
-            System.out.println("Failed to unassign role. Please check the employee ID and role name.");
+            if (roleName.equals("Driver"))
+                System.out.println("Cannot unassign the 'Driver' role from a driver employee");
+            else
+                System.out.println("Failed to unassign role. Please check the role name.");
         }
     }
     private void printEmployeeRoles(String employeeId) {
