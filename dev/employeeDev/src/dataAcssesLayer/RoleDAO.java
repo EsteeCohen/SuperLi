@@ -51,7 +51,6 @@ public class RoleDAO {
                 roles.add(new RoleDTO(roleName));
             }
         } catch (SQLException e) {
-            System.out.println("Working Directory = " + System.getProperty("user.dir"));
             System.err.println("Error retrieving roles: " + e.getMessage());
             throw new RuntimeException("Error retrieving roles", e);
         }

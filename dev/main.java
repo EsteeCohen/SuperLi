@@ -5,6 +5,14 @@ import transportDev.src.main.TransportApp;
 
 public class main {
     public static void main(String[] args) {
+        try{
+            // Load the SQLite JDBC driver
+            Class.forName("org.sqlite.JDBC");
+        } catch (ClassNotFoundException e) {
+            System.err.println("SQLite JDBC driver not found. Please ensure it is included in your classpath.");
+            return;
+        }
+
         Factory employeeFactory = new Factory();
         TransportApp transportApp = new TransportApp(employeeFactory);
         employeeFactory.setTransportScheduleService(transportApp.getITransportScheduleService());
