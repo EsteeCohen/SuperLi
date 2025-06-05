@@ -4,14 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 import transportDev.src.main.entities.Truck;
 import transportDev.src.main.enums.LicenseType;
+import transportDev.src.main.dataAccessLayer.TruckDAO;
+import transportDev.src.main.mappers.TruckMapper;
+import transportDev.src.main.dtos.TruckDTO;
 
 public class TruckService {
-    // :)
-    private List<Truck> trucks;
+    private TruckDAO truckDAO;
     
     //בנאי ליצירת שירות משאיות חדש
     public TruckService() {
-        this.trucks = new ArrayList<>();
+        this.truckDAO = new TruckDAO();
     }
     
     //יוצר משאית חדשה במערכת
@@ -29,14 +31,30 @@ public class TruckService {
             return null;
         }
         
-        Truck truck = new Truck(regNumber, model, emptyWeight, maxWeight, licenseType);
-        trucks.add(truck);
-        return truck;
+        try {
+            Truck truck = new Truck(regNumber, model, emptyWeight, maxWeight, licenseType);
+            TruckDTO truckDTO = TruckMapper.toDTO(truck);
+            truckDAO.insertTruck(truckDTO);
+            return truck;
+        } catch (Exception e) {
+            System.err.println("Error adding truck to database: " + e.getMessage());
+            return null;
+        }
     }
     
     //מחזיר את כל המשאיות במערכת
     public List<Truck> getAllTrucks() {
-        return new ArrayList<>(trucks);
+        try {
+            List<TruckDTO> truckDTOs = truckDAO.getAllTrucks();
+            List<Truck> trucks = new ArrayList<>();
+            for (TruckDTO dto : truckDTOs) {
+                trucks.add(TruckMapper.fromDTO(dto));
+            }
+            return trucks;
+        } catch (Exception e) {
+            System.err.println("Error retrieving trucks from database: " + e.getMessage());
+            return new ArrayList<>();
+        }
     }
     
     //מחזיר משאית לפי מספר רישוי
@@ -45,13 +63,16 @@ public class TruckService {
             return null;
         }
         
-        for (Truck truck : trucks) {
-            if (truck.getRegNumber().equals(regNumber)) {
-                return truck;
+        try {
+            TruckDTO truckDTO = truckDAO.getTruckByLicensePlate(regNumber);
+            if (truckDTO != null) {
+                return TruckMapper.fromDTO(truckDTO);
             }
+            return null;
+        } catch (Exception e) {
+            System.err.println("Error retrieving truck from database: " + e.getMessage());
+            return null;
         }
-        
-        return null;
     }
     
     //מחזיר משאית לפי ID (אליאס ל-getTruckByRegNumber)
@@ -65,8 +86,9 @@ public class TruckService {
             return new ArrayList<>();
         }
         
+        List<Truck> allTrucks = getAllTrucks();
         List<Truck> result = new ArrayList<>();
-        for (Truck truck : trucks) {
+        for (Truck truck : allTrucks) {
             if (truck.getLicenseType() == licenseType) {
                 result.add(truck);
             }
@@ -77,8 +99,9 @@ public class TruckService {
     
     //מחזיר משאיות שיכולות לשאת משקל מסוים
     public List<Truck> getTrucksWithCapacityForWeight(double weight) {
+        List<Truck> allTrucks = getAllTrucks();
         List<Truck> result = new ArrayList<>();
-        for (Truck truck : trucks) {
+        for (Truck truck : allTrucks) {
             if (truck.canCarryLoad(weight)) {
                 result.add(truck);
             }
@@ -95,23 +118,30 @@ public class TruckService {
             return false;
         }
         
-        if (model != null && !model.trim().isEmpty()) {
-            truck.setModel(model);
+        try {
+            if (model != null && !model.trim().isEmpty()) {
+                truck.setModel(model);
+            }
+            
+            if (emptyWeight != null && emptyWeight >= 0) {
+                truck.setEmptyWeight(emptyWeight);
+            }
+            
+            if (maxWeight != null && maxWeight > 0 && maxWeight > truck.getEmptyWeight()) {
+                truck.setMaxWeight(maxWeight);
+            }
+            
+            if (licenseType != null) {
+                truck.setLicenseType(licenseType);
+            }
+            
+            TruckDTO truckDTO = TruckMapper.toDTO(truck);
+            truckDAO.updateTruck(truckDTO);
+            return true;
+        } catch (Exception e) {
+            System.err.println("Error updating truck in database: " + e.getMessage());
+            return false;
         }
-        
-        if (emptyWeight != null && emptyWeight >= 0) {
-            truck.setEmptyWeight(emptyWeight);
-        }
-        
-        if (maxWeight != null && maxWeight > 0 && maxWeight > truck.getEmptyWeight()) {
-            truck.setMaxWeight(maxWeight);
-        }
-        
-        if (licenseType != null) {
-            truck.setLicenseType(licenseType);
-        }
-        
-        return true;
     }
     
     //מוחק משאית מהמערכת
@@ -122,16 +152,29 @@ public class TruckService {
             return false;
         }
         
-        return trucks.remove(truck);
+        try {
+            truckDAO.deleteTruck(regNumber);
+            return true;
+        } catch (Exception e) {
+            System.err.println("Error deleting truck from database: " + e.getMessage());
+            return false;
+        }
     }
     
     //מוחק את כל המשאיות מהמערכת - משמש לאתחול או לבדיקות
     public void clearAllTrucks() {
-        trucks.clear();
+        try {
+            List<Truck> allTrucks = getAllTrucks();
+            for (Truck truck : allTrucks) {
+                truckDAO.deleteTruck(truck.getRegNumber());
+            }
+        } catch (Exception e) {
+            System.err.println("Error clearing trucks from database: " + e.getMessage());
+        }
     }
 
     public List<Truck> getAvailableTrucksWithCapacity(double requiredCapacity, TransportService transportService) {
-        return trucks.stream()
+        return getAllTrucks().stream()
             .filter(truck -> truck.getMaxWeight() >= requiredCapacity)
             .filter(truck -> transportService.isTruckAvailable(truck.getRegNumber()))
             .collect(java.util.stream.Collectors.toList());
