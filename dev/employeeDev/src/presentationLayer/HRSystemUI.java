@@ -37,8 +37,8 @@ public class HRSystemUI {
         this.siteService = factory.getSiteService();
 
         this.scanner = new Scanner(System.in);
-
-        Initialize();
+        // uncomment the following line to initialize the system with default values not from DB
+        // Initialize();
     }
 
     private void Initialize() {
