@@ -25,11 +25,15 @@ public class CurrentShiftsTablePresentation extends Form {
             System.out.println("Site selection cancelled.");
             return;
         }
+        System.out.println("Current Shifts for Site: " + site.getName());
 
-        List<ShiftPL> shifts = shiftService.getWeeklyShifts(java.time.LocalDate.now(), site).stream()
+        List<ShiftPL> shifts = shiftService.getAllShiftFromSite(site).stream()
             .map(shiftSL -> new ShiftPL(shiftSL))
             .toList();
-
+        if (shifts.isEmpty()) {
+            System.out.println("No current shifts available for the selected site.");
+            return;
+        }
         for (ShiftPL shift : shifts) {
             if (shift.getSite().equals(site)
                     && shift.getStartTime().isBefore(java.time.LocalDateTime.now())

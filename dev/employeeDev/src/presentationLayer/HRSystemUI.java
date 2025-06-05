@@ -190,7 +190,7 @@ public class HRSystemUI {
                 break;
             case 2:
                 ShiftsTablePresentation shiftsTable = new ShiftsTablePresentation(shiftService, scanner, assigningService, employeeService, siteService);
-                shiftsTable.showShiftTable();
+                shiftsTable.showEmployeeShift(employee.getID());
                 break;
             case 3:
                 CurrentShiftsTablePresentation currentShifts = new CurrentShiftsTablePresentation(shiftService, siteService, scanner);

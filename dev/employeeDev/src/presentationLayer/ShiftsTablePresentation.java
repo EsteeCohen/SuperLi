@@ -31,6 +31,39 @@ public class ShiftsTablePresentation extends Form {
         
     }
 
+    public void showEmployeeShift(String employeeId) {
+        if (employeeId == null) return;
+        LocalDate today = LocalDate.now();
+        LocalDate nextSunday = today.plusDays(7 - today.getDayOfWeek().getValue() % 7);
+        shifts = siteService.getAllSites().stream()
+    .flatMap(site -> shiftService.getWeeklyShifts(nextSunday, site).stream()
+        .map(shiftSL -> new ShiftPL(shiftSL)))
+    .collect(java.util.stream.Collectors.toCollection(ArrayList::new));
+        shifts.sort(Comparator.comparing(ShiftPL::getStartTime, Comparator.naturalOrder()));
+        Map<String, List<ShiftPL>> siteToShifts = groupShiftsBySite();
+        List<ShiftPL> employeeShifts = siteToShifts.values().stream()
+            .flatMap(List::stream)
+            .filter(shift -> shift.getEmployeesAssignment().values().stream()
+                .flatMap(List::stream)
+                .anyMatch(employee -> employee.getID().equals(employeeId)))
+            .toList();
+
+        if (employeeShifts.isEmpty()) {
+            System.out.println("No shifts found for employee with ID: " + employeeId);
+            return;
+        }
+
+        System.out.println("Shifts for Employee ID: " + employeeId);
+        for (ShiftPL shift : employeeShifts) {
+            System.out.println("-----------------------------------");
+            System.out.println("Shift Number: " + (employeeShifts.indexOf(shift) + 1));
+            System.out.println("Start Time: " + shift.getStartTime());
+            System.out.println("End Time: " + shift.getEndTime());
+            System.out.println("Shift Type: " + shift.getShiftType());
+            System.out.println("Site: " + (shift.getSite() != null ? shift.getSite().getName() : "Unknown Site"));
+        }
+    }
+
     public void showShiftTable() {
        LocalDate today = LocalDate.now();
         LocalDate nextSunday = today.plusDays(7 - today.getDayOfWeek().getValue() % 7);
