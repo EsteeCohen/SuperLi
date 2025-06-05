@@ -159,7 +159,7 @@ public class Transport {
         if (destinations == null || destinations.isEmpty()) {
             throw new IllegalArgumentException("there must be at least one destination");
         }
-        ShippingZone zone = destinations.getFirst().getShippingZone();
+        ShippingZone zone = sourceSite.getShippingZone();
         for(Site destination : destinations) {
             if (destination.getShippingZone() != zone) {
                 return false; // Different shipping zones

@@ -124,7 +124,7 @@ public class TransportService {
         List<Site> destinations = new ArrayList<>(transport.getDestinations());
         
         if (!destinations.isEmpty()) {
-            ShippingZone zone = destinations.getFirst().getShippingZone();
+            ShippingZone zone = transport.getSourceSite().getShippingZone();
             if (site.getShippingZone() != zone) return false;
         }
         
