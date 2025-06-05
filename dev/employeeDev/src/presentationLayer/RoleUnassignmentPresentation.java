@@ -35,7 +35,7 @@ public class RoleUnassignmentPresentation extends Form {
             System.out.println("Role '" + roleName + "' successfully unassigned from employee with ID: " + employeeId);
         } else {
             if (roleName.equals("Driver"))
-                System.out.println("Cannot unassign the 'Driver' role from a driver employee");
+                System.out.println("Cannot unassign the 'Driver' role from a driver employee.");
             else
                 System.out.println("Failed to unassign role. Please check the role name.");
         }
