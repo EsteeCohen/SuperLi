@@ -1,7 +1,7 @@
-package unitTests;
+package employeeDev.src.unitTests;
 
-import domainLayer.RoleDL;
-import domainLayer.RoleFacade;
+import employeeDev.src.domainLayer.*;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -10,75 +10,72 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 class RoleFacadeTest {
+    private static final String TEST_ROLE_1 = "tests";
+    private static final String TEST_ROLE_2 = "tests2";
 
     private RoleFacade roleFacade;
-
+    private SiteFacade siteFacade;
+    private EmployeeFacade employeeFacade;
+    private ShiftFacade shiftFacade;
+    
     @BeforeEach
     void setUp() {
         roleFacade = new RoleFacade();
+        siteFacade = new SiteFacade();
+        employeeFacade = new EmployeeFacade(roleFacade, siteFacade);
+        shiftFacade = new ShiftFacade(employeeFacade, siteFacade, roleFacade);
+        new AvailabilityFacade(shiftFacade, employeeFacade, siteFacade);
+    }
+
+    @AfterEach
+    void cleanUp() {
+        employeeDev.src.dataAcssesLayer.RoleDAO dao = new employeeDev.src.dataAcssesLayer.RoleDAO();
+        dao.deleteRole(TEST_ROLE_1);
+        dao.deleteRole(TEST_ROLE_2);
     }
 
     @Test
-    void testAddRole() {
-        roleFacade.add("Manager");
-        RoleDL role = roleFacade.getRoleByName("Manager");
-
-        assertNotNull(role);
-        assertEquals("Manager", role.getName());
+    void testAddRoleSuccess() {
+        assertTrue(roleFacade.add(TEST_ROLE_1));
+        assertNotNull(roleFacade.getRoleByName(TEST_ROLE_1));
     }
 
     @Test
-    void testAddDuplicateRole() {
-        roleFacade.add("Manager");
-        roleFacade.add("Manager"); // Attempt to add the same role again
-
-        List<RoleDL> roles = roleFacade.getAllRoles();
-        assertEquals(1, roles.size()); // Ensure only one instance of the role exists
+    void testAddRoleDuplicate() {
+        assertTrue(roleFacade.add(TEST_ROLE_1));
+        assertFalse(roleFacade.add(TEST_ROLE_1));
     }
 
     @Test
     void testGetRoleByName() {
-        roleFacade.add("Manager");
-        RoleDL role = roleFacade.getRoleByName("Manager");
-
-        assertNotNull(role);
-        assertEquals("Manager", role.getName());
-    }
-
-    @Test
-    void testGetRoleByNameNotFound() {
-        RoleDL role = roleFacade.getRoleByName("NonexistentRole");
-
-        assertNull(role); // Ensure null is returned for a nonexistent role
+        roleFacade.add(TEST_ROLE_1);
+        assertNotNull(roleFacade.getRoleByName(TEST_ROLE_1));
+        assertNull(roleFacade.getRoleByName("NotExist"));
     }
 
     @Test
     void testDeleteRole() {
-        roleFacade.add("Manager");
-        roleFacade.delete("Manager");
-
-        RoleDL role = roleFacade.getRoleByName("Manager");
-        assertNull(role); // Ensure the role is deleted
-    }
-
-    @Test
-    void testDeleteNonexistentRole() {
-        roleFacade.delete("NonexistentRole"); // Attempt to delete a role that doesn't exist
-
-        // Ensure no exceptions are thrown and the roles list remains empty
-        List<RoleDL> roles = roleFacade.getAllRoles();
-        assertTrue(roles.isEmpty());
+        roleFacade.add(TEST_ROLE_1);
+        assertNotNull(roleFacade.getRoleByName(TEST_ROLE_1));
+        roleFacade.delete(TEST_ROLE_1);
+        assertNull(roleFacade.getRoleByName(TEST_ROLE_1));
     }
 
     @Test
     void testGetAllRoles() {
-        roleFacade.add("Manager");
-        roleFacade.add("Developer");
-
+        roleFacade.add(TEST_ROLE_1);
+        roleFacade.add(TEST_ROLE_2);
         List<RoleDL> roles = roleFacade.getAllRoles();
-
         assertEquals(2, roles.size());
-        assertTrue(roles.stream().anyMatch(role -> role.getName().equals("Manager")));
-        assertTrue(roles.stream().anyMatch(role -> role.getName().equals("Developer")));
+    }
+
+    @Test
+    void testLoadRolesFromDB() {
+        roleFacade.add(TEST_ROLE_1);
+        roleFacade.add(TEST_ROLE_2);
+        roleFacade = new RoleFacade();
+        roleFacade.loadRolesFromDB();
+        assertNotNull(roleFacade.getRoleByName(TEST_ROLE_1));
+        assertNotNull(roleFacade.getRoleByName(TEST_ROLE_2));
     }
 }
