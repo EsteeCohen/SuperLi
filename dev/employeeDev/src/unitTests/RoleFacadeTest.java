@@ -1,6 +1,10 @@
 package employeeDev.src.unitTests;
 
-import employeeDev.src.domainLayer.*;
+import employeeDev.src.domainLayer.EmployeeFacade;
+import employeeDev.src.domainLayer.RoleDL;
+import employeeDev.src.domainLayer.RoleFacade;
+import employeeDev.src.domainLayer.ShiftFacade;
+import employeeDev.src.domainLayer.SiteFacade;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,14 +21,14 @@ class RoleFacadeTest {
     private SiteFacade siteFacade;
     private EmployeeFacade employeeFacade;
     private ShiftFacade shiftFacade;
-    
+
     @BeforeEach
     void setUp() {
         roleFacade = new RoleFacade();
         siteFacade = new SiteFacade();
         employeeFacade = new EmployeeFacade(roleFacade, siteFacade);
         shiftFacade = new ShiftFacade(employeeFacade, siteFacade, roleFacade);
-        new AvailabilityFacade(shiftFacade, employeeFacade, siteFacade);
+        new employeeDev.src.domainLayer.AvailabilityFacade(shiftFacade, employeeFacade, siteFacade);
     }
 
     @AfterEach
