@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AvilibilityDAO {
-    private final String dbPath = DBConstants.DB_PATH; 
+    private final String dbPath = "jdbc:sqlite:" + DBConstants.DB_PATH; 
     private final String TABLE_NAME = DBConstants.AVILIBILITY_TABLE;
 
     private final EmployeeDAO employeeDAO;
@@ -32,7 +32,8 @@ public class AvilibilityDAO {
             stmt.setString(4, availability.getShift().getSite().getName());
             stmt.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Error saving availability for employee " + availability.getEmployee().getId() + " for shift starting at " + availability.getShift().getStartTime().toString() + ": " + e.getMessage());
+            throw new RuntimeException("Error saving availability for employee " + availability.getEmployee().getId() + " for shift starting at " + availability.getShift().getStartTime().toString(), e);
         }
     }
 
@@ -57,7 +58,8 @@ public class AvilibilityDAO {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Error retrieving availabilities for shift starting at " + shift.getStartTime().toString() + ": " + e.getMessage());
+            throw new RuntimeException("Error retrieving availabilities for shift starting at " + shift.getStartTime().toString(), e);
         }
         return results;
     }
@@ -77,7 +79,8 @@ public class AvilibilityDAO {
                 return new AvilibilityDTO(shift, employee, isAvailable);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Error retrieving availability for employee " + employee.getId() + " for shift starting at " + shift.getStartTime().toString() + ": " + e.getMessage());
+            throw new RuntimeException("Error retrieving availability for employee " + employee.getId() + " for shift starting at " + shift.getStartTime().toString(), e);
         }
         return null;
     }
@@ -108,7 +111,8 @@ public class AvilibilityDAO {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Error retrieving all availabilities: " + e.getMessage());
+            throw new RuntimeException("Error retrieving all availabilities", e);
         }
         return results;
     }

@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RoleDAO {
-    private final String dbPath = DBConstants.DB_PATH;
+    private final String dbPath = "jdbc:sqlite:" + DBConstants.DB_PATH;
     private final String TABLE_NAME = DBConstants.ROLE_TABLE;
 
     public void addOrReplaceRole(RoleDTO role) {
@@ -22,7 +22,8 @@ public class RoleDAO {
             stmt.executeUpdate();
         }
         catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Error adding or replacing role: " + e.getMessage());
+            throw new RuntimeException("Error adding or replacing role: " + role.getName(), e);
         }
     }
 
@@ -34,7 +35,8 @@ public class RoleDAO {
             stmt.executeUpdate();
         }
         catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Error deleting role: " + e.getMessage());
+            throw new RuntimeException("Error deleting role: " + roleName, e);
         }
     }
 
@@ -49,7 +51,9 @@ public class RoleDAO {
                 roles.add(new RoleDTO(roleName));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("Working Directory = " + System.getProperty("user.dir"));
+            System.err.println("Error retrieving roles: " + e.getMessage());
+            throw new RuntimeException("Error retrieving roles", e);
         }
         return roles;
     }

@@ -50,10 +50,11 @@ public class HRSystemUI {
         siteService.addSite(SITE_NAME, "Main Warehouse", "123 Main St", "123-456-7890", ShippingZone.CENTER.name());
         Site defSite = siteService.getSiteByName(SITE_NAME);
         employeeService.registerAdmin(ADMIN_ID,defSite);
+        assigningService.initializeWeeklyRequirements();
         siteService.getAllSites().forEach(site -> {
             shiftService.createShiftsForNextWeek(site);
         });
-        assigningService.initializeRequirements();
+        
     }
 
     public void start() {

@@ -1,6 +1,9 @@
 package employeeDev.src.domainLayer;
 
+import employeeDev.src.dataAcssesLayer.ShiftDAO;
 import employeeDev.src.domainLayer.Enums.ShiftType;
+import employeeDev.src.mappers.RoleMapper;
+import employeeDev.src.mappers.ShiftMapper;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,8 +25,12 @@ public class ShiftDL {
         this.endTime = endTime;
         this.shiftType = shiftType;
         this.employeesAssignment = new HashMap<>();
-        this.requirements = WeeklyShiftRequirements.getInstance().getRequirements(startTime.toLocalDate().getDayOfWeek(), shiftType);
+        this.requirements = new HashMap<>();
         this.site = site;
+        for (Map.Entry<RoleDL, Integer> entry : WeeklyShiftRequirements.getInstance().getRequirements(startTime.toLocalDate().getDayOfWeek(), this.shiftType).entrySet()) {
+            setIntoRequirements(entry.getKey(), entry.getValue());
+        }
+        presistIntoRequirements();
     }
 
     // constractor for loading from database (requirments are not loaded from WeeklyShiftRequirements)
@@ -119,6 +126,13 @@ public class ShiftDL {
             requirements.put(role, quantity);
         } else {
             throw new IllegalArgumentException("Requirements not initialized for this shift.");
+        }
+    }
+
+    public void presistIntoRequirements() {
+        ShiftDAO shiftDAO = new ShiftDAO();
+        for (Map.Entry<RoleDL, Integer> entry : requirements.entrySet()) {
+            shiftDAO.insertRequirementForShift(ShiftMapper.toDTO(this), RoleMapper.toDTO(entry.getKey()), entry.getValue());
         }
     }
 

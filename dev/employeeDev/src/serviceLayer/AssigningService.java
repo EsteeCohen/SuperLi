@@ -62,8 +62,8 @@ public class AssigningService {
         shiftFacade.setWeeklyRequirements(day, shift, roleDL, quantity);
     }
 
-    public void initializeRequirements() {
-        WeeklyShiftRequirements.getInstance().setRequirementsToAll(roleFacade.getRoleByName("Shift Manager"), 0);
+    public void initializeWeeklyRequirements() {
+        WeeklyShiftRequirements.getInstance().setRequirementsToAll(roleFacade.getRoleByName("Shift Manager"), 1);
     }
 
     public void integrateTransportsIntoShiftAssignments(Site site) {

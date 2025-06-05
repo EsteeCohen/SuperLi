@@ -11,7 +11,7 @@ import java.util.List;
 
 public class SiteDAO {
 
-    private final String dbPath = DBConstants.DB_PATH;
+    private final String dbPath = "jdbc:sqlite:" + DBConstants.DB_PATH;
     private final String TABLE_NAME = DBConstants.SITE_TABLE;
 
     public void addSite(SiteDTO site){
@@ -26,7 +26,8 @@ public class SiteDAO {
             stmt.executeUpdate();
            } 
         catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Error adding site: " + e.getMessage());
+            throw new RuntimeException("Error adding site: " + site.getName(), e);
         }
     }
 
@@ -42,7 +43,8 @@ public class SiteDAO {
             stmt.executeUpdate();
         }
         catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Error updating site: " + e.getMessage());
+            throw new RuntimeException("Error updating site: " + site.getName(), e);
         }
     }
 
@@ -54,7 +56,8 @@ public class SiteDAO {
             stmt.executeUpdate();
         }
         catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Error deleting site: " + e.getMessage());
+            throw new RuntimeException("Error deleting site: " + siteName, e);
         }
     }
 
@@ -73,7 +76,8 @@ public class SiteDAO {
             }
         }
         catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println("Error retrieving site: " + e.getMessage());
+            throw new RuntimeException("Error retrieving site: " + siteName, e);
         }
         return null;
         
@@ -96,8 +100,8 @@ public class SiteDAO {
             return sites;
         }
         catch (SQLException e) {
-            e.printStackTrace();
-            return new ArrayList<>();
+            System.err.println("Error retrieving all sites: " + e.getMessage());
+            throw new RuntimeException("Error retrieving all sites", e);
         }
     }
 
@@ -118,8 +122,8 @@ public class SiteDAO {
             return sites;
         }
         catch (SQLException e) {
-            e.printStackTrace();
-            return new ArrayList<>();
+            System.err.println("Error retrieving sites by shipping zone: " + e.getMessage());
+            throw new RuntimeException("Error retrieving sites by shipping zone: " + shippingZone, e);
         }
     }
 

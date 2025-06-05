@@ -81,8 +81,7 @@ public class ShiftFacade {
             throw new IllegalArgumentException("Shift and role cannot be null");
         }
         shift.setIntoRequirements(role, quantity);
-        ShiftDAO shiftDAO = new ShiftDAO();
-        shiftDAO.insertRequirementForShift(ShiftMapper.toDTO(shift), RoleMapper.toDTO(role), quantity);
+        shift.presistIntoRequirements();
     }
 
     public boolean checkIfThereAreShiftsThatAreNotFullyAssigned(Site site, LocalDate startDate, LocalDate endDate) {

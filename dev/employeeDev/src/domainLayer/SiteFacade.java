@@ -24,7 +24,7 @@ public class SiteFacade {
             sites.add(site);
             site.presistIntoDB();
         } else {
-            throw new IllegalArgumentException("Site is null or already exists.");
+            System.err.println("Site is null or already exists.");
         }
     }
 

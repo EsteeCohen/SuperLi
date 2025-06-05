@@ -1,7 +1,7 @@
 package employeeDev.src.dataAcssesLayer;
 
 public class DBConstants {
-    public static final String DB_PATH = "..//..//db.db";
+    public static final String DB_PATH = "dev\\db.db";
     public static final String EMPLOYEE_TABLE = "Employees";
     public static final String ROLE_TABLE = "Roles";
     public static final String EMPLOYEE_ROLES_TABLE = "EmployeeRoles";

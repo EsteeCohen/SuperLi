@@ -86,12 +86,24 @@ public class ShiftMapper {
     }
 
     private static Map<RoleDTO, Integer> convertToDTORequirements(Map<RoleDL, Integer> requirements) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'convertToDTORequirements'");
+        Map<RoleDTO, Integer> requirementsDTO = new HashMap<>();
+        for (Map.Entry<RoleDL, Integer> entry : requirements.entrySet()) {
+            RoleDTO roleDTO = RoleMapper.toDTO(entry.getKey());
+            requirementsDTO.put(roleDTO, entry.getValue());
+        }
+        return requirementsDTO;
     }
 
     private static Map<RoleDTO, List<EmployeeDTO>> convertToDTOAssignments(Map<RoleDL, List<EmployeeDL>> assignments) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'convertToDTORequirements'");
+        Map<RoleDTO, List<EmployeeDTO>> assignmentsDTO = new HashMap<>();
+        for (Map.Entry<RoleDL, List<EmployeeDL>> entry : assignments.entrySet()) {
+            RoleDTO roleDTO = RoleMapper.toDTO(entry.getKey());
+            List<EmployeeDTO> employeeDTOs = new ArrayList<>();
+            for (EmployeeDL employee : entry.getValue()) {
+                employeeDTOs.add(EmployeeMapper.toDTO(employee));
+            }
+            assignmentsDTO.put(roleDTO, employeeDTOs);
+        }
+        return assignmentsDTO;
     }
 }

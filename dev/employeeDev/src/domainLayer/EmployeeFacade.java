@@ -114,9 +114,9 @@ public class EmployeeFacade {
         List<EmployeeDTO> employeeList = employeeDAO.getAllEmployees();
         for (EmployeeDTO employeeDTO : employeeList) {
             if (employeeDTO.isDriver()) {
-               addEmployee(EmployeeMapper.fromDriverDTO((DriverDTO)employeeDTO, roleFacade, siteFacade));
+               employees.put(employeeDTO.getId(), EmployeeMapper.fromDriverDTO((DriverDTO)employeeDTO, roleFacade, siteFacade));
             } else {
-               addEmployee(EmployeeMapper.fromDTO(employeeDTO, roleFacade, siteFacade));
+               employees.put(employeeDTO.getId(), EmployeeMapper.fromDTO(employeeDTO, roleFacade, siteFacade));
             }
         }
     }
