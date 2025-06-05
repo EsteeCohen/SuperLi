@@ -212,4 +212,9 @@ public class ShiftService implements DriverInfoInterface{
     public void setAvailableToDrive(String driverID, boolean isAvailable) {
         employeeFacade.setAvailableToDrive(driverID, isAvailable);
     }
+
+    @Override
+    public void addDriver(String fullName, String password, String id, int wage, String wageType, int yearlySickDays, int yearlyDaysOff, String siteName, String phoneNumber, LicenseType licenseType) {
+        employeeFacade.registerDriver(fullName, password, id, wage, wageType.charAt(0), yearlySickDays, yearlyDaysOff, siteName, phoneNumber, licenseType);
+    }
 }

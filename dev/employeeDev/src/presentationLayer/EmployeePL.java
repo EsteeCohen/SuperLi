@@ -17,8 +17,9 @@ public class EmployeePL {
     private final int yearlySickDays;
     private final int yearlyDaysOff;
     private final Site site;
+    private final String phoneNumber;
 
-    public EmployeePL(String id, String password, String fullName, LocalDate wordStartingDate, int wage, char wageTypeChar, int yearlySickDays, int yearlyDaysOff, Site site) {
+    public EmployeePL(String id, String password, String fullName, LocalDate wordStartingDate, int wage, char wageTypeChar, int yearlySickDays, int yearlyDaysOff, Site site, String phoneNumber) {
         this.id = id;
         this.fullName = fullName;
         this.wordStartingDate = wordStartingDate;
@@ -28,6 +29,7 @@ public class EmployeePL {
         this.yearlySickDays = yearlySickDays;
         this.yearlyDaysOff = yearlyDaysOff;
         this.site = site; 
+        this.phoneNumber = phoneNumber;
     }
     public EmployeePL(EmployeeSL employeeSL) {
         this.id = employeeSL.getId();
@@ -42,6 +44,7 @@ public class EmployeePL {
         this.yearlySickDays = employeeSL.getYearlySickDays();
         this.yearlyDaysOff = employeeSL.getYearlyDaysOff();
         this.site = employeeSL.getSite();
+        this.phoneNumber = employeeSL.getPhoneNumber();
     }
     
 
@@ -61,6 +64,7 @@ public class EmployeePL {
         return "----------Employee Details:----------\n" + 
                 "Id: " + id + '\n' +
                 "Full Name: " + fullName + '\n' +
+                "Phone Number: " + phoneNumber + '\n' +
                 "Starting Date: " + wordStartingDate + "\n" +
                 "Wage: " + wage + "\n" +
                 "Wage Type: " + wageType + "\n" +

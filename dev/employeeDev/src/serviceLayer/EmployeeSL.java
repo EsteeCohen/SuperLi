@@ -84,4 +84,8 @@ public class EmployeeSL {
     public Site getSite() {
         return site;
     }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
 }
