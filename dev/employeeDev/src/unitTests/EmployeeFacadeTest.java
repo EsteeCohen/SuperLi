@@ -1,127 +1,159 @@
-package unitTests;
+package employeeDev.src.unitTests;
 
-import domainLayer.EmployeeDL;
-import domainLayer.EmployeeFacade;
-import domainLayer.RoleDL;
-import domainLayer.RoleFacade;
+import employeeDev.src.domainLayer.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import transportDev.src.main.entities.Site;
+import transportDev.src.main.enums.LicenseType;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class EmployeeFacadeTest {
 
-    private EmployeeFacade employeeFacade;
     private RoleFacade roleFacade;
+    private SiteFacade siteFacade;
+    private EmployeeFacade employeeFacade;
+    private Site site;
+    private RoleDL role;
+    private EmployeeDL employee;
+    private DriverDL driver;
 
     @BeforeEach
     void setUp() {
-        roleFacade = new RoleFacade(); // Use real RoleFacade
-        employeeFacade = new EmployeeFacade(roleFacade);
+        roleFacade = mock(RoleFacade.class);
+        siteFacade = mock(SiteFacade.class);
+        employeeFacade = new EmployeeFacade(roleFacade, siteFacade);
+
+        site = mock(Site.class);
+        role = mock(RoleDL.class);
+
+        employee = mock(EmployeeDL.class);
+        when(employee.getId()).thenReturn("1");
+        when(employee.getSite()).thenReturn(site);
+        when(employee.hasRole(any())).thenReturn(true);
+        when(employee.isDriver()).thenReturn(false);
+
+        driver = mock(DriverDL.class);
+        when(driver.getId()).thenReturn("2");
+        when(driver.getSite()).thenReturn(site);
+        when(driver.isDriver()).thenReturn(true);
+        when(driver.isAvailableToDrive()).thenReturn(true);
+        when(driver.isLicensed(any())).thenReturn(true);
     }
 
     @Test
-    void testAddEmployee() {
-        EmployeeDL employee = new EmployeeDL("E001", "password", "John Doe", LocalDate.now(), 5000, 'H', 10, 15);
-        employeeFacade.addEmployee(employee);
-
-        assertEquals(employee, employeeFacade.getEmployee("E001"));
-    }
-
-    @Test
-    void testGetEmployee() {
-        EmployeeDL employee = new EmployeeDL("E001", "password", "John Doe", LocalDate.now(), 5000, 'H', 10, 15);
-        employeeFacade.addEmployee(employee);
-
-        EmployeeDL retrievedEmployee = employeeFacade.getEmployee("E001");
-        assertNotNull(retrievedEmployee);
-        assertEquals("John Doe", retrievedEmployee.getFullName());
-    }
-
-    @Test
-    void testEmployeeHasRole() {
-        EmployeeDL employee = new EmployeeDL("E001", "password", "John Doe", LocalDate.now(), 5000, 'H', 10, 15);
-        RoleDL role = new RoleDL("Manager");
-
-        roleFacade.add("Manager"); // Add role to RoleFacade
-        employeeFacade.addEmployee(employee);
-        employeeFacade.assignRoleToEmployee("E001", "Manager");
-
-        assertTrue(employeeFacade.employeeHasRole("E001", "Manager"));
+    void testAddAndGetEmployee() {
+        EmployeeDL e = mock(EmployeeDL.class);
+        when(e.getId()).thenReturn("3");
+        employeeFacade.addEmployee(e);
+        assertEquals(e, employeeFacade.getEmployee("3"));
     }
 
     @Test
     void testLoginSuccess() {
-        EmployeeDL employee = new EmployeeDL("E001", "password", "John Doe", LocalDate.now(), 5000, 'H', 10, 15);
+        when(employee.IsPassword("pass")).thenReturn(true);
         employeeFacade.addEmployee(employee);
-
-        EmployeeDL loggedInEmployee = employeeFacade.login("E001", "password");
-        assertNotNull(loggedInEmployee);
-        assertEquals("John Doe", loggedInEmployee.getFullName());
+        assertEquals(employee, employeeFacade.login("1", "pass"));
     }
 
     @Test
-    void testLoginFailure() {
-        EmployeeDL employee = new EmployeeDL("E001", "password", "John Doe", LocalDate.now(), 5000, 'H', 10, 15);
+    void testLoginFail() {
+        when(employee.IsPassword("wrong")).thenReturn(false);
         employeeFacade.addEmployee(employee);
-
-        EmployeeDL loggedInEmployee = employeeFacade.login("E001", "wrongpassword");
-        assertNull(loggedInEmployee);
+        assertNull(employeeFacade.login("1", "wrong"));
+        assertNull(employeeFacade.login("notfound", "pass"));
     }
 
     @Test
     void testRegisterEmployee() {
-        boolean result = employeeFacade.registerEmployee("John Doe", "password", "E001", 5000, 'H', 10, 15);
+        when(siteFacade.getSiteByName("site")).thenReturn(site);
+        boolean result = employeeFacade.registerEmployee("Full Name", "pass", "4", 100, 'H', 10, 10, "site", "123");
         assertTrue(result);
-
-        EmployeeDL employee = employeeFacade.getEmployee("E001");
-        assertNotNull(employee);
-        assertEquals("John Doe", employee.getFullName());
+        assertNotNull(employeeFacade.getEmployee("4"));
     }
 
     @Test
-    void testRegisterEmployeeDuplicateId() {
-        employeeFacade.registerEmployee("John Doe", "password", "E001", 5000, 'H', 10, 15);
-        boolean result = employeeFacade.registerEmployee("Jane Doe", "password", "E001", 6000, 'M', 12, 20);
-
-        assertFalse(result); // Duplicate ID should not allow registration
+    void testRegisterEmployeeDuplicate() {
+        when(siteFacade.getSiteByName("site")).thenReturn(site);
+        employeeFacade.registerEmployee("Full Name", "pass", "5", 100, 'H', 10, 10, "site", "123");
+        boolean result = employeeFacade.registerEmployee("Full Name", "pass", "5", 100, 'H', 10, 10, "site", "123");
+        assertFalse(result);
     }
 
     @Test
     void testAssignRoleToEmployee() {
-        EmployeeDL employee = new EmployeeDL("E001", "password", "John Doe", LocalDate.now(), 5000, 'H', 10, 15);
-        RoleDL role = new RoleDL("Manager");
-
-        roleFacade.add("Manager"); // Add role to RoleFacade
         employeeFacade.addEmployee(employee);
-        boolean result = employeeFacade.assignRoleToEmployee("E001", "Manager");
-
-        assertTrue(employee.getRoles().contains(role) && result);
+        when(roleFacade.getRoleByName("Manager")).thenReturn(role);
+        when(employee.getRoles()).thenReturn(new ArrayList<>());
+        assertTrue(employeeFacade.assignRoleToEmployee("1", "Manager"));
     }
 
     @Test
-    void testAssignRoleToNonexistentEmployee() {
-        roleFacade.add("Manager"); // Add role to RoleFacade
-
-        boolean result = employeeFacade.assignRoleToEmployee("E999", "Manager");
-        assertFalse(result); // Employee does not exist
+    void testAssignRoleToEmployeeNotFound() {
+        assertFalse(employeeFacade.assignRoleToEmployee("notfound", "Manager"));
     }
 
     @Test
     void testGetAllEmployees() {
-        EmployeeDL employee1 = new EmployeeDL("E001", "password", "John Doe", LocalDate.now(), 5000, 'H', 10, 15);
-        EmployeeDL employee2 = new EmployeeDL("E002", "password", "Jane Doe", LocalDate.now(), 6000, 'G', 12, 20);
+        employeeFacade.addEmployee(employee);
+        assertTrue(employeeFacade.getAllEmployees().contains(employee));
+    }
 
-        employeeFacade.addEmployee(employee1);
-        employeeFacade.addEmployee(employee2);
+    @Test
+    void testGetEmployeesBySite() {
+        employeeFacade.addEmployee(employee);
+        assertTrue(employeeFacade.getEmployeesBySite(site).contains(employee));
+    }
 
-        List<EmployeeDL> employees = employeeFacade.getAllEmployees();
-        assertEquals(2, employees.size());
-        assertTrue(employees.contains(employee1));
-        assertTrue(employees.contains(employee2));
+    @Test
+    void testGetDrivers() {
+        employeeFacade.addEmployee(driver);
+        List<DriverDL> drivers = employeeFacade.getDrivers();
+        assertTrue(drivers.contains(driver));
+    }
+
+    @Test
+    void testUpdateEmployeeAttributes() {
+        employeeFacade.addEmployee(employee);
+        Map<String, Object> attrs = new HashMap<>();
+        attrs.put("phone", "123");
+        employeeFacade.updateEmployeeAttributes("1", attrs);
+        verify(employee, times(1)).updateAttributes(attrs);
+        verify(employee, times(1)).updateInDB();
+    }
+
+    @Test
+    void testCanDriverDrive() {
+        employeeFacade.addEmployee(driver);
+        assertTrue(employeeFacade.canDriverDrive("2", LicenseType.C1));
+    }
+
+    @Test
+    void testSetAvailableToDrive() {
+        employeeFacade.addEmployee(driver);
+        employeeFacade.setAvailableToDrive("2", false);
+        verify(driver, times(1)).setAvailableToDrive(false);
+        verify(driver, times(1)).updateInDB();
+    }
+
+    @Test
+    void testUnassignRoleFromEmployee() {
+        employeeFacade.addEmployee(employee);
+        when(employee.isDriver()).thenReturn(false);
+        when(roleFacade.getRoleByName("Manager")).thenReturn(role);
+        when(employee.removeRole("Manager")).thenReturn(true);
+        assertTrue(employeeFacade.unassignRoleFromEmployee("1", "Manager"));
+    }
+
+    @Test
+    void testUnassignRoleFromEmployeeDriverRole() {
+        employeeFacade.addEmployee(driver);
+        when(driver.isDriver()).thenReturn(true);
+        assertFalse(employeeFacade.unassignRoleFromEmployee("2", "Driver"));
     }
 }

@@ -1,88 +1,153 @@
-package unitTests;
+package employeeDev.src.unitTests;
 
-import domainLayer.*;
-import domainLayer.Enums.ShiftType;
+import employeeDev.src.domainLayer.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import transportDev.src.main.entities.Site;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 class ShiftFacadeTest {
 
+    private EmployeeFacade employeeFacade;
+    private SiteFacade siteFacade;
+    private RoleFacade roleFacade;
     private ShiftFacade shiftFacade;
-    private EmployeeDL employee;
+    private Site site;
     private RoleDL role;
+    private EmployeeDL employee;
     private ShiftDL shift;
 
     @BeforeEach
     void setUp() {
-        shiftFacade = new ShiftFacade();
-        employee = new EmployeeDL("E001", "password", "John Doe", LocalDate.now(), 5000, 'H', 10, 15);
-        role = new RoleDL("Manager");
-        shift = new ShiftDL(LocalDate.of(2025, 4, 26), ShiftType.MORNING);
+        employeeFacade = mock(EmployeeFacade.class);
+        siteFacade = mock(SiteFacade.class);
+        roleFacade = mock(RoleFacade.class);
+        shiftFacade = new ShiftFacade(employeeFacade, siteFacade, roleFacade);
+
+        site = mock(Site.class);
+        when(site.getName()).thenReturn("TestSite");
+        role = mock(RoleDL.class);
+        when(role.getName()).thenReturn("TestRole");
+        employee = mock(EmployeeDL.class);
+        when(employee.getId()).thenReturn("emp1");
+
+        shift = mock(ShiftDL.class);
+        when(shift.getStartTime()).thenReturn(LocalDateTime.of(2024, 6, 5, 8, 0));
+        when(shift.getEndTime()).thenReturn(LocalDateTime.of(2024, 6, 5, 16, 0));
+        when(shift.getSite()).thenReturn(site);
+        when(shift.meetTheRequirements()).thenReturn(true);
+        when(shift.isEmployeeAssigned(any())).thenReturn(false);
     }
 
     @Test
-    void testAddShift() {
-        shiftFacade.addShift(shift);
-        ShiftDL retrievedShift = shiftFacade.getShiftByDateAndType(shift.getDate(), shift.getShiftType().toString());
-
-        assertNotNull(retrievedShift);
-        assertEquals(shift.getDate(), retrievedShift.getDate());
-        assertEquals(shift.getShiftType(), retrievedShift.getShiftType());
+    void testAddAndGetShift() {
+        ShiftDL newShift = mock(ShiftDL.class);
+        when(newShift.getStartTime()).thenReturn(LocalDateTime.of(2024, 6, 6, 8, 0));
+        when(newShift.getSite()).thenReturn(site);
+        shiftFacade.addShift(newShift);
+        ShiftDL found = shiftFacade.getShiftByStartTimeAndSite(LocalDateTime.of(2024, 6, 6, 8, 0), site);
+        assertEquals(newShift, found);
     }
 
     @Test
-    void testGetAllShifts() {
-        shiftFacade.addShift(shift);
-        ShiftDL anotherShift = new ShiftDL(LocalDate.of(2025, 4, 27), ShiftType.EVENING);
-        shiftFacade.addShift(anotherShift);
-
-        List<ShiftDL> allShifts = shiftFacade.getAllShifts();
-
-        assertEquals(2, allShifts.size());
-        assertTrue(allShifts.contains(shift));
-        assertTrue(allShifts.contains(anotherShift));
+    void testAssignToShiftThrowsIfNotFound() {
+        assertThrows(IllegalArgumentException.class, () ->
+            shiftFacade.assignToShift(employee, LocalDateTime.of(2024, 6, 7, 8, 0), site, role)
+        );
     }
 
     @Test
-    void testAssignToShift() {
-        shiftFacade.addShift(shift);
-        shiftFacade.assignToShift(employee, shift.getDate(), shift.getShiftType().toString(), role);
-
-        assertTrue(shift.getEmployeesAssignment().get(role).contains(employee));
+    void testUnassignToShiftThrowsIfNotFound() {
+        assertThrows(IllegalArgumentException.class, () ->
+            shiftFacade.unassignToShift(employee, LocalDateTime.of(2024, 6, 7, 8, 0), site, role)
+        );
     }
 
     @Test
-    void testAssignToNonexistentShift() {
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            shiftFacade.assignToShift(employee, LocalDate.of(2025, 4, 27), "MORNING", role);
-        });
-
-        assertEquals("Shift not found for the given date and type", exception.getMessage());
+    void testGetAllShiftsFromSite() {
+        ShiftDL shift1 = mock(ShiftDL.class);
+        when(shift1.getSite()).thenReturn(site);
+        ShiftDL shift2 = mock(ShiftDL.class);
+        when(shift2.getSite()).thenReturn(site);
+        shiftFacade.addShift(shift1);
+        shiftFacade.addShift(shift2);
+        List<ShiftDL> shifts = shiftFacade.getAllShiftsFromSite(site);
+        assertEquals(2, shifts.size());
     }
 
     @Test
-    void testUnassignFromNonexistentShift() {
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            shiftFacade.unassignToShift(employee, LocalDate.of(2025, 4, 27), "MORNING", role);
-        });
-
-        assertEquals("Shift not found for the given date and type", exception.getMessage());
+    void testGetAllShiftsInRange() {
+        ShiftDL shift1 = mock(ShiftDL.class);
+        when(shift1.getStartTime()).thenReturn(LocalDateTime.of(2024, 6, 5, 8, 0));
+        when(shift1.getSite()).thenReturn(site);
+        shiftFacade.addShift(shift1);
+        List<ShiftDL> shifts = shiftFacade.getAllShiftsInRange(LocalDate.of(2024, 6, 4), LocalDate.of(2024, 6, 6), site);
+        assertTrue(shifts.contains(shift1));
     }
 
     @Test
-    void testSetRequirements() {
-        shiftFacade.setRequirements(DayOfWeek.MONDAY, ShiftType.MORNING, role, 3);
+    void testGetWeeklyShifts() {
+        ShiftDL shift1 = mock(ShiftDL.class);
+        when(shift1.getStartTime()).thenReturn(LocalDateTime.of(2024, 6, 5, 8, 0));
+        when(shift1.getSite()).thenReturn(site);
+        shiftFacade.addShift(shift1);
+        List<ShiftDL> shifts = shiftFacade.getWeeklyShifts(LocalDate.of(2024, 6, 3), site);
+        assertTrue(shifts.contains(shift1));
+    }
 
-        int quantity = WeeklyShiftRequirements.getInstance()
-                .getRequirements(DayOfWeek.MONDAY, ShiftType.MORNING)
-                .get(role);
+    @Test
+    void testCheckIfThereAreShiftsThatAreNotFullyAssigned() {
+        ShiftDL shift1 = mock(ShiftDL.class);
+        when(shift1.getStartTime()).thenReturn(LocalDateTime.of(2024, 6, 5, 8, 0));
+        when(shift1.getSite()).thenReturn(site);
+        when(shift1.meetTheRequirements()).thenReturn(false);
+        shiftFacade.addShift(shift1);
+        boolean result = shiftFacade.checkIfThereAreShiftsThatAreNotFullyAssigned(site, LocalDate.of(2024, 6, 4), LocalDate.of(2024, 6, 6));
+        assertTrue(result);
+    }
 
-        assertEquals(3, quantity);
+    @Test
+    void testGetAllUnassignedEmployeesForShift() {
+        ShiftDL shift1 = mock(ShiftDL.class);
+        when(shift1.getStartTime()).thenReturn(LocalDateTime.of(2024, 6, 5, 8, 0));
+        when(shift1.getSite()).thenReturn(site);
+        when(shift1.isEmployeeAssigned(any())).thenReturn(false);
+        shiftFacade.addShift(shift1);
+
+        List<EmployeeDL> allEmployees = Arrays.asList(employee);
+        when(employeeFacade.getAllEmployees()).thenReturn(allEmployees);
+
+        List<EmployeeDL> unassigned = shiftFacade.getAllUnassignedEmployeesForShift(LocalDateTime.of(2024, 6, 5, 8, 0), site);
+        assertTrue(unassigned.contains(employee));
+    }
+
+    @Test
+    void testGetShiftAtTime() {
+        ShiftDL shift1 = mock(ShiftDL.class);
+        when(shift1.getStartTime()).thenReturn(LocalDateTime.of(2024, 6, 5, 8, 0));
+        when(shift1.getEndTime()).thenReturn(LocalDateTime.of(2024, 6, 5, 16, 0));
+        when(shift1.getSite()).thenReturn(site);
+        shiftFacade.addShift(shift1);
+
+        ShiftDL found = shiftFacade.getShiftAtTime(LocalDateTime.of(2024, 6, 5, 10, 0), site);
+        assertEquals(shift1, found);
+    }
+
+    @Test
+    void testGetAllShiftsWithMissingAssigns() {
+        ShiftDL shift1 = mock(ShiftDL.class);
+        when(shift1.getStartTime()).thenReturn(LocalDateTime.of(2024, 6, 5, 8, 0));
+        when(shift1.getSite()).thenReturn(site);
+        when(shift1.meetTheRequirements()).thenReturn(false);
+        shiftFacade.addShift(shift1);
+
+        List<ShiftDL> missing = shiftFacade.getAllShiftsWithMissingAssigns(site, LocalDate.of(2024, 6, 4), LocalDate.of(2024, 6, 6));
+        assertTrue(missing.contains(shift1));
     }
 }
