@@ -166,7 +166,7 @@ public class HRSystemUI {
             case 6:
                 ShiftsTablePresentation shiftsTable = new ShiftsTablePresentation(shiftService, scanner, assigningService, employeeService, siteService);
                 shiftsTable.showShiftTable();
-                shiftsTable.assignEmployeeToShift();
+                shiftsTable.manageShiftOptions();
                 break;
             case 7:
                 EmployeeSearchPresentation employeeSearch = new EmployeeSearchPresentation(employeeService, scanner);

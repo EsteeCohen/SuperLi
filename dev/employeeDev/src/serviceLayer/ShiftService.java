@@ -243,4 +243,13 @@ public class ShiftService implements DriverInfoInterface{
         return false; // Employee with the specified role is not on any shift at the site
         
     }
+
+    public void unassignEmployeeFromShift(String employeeId, LocalDateTime startTime, Site site,String roleName) {
+        ShiftDL shift = shiftFacade.getShiftByStartTimeAndSite(startTime, site);
+        if (shift == null) {
+            throw new IllegalArgumentException("Shift not found for the given start time and site");
+        }
+        EmployeeDL employee = employeeFacade.getEmployee(employeeId);
+        shiftFacade.unassignToShift(employee, startTime, site, roleFacade.getRoleByName(roleName));
+    }
 }
