@@ -105,14 +105,21 @@ public class EmployeeService implements UserManagmentInteface {
     }
 
     public void registerDriver(String name, String password, String id, Integer salary, String wageType,
-            Integer yearlySickDays, Integer yearlyDaysOff, String siteName, String phone, String licenseType) {
-                employeeFacade.registerDriver(name, password, id, salary, wageType.charAt(0), yearlySickDays, yearlyDaysOff, siteName, phone, LicenseType.valueOf(licenseType));
+            Integer yearlySickDays, Integer yearlyDaysOff, String siteName, String phone, LicenseType licenseType) {
+                employeeFacade.registerDriver(name, password, id, salary, wageType.charAt(0), yearlySickDays, yearlyDaysOff, siteName, phone, licenseType);
 
     }
 
-    public String getAllLicensesType(String license) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getLicenseType'");
+    public List<LicenseType> getAllLicensesType() {
+        return List.of(LicenseType.values());
+    }
+
+    public boolean unassignRoleFromEmployee(String employeeId, String roleName) {
+        return employeeFacade.unassignRoleFromEmployee(employeeId, roleName);
+    }
+
+    public boolean isEmployeeExists(String employeeId) {
+        return employeeFacade.getEmployee(employeeId) != null;
     }
 }
 

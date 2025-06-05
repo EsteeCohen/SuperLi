@@ -73,6 +73,15 @@ public class EmployeeMapper {
         if (driverRole == null) {
             throw new IllegalArgumentException("Role 'Driver' not found.");
         }
+         List<RoleDL> roles = new ArrayList<>();
+        if (driverDTO.getRoles() != null) {
+            for (RoleDTO roleDTO : driverDTO.getRoles()) {
+                RoleDL role = roleFacade.getRoleByName(roleDTO.getName());
+                if (role != null) {
+                    roles.add(role);
+                }
+            }
+        }
         LicenseType licenseType = LicenseType.fromString(driverDTO.getLicenseType());
         DriverDL driver = new DriverDL(
                 driverDTO.getId(),
@@ -87,7 +96,8 @@ public class EmployeeMapper {
                 driverDTO.getPhoneNumber(),
                 licenseType,
                 driverRole,
-                driverDTO.isAvailableToDrive()
+                driverDTO.isAvailableToDrive(),
+                roles
         );
         return driver;
     }

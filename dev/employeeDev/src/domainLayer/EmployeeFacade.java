@@ -5,11 +5,8 @@ import employeeDev.src.dataAcssesLayer.EmployeeDAO;
 import employeeDev.src.dtos.DriverDTO;
 import employeeDev.src.dtos.EmployeeDTO;
 import employeeDev.src.mappers.EmployeeMapper;
-import employeeDev.src.serviceLayer.DriverSL;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -151,5 +148,21 @@ public class EmployeeFacade {
 
     public List<RoleDL> getAllRoles() {
         return roleFacade.getAllRoles();
+    }
+
+    public boolean unassignRoleFromEmployee(String employeeId, String roleName) {
+        EmployeeDL employee = employees.get(employeeId);
+        if (employee.isDriver() && roleName.equals("Driver")) {
+            return false;
+        }
+        if (employee != null) {
+            RoleDL role = roleFacade.getRoleByName(roleName);
+            if (role != null && employee.removeRole(roleName)) {
+                EmployeeDAO employeeDAO = new EmployeeDAO();
+                employeeDAO.removeRoleFromEmployee(employeeId, roleName);
+                return true;
+            }
+        }
+        return false;
     }
 }

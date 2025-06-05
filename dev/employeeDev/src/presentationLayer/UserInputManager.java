@@ -1,5 +1,6 @@
 package employeeDev.src.presentationLayer;
 
+import java.util.List;
 import java.util.Scanner;
 
 import transportDev.src.main.enums.LicenseType;
@@ -54,7 +55,7 @@ public class UserInputManager {
             String input = getUserInputOrCancel(scanner, cancelMessage, cancelKeyword);
             if (input == null) return null;
             if (input.equals("1")) return "Hourly";
-            if (input.equals("2")) return "Monthly";
+            if (input.equals("2")) return "Global";
             System.out.println("Invalid input. Please enter 1 for Hourly, 2 for Monthly, or '" + cancelKeyword + "' to cancel.");
         }
     }
@@ -81,23 +82,23 @@ public class UserInputManager {
         }
     }
 
-    public static String promptForLicenseType(Scanner scanner,String prompt, String cancelMessage, String cancelKeyword) {
+    public static String promptForLicenseType(Scanner scanner,List<LicenseType> types, String prompt, String cancelMessage, String cancelKeyword) {
         while (true) {
             System.out.println("Available License Types:");
             int index = 1;
-            for (LicenseType type : LicenseType.values()) {
+            for (LicenseType type : types) {
                 System.out.println(index + " - " + type.name());
                 index++;
             }
             System.out.print(prompt);
             String input = getUserInputOrCancel(scanner, cancelMessage, cancelKeyword);
-            if (input == null||input==cancelKeyword) return null;
-            input = input.toUpperCase();
-            if (LicenseType.isValidLicenseType(input)) {
-                return input;
-            } else {
-                System.out.println("Invalid license type. Please enter A, B, C, or D, or '" + cancelKeyword + "' to cancel.");
+            if (input == null) return null;
+            if (input.isEmpty()) {
+                System.out.println("Field cannot be empty.");
+                continue;
             }
+            return input;
+            
         }
     }
 }

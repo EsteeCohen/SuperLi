@@ -221,4 +221,35 @@ public class ShiftService implements DriverInfoInterface{
     public void addDriver(String fullName, String password, String id, int wage, String wageType, int yearlySickDays, int yearlyDaysOff, String siteName, String phoneNumber, LicenseType licenseType) {
         employeeFacade.registerDriver(fullName, password, id, wage, wageType.charAt(0), yearlySickDays, yearlyDaysOff, siteName, phoneNumber, licenseType);
     }
+
+    public boolean isEmployeeWithRoleOnShift(Site site, String employeeId, String roleName) {
+        EmployeeDL employee = employeeFacade.getEmployee(employeeId);
+        if (employee == null) {
+            return false; // Employee not found
+        }
+        RoleDL role = roleFacade.getRoleByName(roleName);
+        if (role == null) {
+            return false; // Role not found
+        }
+        List<ShiftDL> shifts = shiftFacade.getAllShiftsFromSite(site);
+        for (ShiftDL shift : shifts) {
+            if (shift.getEmployeesAssignment().containsKey(role)) {
+                List<EmployeeDL> assignedEmployees = shift.getEmployeesAssignment().get(role);
+                if (assignedEmployees != null && assignedEmployees.contains(employee)) {
+                    return true;
+                }
+            }
+        }
+        return false; // Employee with the specified role is not on any shift at the site
+        
+    }
+
+    public void unassignEmployeeFromShift(String employeeId, LocalDateTime startTime, Site site,String roleName) {
+        ShiftDL shift = shiftFacade.getShiftByStartTimeAndSite(startTime, site);
+        if (shift == null) {
+            throw new IllegalArgumentException("Shift not found for the given start time and site");
+        }
+        EmployeeDL employee = employeeFacade.getEmployee(employeeId);
+        shiftFacade.unassignToShift(employee, startTime, site, roleFacade.getRoleByName(roleName));
+    }
 }

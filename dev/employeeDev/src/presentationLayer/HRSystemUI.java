@@ -99,11 +99,12 @@ public class HRSystemUI {
         System.out.println("1. Register new employee");
         System.out.println("2. Enter availability");
         System.out.println("3. Assign roles to employee");
-        System.out.println("4. Create new role");
-        System.out.println("5. View and manage shift schedule");
-        System.out.println("6. Search employee by ID");
-        System.out.println("7. Update employee details");
-        System.out.println("8. View corrent shifts and employees");
+        System.out.println("4. Unassign role from employee");
+        System.out.println("5. Create new role");
+        System.out.println("6. View and manage shift schedule");
+        System.out.println("7. Search employee by ID");
+        System.out.println("8. Update employee details");
+        System.out.println("9. View corrent shifts and employees");
         System.out.println("0. Exit");
     }
 
@@ -155,23 +156,27 @@ public class HRSystemUI {
                 roleAssignment.assignRoleToEmployee();
                 break;
             case 4:
+                RoleUnassignmentPresentation roleUnassignment = new RoleUnassignmentPresentation(employeeService, shiftService, siteService, scanner);
+                roleUnassignment.unassignRoleFromEmployee();
+                break;
+            case 5:
                 RoleCreationPresentation roleCreation = new RoleCreationPresentation(roleService, scanner);
                 roleCreation.createNewRole();
                 break;
-            case 5:
+            case 6:
                 ShiftsTablePresentation shiftsTable = new ShiftsTablePresentation(shiftService, scanner, assigningService, employeeService, siteService);
                 shiftsTable.showShiftTable();
-                shiftsTable.assignEmployeeToShift();
+                shiftsTable.manageShiftOptions();
                 break;
-            case 6:
+            case 7:
                 EmployeeSearchPresentation employeeSearch = new EmployeeSearchPresentation(employeeService, scanner);
                 employeeSearch.searchEmployee();
                 break;
-            case 7:
+            case 8:
                 EmployeeUpdatePresentation employeeUpdate = new EmployeeUpdatePresentation(employeeService, scanner);
                 employeeUpdate.updateEmployeeDetails();
                 break;
-            case 8:
+            case 9:
                 CurrentShiftsTablePresentation currentShifts = new CurrentShiftsTablePresentation(shiftService, siteService, scanner);
                 currentShifts.showCurrentShiftsAndEmployees();
                 break;

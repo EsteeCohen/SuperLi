@@ -155,4 +155,16 @@ public class EmployeeDL {
         EmployeeDAO employeeDAO = new EmployeeDAO();
         employeeDAO.updateEmployee(EmployeeMapper.toDTO(this));
     }
+
+    public boolean removeRole(String roleName) {
+        for (RoleDL role : roles) {
+            if (role.getName().equals(roleName)) {
+                roles.remove(role);
+                EmployeeDAO employeeDAO = new EmployeeDAO();
+                employeeDAO.removeRoleFromEmployee(id, roleName);
+                return true;
+            }
+        }
+        return false; // Role not found
+    }
 }

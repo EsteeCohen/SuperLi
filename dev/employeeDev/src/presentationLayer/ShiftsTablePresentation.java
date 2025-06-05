@@ -60,6 +60,13 @@ public class ShiftsTablePresentation extends Form {
             System.out.println("End Time: " + shift.getEndTime());
             System.out.println("Shift Type: " + shift.getShiftType());
             System.out.println("Site: " + (shift.getSite() != null ? shift.getSite().getName() : "Unknown Site"));
+            System.out.println("My roles in this shift:");
+            shift.getEmployeesAssignment().forEach((role, employees) -> {
+                employees.stream()
+                    .filter(employee -> employee.getID().equals(employeeId))
+                    .findFirst()
+                    .ifPresent(employee -> System.out.println("  Role: " + role.getName() + " (ID: " + employee.getID() + ")"));
+            });
         }
     }
 
@@ -141,6 +148,70 @@ public class ShiftsTablePresentation extends Form {
         return siteToShifts;
     }
 
+    public void manageShiftOptions() {
+        boolean continueManaging = true;
+
+        while (continueManaging) {
+            System.out.println("1. Assign Employee to Shift");
+            System.out.println("2. Unassigned Employee Shifts");
+            System.out.println("0. Exit");
+
+            String choice = UserInputManager.promptForString(scanner, "Choose an option: ", "Invalid choice. Please try again.", "q");
+            if (choice == null) return;
+
+            switch (choice) {
+                case "1":
+                    assignEmployeeToShift();
+                    break;
+                case "2":
+                    unassignedEmployeeFromShift();
+                    break;
+                case "0":
+                    continueManaging = false;
+                    System.out.println("Exiting shift management.");
+                    break;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        }
+    }
+    
+    private void unassignedEmployeeFromShift() {
+        String employeeId = UserInputManager.promptForString(scanner, "Enter Employee ID to view unassigned shifts (or 'q' to cancel): ", "Operation cancelled.", "q");
+        if (employeeId == null) return;
+        showEmployeeShift(employeeId);
+       shifts = siteService.getAllSites().stream().flatMap(site -> shiftService.getWeeklyShifts(NEXT_SUNDAY, site).stream()
+        .map(shiftSL -> new ShiftPL(shiftSL))).collect(java.util.stream.Collectors.toCollection(ArrayList::new));
+        shifts.sort(Comparator.comparing(ShiftPL::getStartTime, Comparator.naturalOrder()));
+        Map<String, List<ShiftPL>> siteToShifts = groupShiftsBySite();
+        List<ShiftPL> employeeShifts = siteToShifts.values().stream()
+            .flatMap(List::stream)
+            .filter(shift -> shift.getEmployeesAssignment().values().stream()
+                .flatMap(List::stream)
+                .anyMatch(employee -> employee.getID().equals(employeeId)))
+            .toList();
+
+        if (employeeShifts.isEmpty()) {
+            System.out.println("No assigned shifts found for employee with ID: " + employeeId);
+            return;
+        }
+
+        String shiftToUnassign = UserInputManager.promptForString(scanner, "Enter Shift number to unassign (or 'q' to cancel): ", "Operation cancelled.", "q");
+        if (shiftToUnassign == null) return;
+        int shiftIndex = Integer.parseInt(shiftToUnassign) - 1;
+        if (shiftIndex < 0 || shiftIndex >= employeeShifts.size()) {
+            System.out.println("Invalid shift number. Please try again.");
+            return;
+        }
+        ShiftPL selectedShift = employeeShifts.get(shiftIndex);
+        if (selectedShift == null) {
+            System.out.println("No shift found with the provided number.");
+            return;
+        }
+        String roleString = UserInputManager.promptForString(scanner, "Enter Role Name to unassign (or 'q' to cancel): ", "Operation cancelled.", "q");
+        shiftService.unassignEmployeeFromShift(employeeId, selectedShift.getStartTime(), selectedShift.getSite(),roleString);
+    }
+
     public void assignEmployeeToShift() {
         boolean assignMore = true;
 
@@ -161,7 +232,10 @@ public class ShiftsTablePresentation extends Form {
                 "q"
             );
             if (employeeId == null) return;
-
+            if (!employeeService.isEmployeeExists(employeeId)) {
+                System.out.println("Employee with ID: " + employeeId + " does not exist.");
+                continue;
+            }
             EmployeePL employee = new EmployeePL(employeeService.getEmployeeById(employeeId));
             List<String> roles = employee.getRoles();
             if (roles.isEmpty()) {
@@ -233,7 +307,7 @@ public class ShiftsTablePresentation extends Form {
             }
         return missingShifts;
     }
-    
+
     private void handleMissingAvailability() {
         List<ShiftPL> missingShifts = getShiftsWithMissingWorkers();
         List<EmployeePL> allEmployees = employeeService.getAllEmployees().values().stream().map(EmployeePL::new).toList();

@@ -4,6 +4,7 @@ import employeeDev.src.serviceLayer.EmployeeService;
 import employeeDev.src.serviceLayer.SiteService;
 import java.util.Scanner;
 import transportDev.src.main.entities.Site;
+import transportDev.src.main.enums.LicenseType;
 
 public class RegistrationPresentation extends Form {
     private final EmployeeService employeeService;
@@ -24,6 +25,10 @@ public class RegistrationPresentation extends Form {
         if (password == null) return;
         String id = UserInputManager.promptForString(scanner, "ID: ", "Registration cancelled.", "q");
         if (id == null) return;
+        if (!employeeService.isEmployeeExists(id)) {
+            System.out.println("Employee with ID: " + id + " does not exist.");
+            return;
+        }
         String phone = UserInputManager.promptForString(scanner, "Phone Number: ", "Registration cancelled.", "q");
         if (phone == null) return;
         printSiteList();
@@ -35,11 +40,11 @@ public class RegistrationPresentation extends Form {
         String roleString = UserInputManager.promptForString(scanner, "Role number: ", "Registration cancelled.", "q");
         if (roleString == null) return;
         String role = employeeService.getAllRoles()[Integer.parseInt(roleString) - 1];
-        String licenseType = null;
-        if( role == "Driver"){
-            String license = UserInputManager.promptForLicenseType(scanner, "License Type (A, B, C, D): ", "Registration cancelled.", "q");
+        LicenseType licenseType = null;
+        if( role.equals("Driver")){
+            String license = UserInputManager.promptForLicenseType(scanner,employeeService.getAllLicensesType(), "License Type (A, B, C, D): ", "Registration cancelled.", "q");
             if (license == null) return;
-            licenseType = employeeService.getAllLicensesType(license);
+            licenseType = employeeService.getAllLicensesType().get(Integer.parseInt(license) - 1);
         }
         Integer salary = UserInputManager.promptForInt(scanner, "Wage: ", "Registration cancelled.", "q");
         if (salary == null) return;
