@@ -22,6 +22,10 @@ public class RoleAssignmentPresentation extends Form {
     public void assignRoleToEmployee() {
         String employeeId = promptForEmployeeId();
         if (employeeId == null) return;
+        if (!employeeService.isEmployeeExists(employeeId)) {
+            System.out.println("Employee with ID: " + employeeId + " does not exist.");
+            return;
+        }
 
         List<String> roles = roleService.getAllRoles().stream()
                                         .map(RoleSL::getName)

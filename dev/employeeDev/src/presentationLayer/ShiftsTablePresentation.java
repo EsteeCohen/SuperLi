@@ -198,10 +198,12 @@ public class ShiftsTablePresentation extends Form {
 
         String shiftToUnassign = UserInputManager.promptForString(scanner, "Enter Shift number to unassign (or 'q' to cancel): ", "Operation cancelled.", "q");
         if (shiftToUnassign == null) return;
-        ShiftPL selectedShift = employeeShifts.stream()
-            .filter(shift -> shift.getStartTime().toString().equals(shiftToUnassign))
-            .findFirst()
-            .orElse(null);
+        int shiftIndex = Integer.parseInt(shiftToUnassign) - 1;
+        if (shiftIndex < 0 || shiftIndex >= employeeShifts.size()) {
+            System.out.println("Invalid shift number. Please try again.");
+            return;
+        }
+        ShiftPL selectedShift = employeeShifts.get(shiftIndex);
         if (selectedShift == null) {
             System.out.println("No shift found with the provided number.");
             return;
@@ -230,7 +232,10 @@ public class ShiftsTablePresentation extends Form {
                 "q"
             );
             if (employeeId == null) return;
-
+            if (!employeeService.isEmployeeExists(employeeId)) {
+                System.out.println("Employee with ID: " + employeeId + " does not exist.");
+                continue;
+            }
             EmployeePL employee = new EmployeePL(employeeService.getEmployeeById(employeeId));
             List<String> roles = employee.getRoles();
             if (roles.isEmpty()) {

@@ -25,6 +25,10 @@ public class RegistrationPresentation extends Form {
         if (password == null) return;
         String id = UserInputManager.promptForString(scanner, "ID: ", "Registration cancelled.", "q");
         if (id == null) return;
+        if (!employeeService.isEmployeeExists(id)) {
+            System.out.println("Employee with ID: " + id + " does not exist.");
+            return;
+        }
         String phone = UserInputManager.promptForString(scanner, "Phone Number: ", "Registration cancelled.", "q");
         if (phone == null) return;
         printSiteList();

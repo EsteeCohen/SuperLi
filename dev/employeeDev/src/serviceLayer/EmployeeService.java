@@ -117,5 +117,9 @@ public class EmployeeService implements UserManagmentInteface {
     public boolean unassignRoleFromEmployee(String employeeId, String roleName) {
         return employeeFacade.unassignRoleFromEmployee(employeeId, roleName);
     }
+
+    public boolean isEmployeeExists(String employeeId) {
+        return employeeFacade.getEmployee(employeeId) != null;
+    }
 }
 

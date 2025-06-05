@@ -21,6 +21,10 @@ public class RoleUnassignmentPresentation extends Form {
     public void unassignRoleFromEmployee() {
         String employeeId = UserInputManager.promptForString(scanner, "Enter Employee ID to unassign role from: ", "Unassignment cancelled.", "q");
         if (employeeId == null) return;
+        if (!employeeService.isEmployeeExists(employeeId)) {
+            System.out.println("Employee with ID: " + employeeId + " does not exist.");
+            return;
+        }
         printEmployeeRoles(employeeId);
         String roleName = UserInputManager.promptForString(scanner, "Enter Role Name to unassign: ", "Unassignment cancelled.", "q");
         if (roleName == null) return;
