@@ -160,7 +160,7 @@ public class OrderUI {
             addMore = more.equalsIgnoreCase("yes");
         }
 
-        Order newOrder = facadeController.createOrder(date, selectedSite.getId(), items);
+        Order newOrder = facadeController.createOrder(date, selectedSite.getName(), items);
         if (newOrder != null) {
             System.out.println("Order created successfully! ID: " + newOrder.getId());
         } else {

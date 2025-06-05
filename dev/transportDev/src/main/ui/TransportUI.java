@@ -1,14 +1,17 @@
 package transportDev.src.main.ui;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+
+import employeeDev.src.serviceLayer.DriverSL;
 import transportDev.src.main.controllers.FacadeController;
 import transportDev.src.main.entities.*;
+import transportDev.src.main.enums.LicenseType;
 import transportDev.src.main.enums.ShippingZone;
 import transportDev.src.main.enums.TransportStatus;
 
@@ -136,7 +139,7 @@ public class TransportUI {
             
             if (!completed && currentDraft != null) {
                 displayNavigationMenu();
-                int choice = getIntInput("👉 What would you like to do: ");
+                int choice = getIntInput(" What would you like to do: ");
                 
                 switch (choice) {
                     case 1: // Continue
@@ -146,25 +149,25 @@ public class TransportUI {
                         if (currentDraft.getCurrentStep() > 0) {
                             currentDraft.previousStep();
                         } else {
-                            System.out.println("⚠️ Already at first step.");
+                            System.out.println(" Already at first step.");
                             pressEnterToContinue();
                         }
                         break;
                     case 3: // Save and exit
                         currentDraft.save();
-                        System.out.println("💾 Draft saved successfully!");
-                        System.out.println("✅ You can resume later from Transport Menu.");
+                        System.out.println(" Draft saved successfully!");
+                        System.out.println(" You can resume later from Transport Menu.");
                         pressEnterToContinue();
                         return;
                     case 4: // Cancel
                         if (confirmContinue("Are you sure you want to discard all changes?")) {
                             currentDraft = null;
-                            System.out.println("❌ Changes discarded.");
+                            System.out.println(" Changes discarded.");
                             pressEnterToContinue();
                         }
                         return;
                     default:
-                        System.out.println("❌ Invalid choice.");
+                        System.out.println(" Invalid choice.");
                         pressEnterToContinue();
                 }
             }
@@ -176,28 +179,28 @@ public class TransportUI {
     }
     
     private void displayCreationHeader() {
-        System.out.println("🚛 TRANSPORT CREATION WIZARD");
+        System.out.println("TRANSPORT CREATION WIZARD");
         System.out.println("=".repeat(35));
         currentDraft.displayProgress();
         System.out.println("");
     }
     
     private void displayNavigationMenu() {
-        System.out.println("\n🧭 NAVIGATION OPTIONS");
+        System.out.println("\n NAVIGATION OPTIONS");
         System.out.println("─".repeat(20));
-        System.out.println("1. ➡️  Continue to next step");
-        System.out.println("2. ⬅️  Go back to previous step");
-        System.out.println("3. 💾 Save draft and exit");
-        System.out.println("4. ❌ Cancel (discard changes)");
+        System.out.println("1. Continue to next step");
+        System.out.println("2. Go back to previous step");
+        System.out.println("3. Save draft and exit");
+        System.out.println("4. Cancel (discard changes)");
         System.out.println("");
     }
     
     private boolean stepBasicDetails() {
-        System.out.println("📅 STEP 1: BASIC DETAILS");
+        System.out.println("STEP 1: BASIC DETAILS");
         System.out.println("─".repeat(25));
         
         if (currentDraft.getDate() != null) {
-            System.out.println("📋 Current information:");
+            System.out.println("Current information:");
             System.out.println("Date: " + currentDraft.getDate().format(
                 java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")));
             System.out.println("Time: " + currentDraft.getTime());
@@ -210,9 +213,9 @@ public class TransportUI {
         // Date input with validation
         LocalDate date = null;
         while (date == null) {
-            String dateStr = getStringInput("📅 Enter transport date (DD/MM/YYYY): ");
+            String dateStr = getStringInput("Enter transport date (DD/MM/YYYY): ");
             if (dateStr.isEmpty()) {
-                System.out.println("❌ Date is required.");
+                System.out.println("Date is required.");
                 continue;
             }
             
@@ -225,13 +228,13 @@ public class TransportUI {
                     date = LocalDate.of(year, month, day);
                     
                     if (date.isBefore(LocalDate.now())) {
-                        System.out.println("⚠️ Cannot select a date in the past.");
+                        System.out.println("Cannot select a date in the past.");
                         date = null;
                         continue;
                     }
                     
                     if (date.isAfter(LocalDate.now().plusMonths(6))) {
-                        System.out.println("⚠️ Cannot schedule transport more than 6 months ahead.");
+                        System.out.println("Cannot schedule transport more than 6 months ahead.");
                         date = null;
                         continue;
                     }
@@ -239,16 +242,16 @@ public class TransportUI {
                     throw new Exception("Invalid format");
                 }
             } catch (Exception e) {
-                System.out.println("❌ Invalid date format. Please use DD/MM/YYYY (e.g., 25/12/2024)");
+                System.out.println("Invalid date format. Please use DD/MM/YYYY (e.g., 25/12/2024)");
             }
         }
         
         // Time input with validation
         LocalTime time = null;
         while (time == null) {
-            String timeStr = getStringInput("🕐 Enter transport time (HH:MM): ");
+            String timeStr = getStringInput(" Enter transport time (HH:MM): ");
             if (timeStr.isEmpty()) {
-                System.out.println("❌ Time is required.");
+                System.out.println("Time is required.");
                 continue;
             }
             
@@ -257,7 +260,7 @@ public class TransportUI {
                 
                 // Check if it's a reasonable time (between 6:00 and 22:00)
                 if (time.isBefore(LocalTime.of(6, 0)) || time.isAfter(LocalTime.of(22, 0))) {
-                    System.out.println("⚠️ Transport time should be between 06:00 and 22:00.");
+                    System.out.println("Transport time should be between 06:00 and 22:00.");
                     if (!confirmContinue("Continue with this time anyway?")) {
                         time = null;
                         continue;
@@ -265,29 +268,29 @@ public class TransportUI {
                 }
                 
             } catch (DateTimeParseException e) {
-                System.out.println("❌ Invalid time format. Please use HH:MM (e.g., 14:30)");
+                System.out.println("Invalid time format. Please use HH:MM (e.g., 14:30)");
             }
         }
         
         currentDraft.setDate(date);
         currentDraft.setTime(time);
         
-        System.out.println("✅ Basic details saved!");
-        System.out.println("📅 Date: " + date.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")));
-        System.out.println("🕐 Time: " + time);
+        System.out.println("Basic details saved!");
+        System.out.println("Date: " + date.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")));
+        System.out.println("Time: " + time);
         
         return true;
     }
     
     private boolean stepRoutePlanning() {
-        System.out.println("🗺️ STEP 2: ROUTE PLANNING");
+        System.out.println("STEP 2: ROUTE PLANNING");
         System.out.println("─".repeat(25));
         
         if (currentDraft.getSourceSiteId() != null) {
-            System.out.println("📋 Current route:");
-            System.out.println("🏢 Source: " + getSiteName(currentDraft.getSourceSiteId()));
+            System.out.println("Current route:");
+            System.out.println("Source: " + getSiteName(currentDraft.getSourceSiteId()));
             if (currentDraft.getDestinationIds() != null && !currentDraft.getDestinationIds().isEmpty()) {
-                System.out.println("🎯 Destinations:");
+                System.out.println("Destinations:");
                 for (String destId : currentDraft.getDestinationIds()) {
                     System.out.println("  → " + getSiteName(destId));
                 }
@@ -298,23 +301,23 @@ public class TransportUI {
         }
         
         // Source site selection
-        System.out.println("🏢 SELECTING SOURCE SITE");
+        System.out.println("SELECTING SOURCE SITE");
         System.out.println("─".repeat(22));
         String sourceSiteId = selectSite("Choose the starting location for this transport:");
         if (sourceSiteId == null) {
-            System.out.println("❌ Source site is required.");
+            System.out.println("Source site is required.");
             return false;
         }
         
         Site sourceSite = facadeController.getSiteById(sourceSiteId);
         ShippingZone transportZone = sourceSite.getShippingZone();
         
-        System.out.println("✅ Source site selected: " + sourceSite.getName());
-        System.out.println("🌐 Transport zone: " + transportZone);
-        System.out.println("ℹ️ All destinations must be in the same zone (" + transportZone + ")");
+        System.out.println("Source site selected: " + sourceSite.getName());
+        System.out.println("Transport zone: " + transportZone);
+        System.out.println("ℹAll destinations must be in the same zone (" + transportZone + ")");
         
         // Destinations selection
-        System.out.println("\n🎯 SELECTING DESTINATIONS");
+        System.out.println("\nSELECTING DESTINATIONS");
         System.out.println("─".repeat(22));
         List<String> destinationIds = new ArrayList<>();
         
@@ -322,7 +325,7 @@ public class TransportUI {
             String destId = selectSiteInZone("Select destination site:", transportZone, destinationIds);
             if (destId == null) {
                 if (destinationIds.isEmpty()) {
-                    System.out.println("⚠️ At least one destination is required.");
+                    System.out.println("At least one destination is required.");
                     continue;
                 } else {
                     break;
@@ -330,8 +333,8 @@ public class TransportUI {
             }
             
             destinationIds.add(destId);
-            System.out.println("✅ Added destination: " + getSiteName(destId));
-            System.out.println("📊 Total destinations: " + destinationIds.size());
+            System.out.println("Added destination: " + getSiteName(destId));
+            System.out.println("Total destinations: " + destinationIds.size());
             
             if (!confirmContinue("Add another destination?")) {
                 break;
@@ -342,18 +345,18 @@ public class TransportUI {
         currentDraft.setDestinationIds(destinationIds);
         currentDraft.setTransportZone(transportZone);
         
-        System.out.println("\n✅ Route planning completed!");
+        System.out.println("\nRoute planning completed!");
         displayRouteSummary();
         
         return true;
     }
     
     private void displayRouteSummary() {
-        System.out.println("\n📍 ROUTE SUMMARY");
+        System.out.println("\nROUTE SUMMARY");
         System.out.println("─".repeat(15));
-        System.out.println("🏢 Source: " + getSiteName(currentDraft.getSourceSiteId()));
-        System.out.println("🌐 Zone: " + currentDraft.getTransportZone());
-        System.out.println("🎯 Destinations:");
+        System.out.println("Source: " + getSiteName(currentDraft.getSourceSiteId()));
+        System.out.println("Zone: " + currentDraft.getTransportZone());
+        System.out.println("Destinations:");
         for (int i = 0; i < currentDraft.getDestinationIds().size(); i++) {
             String destId = currentDraft.getDestinationIds().get(i);
             System.out.println("  " + (i + 1) + ". " + getSiteName(destId));
@@ -361,13 +364,13 @@ public class TransportUI {
     }
     
     private boolean stepVehicleAssignment() {
-        System.out.println("🚛 STEP 3: VEHICLE ASSIGNMENT");
+        System.out.println("STEP 3: VEHICLE ASSIGNMENT");
         System.out.println("─".repeat(29));
         
         if (currentDraft.getTruckId() != null) {
-            System.out.println("📋 Current assignment:");
-            System.out.println("🚛 Truck: " + getTruckName(currentDraft.getTruckId()));
-            System.out.println("👨‍✈️ Driver: " + getDriverName(currentDraft.getDriverId()));
+            System.out.println("Current assignment:");
+            System.out.println("Truck: " + getTruckName(currentDraft.getTruckId()));
+            System.out.println("Driver: " + getDriverName(currentDraft.getDriverId()));
             if (confirmContinue("Keep current vehicle assignment?")) {
                 return true;
             }
@@ -376,40 +379,40 @@ public class TransportUI {
         // Calculate required capacity
         double estimatedWeight = getEstimatedWeight();
         
-        System.out.println("🚛 SELECTING TRUCK");
+        System.out.println("SELECTING TRUCK");
         System.out.println("─".repeat(16));
-        System.out.println("📦 Estimated cargo weight: " + estimatedWeight + " kg");
+        System.out.println("Estimated cargo weight: " + estimatedWeight + " kg");
         
         String truckId = selectAppropriaTruck(estimatedWeight);
         if (truckId == null) {
-            System.out.println("❌ Truck selection is required.");
+            System.out.println("Truck selection is required.");
             return false;
         }
         
         Truck selectedTruck = facadeController.getTruckById(truckId);
-        System.out.println("✅ Truck selected: " + selectedTruck.getRegNumber() + " (" + selectedTruck.getModel() + ")");
-        System.out.println("⚖️ Capacity: " + selectedTruck.getMaxWeight() + " kg");
-        System.out.println("🪪 Required license: " + selectedTruck.getLicenseType());
+        System.out.println("Truck selected: " + selectedTruck.getRegNumber() + " (" + selectedTruck.getModel() + ")");
+        System.out.println("Capacity: " + selectedTruck.getMaxWeight() + " kg");
+        System.out.println("Required license: " + selectedTruck.getLicenseType());
         
         // Select driver with matching license
-        System.out.println("\n👨‍✈️ SELECTING DRIVER");
+        System.out.println("\nSELECTING DRIVER");
         System.out.println("─".repeat(17));
-        System.out.println("🪪 Required license type: " + selectedTruck.getLicenseType());
+        System.out.println("Required license type: " + selectedTruck.getLicenseType());
         
         String driverId = selectAvailableDriver(selectedTruck.getLicenseType().toString());
         if (driverId == null) {
-            System.out.println("❌ Driver selection is required.");
+            System.out.println("Driver selection is required.");
             return false;
         }
         
-        Driver selectedDriver = facadeController.getDriverById(driverId);
-        System.out.println("✅ Driver selected: " + selectedDriver.getName());
-        System.out.println("🪪 License: " + selectedDriver.getLicenseType());
+        DriverSL selectedDriver = facadeController.getDriverById(driverId);
+        System.out.println("Driver selected: " + selectedDriver.getFullName());
+        System.out.println("License: " + selectedDriver.getLicenseType());
         
         currentDraft.setTruckId(truckId);
         currentDraft.setDriverId(driverId);
         
-        System.out.println("\n✅ Vehicle assignment completed!");
+        System.out.println("\nVehicle assignment completed!");
         displayVehicleAssignmentSummary();
         
         return true;
@@ -421,32 +424,32 @@ public class TransportUI {
     }
     
     private void displayVehicleAssignmentSummary() {
-        System.out.println("\n🚛 VEHICLE ASSIGNMENT SUMMARY");
+        System.out.println("\nVEHICLE ASSIGNMENT SUMMARY");
         System.out.println("─".repeat(30));
         Truck truck = facadeController.getTruckById(currentDraft.getTruckId());
-        Driver driver = facadeController.getDriverById(currentDraft.getDriverId());
+        DriverSL driver = facadeController.getDriverById(currentDraft.getDriverId());
         
-        System.out.println("🚛 Truck: " + truck.getRegNumber() + " (" + truck.getModel() + ")");
-        System.out.println("⚖️ Max capacity: " + truck.getMaxWeight() + " kg");
-        System.out.println("👨‍✈️ Driver: " + driver.getName());
-        System.out.println("🪪 License: " + driver.getLicenseType());
-        System.out.println("🔗 License match: ✅ Compatible");
+        System.out.println("Truck: " + truck.getRegNumber() + " (" + truck.getModel() + ")");
+        System.out.println("Max capacity: " + truck.getMaxWeight() + " kg");
+        System.out.println("Driver: " + driver.getFullName());
+        System.out.println("License: " + driver.getLicenseType());
+        System.out.println("License match:  Compatible");
     }
     
     private boolean stepFinalReview() {
-        System.out.println("📋 STEP 4: FINAL REVIEW & CONFIRMATION");
+        System.out.println("STEP 4: FINAL REVIEW & CONFIRMATION");
         System.out.println("─".repeat(38));
         
         displayCompleteSummary();
         
-        System.out.println("\n❓ CONFIRMATION");
+        System.out.println("\n CONFIRMATION");
         System.out.println("─".repeat(13));
         if (!confirmContinue("Create this transport?")) {
             return false;
         }
         
         // Create the actual transport
-        System.out.print("🔄 Creating transport");
+        System.out.print("Creating transport");
         showLoadingAnimation();
         
         Transport transport = facadeController.createTransport(
@@ -462,9 +465,9 @@ public class TransportUI {
             displaySuccessMessage(transport);
             showPostCreationOptions(transport);
         } else {
-            System.out.println("\n❌ TRANSPORT CREATION FAILED!");
-            System.out.println("🚫 There was an error creating the transport.");
-            System.out.println("💡 Please check all details and try again.");
+            System.out.println("\n TRANSPORT CREATION FAILED!");
+            System.out.println(" There was an error creating the transport.");
+            System.out.println(" Please check all details and try again.");
             pressEnterToContinue();
             return false;
         }
@@ -473,17 +476,17 @@ public class TransportUI {
     }
     
     private void displayCompleteSummary() {
-        System.out.println("📊 COMPLETE TRANSPORT SUMMARY");
+        System.out.println(" COMPLETE TRANSPORT SUMMARY");
         System.out.println("=".repeat(30));
         
         // Basic details
-        System.out.println("📅 SCHEDULE");
+        System.out.println(" SCHEDULE");
         System.out.println("Date: " + currentDraft.getDate().format(
             java.time.format.DateTimeFormatter.ofPattern("EEEE, dd/MM/yyyy")));
         System.out.println("Time: " + currentDraft.getTime());
         
         // Route
-        System.out.println("\n🗺️ ROUTE");
+        System.out.println("\n ROUTE");
         System.out.println("Source: " + getSiteName(currentDraft.getSourceSiteId()));
         System.out.println("Zone: " + currentDraft.getTransportZone());
         System.out.println("Destinations:");
@@ -493,12 +496,12 @@ public class TransportUI {
         }
         
         // Vehicle assignment
-        System.out.println("\n🚛 VEHICLE ASSIGNMENT");
+        System.out.println("\n VEHICLE ASSIGNMENT");
         Truck truck = facadeController.getTruckById(currentDraft.getTruckId());
-        Driver driver = facadeController.getDriverById(currentDraft.getDriverId());
+        DriverSL driver = facadeController.getDriverById(currentDraft.getDriverId());
         System.out.println("Truck: " + truck.getRegNumber() + " (" + truck.getModel() + ")");
         System.out.println("Capacity: " + truck.getMaxWeight() + " kg");
-        System.out.println("Driver: " + driver.getName());
+        System.out.println("Driver: " + driver.getFullName());
         System.out.println("License: " + driver.getLicenseType());
     }
     
@@ -509,7 +512,7 @@ public class TransportUI {
             java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy")) + " at " + transport.getTime());
         System.out.println("Status: " + getStatusDisplay(transport.getStatus()));
         System.out.println("Assigned truck: " + transport.getTruck().getRegNumber());
-        System.out.println("Assigned driver: " + transport.getDriver().getName());
+        System.out.println("Assigned driver: " + transport.getDriver().getFullName());
     }
     
     private void showPostCreationOptions(Transport transport) {
@@ -599,134 +602,126 @@ public class TransportUI {
 
     // Helper methods for site/truck/driver selection
     private String selectSite(String prompt) {
-        System.out.println("🏢 " + prompt);
+        System.out.println(" " + prompt);
         List<Site> sites = facadeController.getAllSites();
         if (sites.isEmpty()) {
-            System.out.println("❌ No sites available in the system.");
+            System.out.println(" No sites available in the system.");
             pressEnterToContinue();
             return null;
         }
         
-        System.out.println("📍 Available sites:");
+        System.out.println(" Available sites:");
         for (int i = 0; i < sites.size(); i++) {
             Site site = sites.get(i);
             System.out.println((i + 1) + ". " + site.getName() + " (" + site.getShippingZone() + ")");
         }
         
-        int choice = getIntInput("👉 Select site (number): ");
+        int choice = getIntInput(" Select site (number): ");
         if (choice > 0 && choice <= sites.size()) {
-            return sites.get(choice - 1).getId();
+            return sites.get(choice - 1).getName();
         }
         
-        System.out.println("❌ Invalid selection.");
+        System.out.println(" Invalid selection.");
         return null;
     }
     
     private String selectSiteInZone(String prompt, ShippingZone zone, List<String> excludeIds) {
-        System.out.println("🏢 " + prompt);
+        System.out.println( prompt);
         List<Site> sites = facadeController.getAllSites();
         List<Site> zoneSites = sites.stream()
             .filter(site -> site.getShippingZone() == zone)
-            .filter(site -> !excludeIds.contains(site.getId()))
+            .filter(site -> !excludeIds.contains(site.getName()))
             .collect(java.util.stream.Collectors.toList());
         
         if (zoneSites.isEmpty()) {
-            System.out.println("❌ No available sites in zone " + zone);
-            System.out.println("ℹ️ All destinations must be in the same shipping zone.");
+            System.out.println(" No available sites in zone " + zone);
+            System.out.println(" All destinations must be in the same shipping zone.");
             return null;
         }
         
-        System.out.println("📍 Available sites in " + zone + ":");
+        System.out.println(" Available sites in " + zone + ":");
         for (int i = 0; i < zoneSites.size(); i++) {
             Site site = zoneSites.get(i);
             System.out.println((i + 1) + ". " + site.getName());
         }
-        System.out.println("0. ❌ Skip/Cancel");
+        System.out.println("0.  Skip/Cancel");
         
-        int choice = getIntInput("👉 Select site (number, 0 to skip): ");
+        int choice = getIntInput(" Select site (number, 0 to skip): ");
         if (choice == 0) {
             return null;
         }
         if (choice > 0 && choice <= zoneSites.size()) {
-            return zoneSites.get(choice - 1).getId();
+            return zoneSites.get(choice - 1).getName();
         }
         
-        System.out.println("❌ Invalid selection.");
+        System.out.println(" Invalid selection.");
         return null;
     }
     
     private String selectAppropriaTruck(double requiredCapacity) {
-        System.out.println("🚛 Finding suitable trucks...");
-        System.out.println("📦 Minimum capacity required: " + requiredCapacity + " kg");
+        System.out.println(" Finding suitable trucks...");
+        System.out.println(" Minimum capacity required: " + requiredCapacity + " kg");
         
         List<Truck> suitableTrucks = facadeController.getAvailableTrucksWithCapacity(requiredCapacity);
         
         if (suitableTrucks.isEmpty()) {
-            System.out.println("❌ No suitable trucks available.");
-            System.out.println("💡 Try with lower weight requirement or check truck availability.");
+            System.out.println(" No suitable trucks available.");
+            System.out.println(" Try with lower weight requirement or check truck availability.");
             pressEnterToContinue();
             return null;
         }
         
-        System.out.println("✅ Found " + suitableTrucks.size() + " suitable truck(s):");
+        System.out.println(" Found " + suitableTrucks.size() + " suitable truck(s):");
         for (int i = 0; i < suitableTrucks.size(); i++) {
             Truck truck = suitableTrucks.get(i);
-            System.out.println((i + 1) + ". 🚛 " + truck.getRegNumber() + 
+            System.out.println((i + 1) + ".  " + truck.getRegNumber() + 
                              " (" + truck.getModel() + ")");
-            System.out.println("   ⚖️ Capacity: " + truck.getMaxWeight() + " kg");
-            System.out.println("   🪪 License required: " + truck.getLicenseType());
-            System.out.println("   📊 Available space: " + (truck.getMaxWeight() - requiredCapacity) + " kg");
+            System.out.println("    Capacity: " + truck.getMaxWeight() + " kg");
+            System.out.println("    License required: " + truck.getLicenseType());
+            System.out.println("    Available space: " + (truck.getMaxWeight() - requiredCapacity) + " kg");
         }
         
-        int choice = getIntInput("👉 Select truck (number): ");
+        int choice = getIntInput(" Select truck (number): ");
         if (choice > 0 && choice <= suitableTrucks.size()) {
             return suitableTrucks.get(choice - 1).getRegNumber();
         }
         
-        System.out.println("❌ Invalid selection.");
+        System.out.println(" Invalid selection.");
         return null;
     }
     
     private String selectAvailableDriver(String requiredLicense) {
-        System.out.println("👨‍✈️ Finding drivers with " + requiredLicense + " license...");
+        System.out.println(" Finding drivers with " + requiredLicense + " license...");
         
-        List<Driver> suitableDrivers = facadeController.getAvailableDriversWithLicense(requiredLicense);
+        LicenseType license = LicenseType.fromString(requiredLicense);
+        LocalDateTime time = currentDraft.getDate().atTime(currentDraft.getTime());
+        Site site = facadeController.getSiteById(currentDraft.getSourceSiteId());
+        List<DriverSL> suitableDrivers = facadeController.getAvailableDriversWithLicense(time,site,license);
         
         if (suitableDrivers.isEmpty()) {
-            System.out.println("❌ No available drivers with " + requiredLicense + " license.");
-            System.out.println("💡 Check driver schedules or contact fleet management.");
+            System.out.println(" No available drivers with " + requiredLicense + " license.");
+            System.out.println(" Check driver schedules or contact fleet management.");
             pressEnterToContinue();
             return null;
         }
         
-        System.out.println("✅ Found " + suitableDrivers.size() + " available driver(s):");
+        System.out.println(" Found " + suitableDrivers.size() + " available driver(s):");
         for (int i = 0; i < suitableDrivers.size(); i++) {
-            Driver driver = suitableDrivers.get(i);
-            System.out.println((i + 1) + ". 👨‍✈️ " + driver.getName() + 
+            DriverSL driver = suitableDrivers.get(i);
+            System.out.println((i + 1) + ".  " + driver.getFullName() + 
                              " (ID: " + driver.getId() + ")");
-            System.out.println("   🪪 License: " + driver.getLicenseType());
-            System.out.println("   📞 Phone: " + driver.getPhone());
+            System.out.println("    License: " + driver.getLicenseType());
+            System.out.println("    Phone: " + driver.getPhoneNumber());
         }
         
-        int choice = getIntInput("👉 Select driver (number): ");
+        int choice = getIntInput(" Select driver (number): ");
         if (choice > 0 && choice <= suitableDrivers.size()) {
             return suitableDrivers.get(choice - 1).getId();
         }
         
-        System.out.println("❌ Invalid selection.");
+        System.out.println(" Invalid selection.");
         return null;
     }
-
-    // Additional helper methods and existing transport management
-    /*
-    private void manageSpecificTransport(Transport transport) {
-        // This method is unused - commenting out to remove warnings
-    }
-    
-    private void manageTransportItems(int transportId) {
-        // This method is unused - commenting out to remove warnings  
-    }
-    */
     
     // Display and utility methods
     private void displayTransportInfo(Transport transport) {
@@ -739,9 +734,9 @@ public class TransportUI {
         System.out.println("Truck: " + getTruckName(transport.getTruck().getRegNumber()));
         System.out.println("Driver: " + getDriverName(transport.getDriver().getId()));
         System.out.println("Route:");
-        System.out.println("  From: " + getSiteName(transport.getSourceSite().getId()));
+        System.out.println("  From: " + getSiteName(transport.getSourceSite().getName()));
         for (Site dest : transport.getDestinations()) {
-            System.out.println("  To: " + getSiteName(dest.getId()));
+            System.out.println("  To: " + getSiteName(dest.getName()));
         }
     }
     
@@ -766,8 +761,8 @@ public class TransportUI {
     }
     
     private String getDriverName(String driverId) {
-        Driver driver = facadeController.getDriverById(driverId);
-        return driver != null ? driver.getName() : "Unknown Driver";
+        DriverSL driver = facadeController.getDriverById(driverId);
+        return driver != null ? driver.getFullName() : "Unknown Driver";
     }
     
     private void showLoadingAnimation() {

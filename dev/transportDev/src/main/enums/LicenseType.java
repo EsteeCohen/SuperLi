@@ -45,19 +45,13 @@ public enum LicenseType {
     }
 
     public static LicenseType fromString(String type) {
-        switch (type.toUpperCase()) {
-            case "C1":
-                return C1;
-            case "C":
-                return C;
-            case "CE":
-                return CE;
-            case "C1E":
-                return C1E;
-            default:
-                throw new IllegalArgumentException("Unknown license type: " + type);
+    for (LicenseType license : LicenseType.values()) {
+        if (license.name().equalsIgnoreCase(type) || license.toString().equalsIgnoreCase(type)) {
+            return license;
         }
     }
+    throw new IllegalArgumentException("Unknown license type: " + type);
+}
 
     public static boolean isValidLicenseType(String input) {
         try {

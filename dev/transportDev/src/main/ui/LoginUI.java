@@ -44,9 +44,8 @@ public class LoginUI {
             
             if (sessionId != null) {
                 System.out.println("\nLogin successful!");
-                String userName = facadeController.getCurrentUserName(sessionId);
                 String userRole = facadeController.getCurrentUserRole(sessionId);
-                System.out.println("Welcome, " + userName + " (" + userRole + ")");
+                System.out.println("Welcome, " +  userRole );
                 pressEnterToContinue();
                 return sessionId;
             } else {

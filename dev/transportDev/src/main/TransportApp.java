@@ -1,5 +1,9 @@
 package transportDev.src.main;
 
+import employeeDev.src.serviceLayer.Interfaces.DriverInfoInterface;
+import employeeDev.src.serviceLayer.Interfaces.SiteInfoInterface;
+import employeeDev.src.serviceLayer.Factory;
+
 import transportDev.src.main.controllers.*;
 import transportDev.src.main.services.*;
 import transportDev.src.main.ui.*;
@@ -9,11 +13,13 @@ public class TransportApp {
     public static void main(String[] args) {
         System.out.println("=== Transport Management System for Supermarket Chain ===");
         System.out.println("Initializing system...");
+
+        Factory employeeFactory = new Factory();
         
         // Initialize services
-        DriverService driverService = new DriverService();
+        DriverInfoInterface driverService = employeeFactory.getDriverInfoService();
         TruckService truckService = new TruckService();
-        SiteService siteService = new SiteService();
+        SiteInfoInterface siteService = employeeFactory.getSiteInfoService();
         TransportService transportService = new TransportService(truckService, driverService, siteService);
         IncidentService incidentService = new IncidentService(transportService);
         OrderService orderService = new OrderService(siteService, transportService, incidentService);
@@ -35,7 +41,7 @@ public class TransportApp {
         );
 
         // Initialize system with option for demo data
-        SystemInitializer initializer = new SystemInitializer(driverService, truckService, 
+        SystemInitializer initializer = new SystemInitializer(driverService,truckService, 
                                                              siteService, transportService, 
                                                              orderService, incidentService, userService);
         initializer.initializeSystem();

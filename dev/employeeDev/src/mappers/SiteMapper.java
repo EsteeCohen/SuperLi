@@ -11,7 +11,7 @@ public class SiteMapper {
                 site.getAddress(),
                 site.getContactPhone(),
                 site.getContactName(),
-                site.getShippingZone().toString());
+                site.getShippingZone().name());
         return siteDTO;
     }
 
@@ -21,7 +21,7 @@ public class SiteMapper {
                 siteDTO.getAddress(),
                 siteDTO.getContactPhone(),
                 siteDTO.getContactName(),
-                ShippingZone.getByHebrewName(siteDTO.getShippingZone()));
+                ShippingZone.getByName(siteDTO.getShippingZone()));
         return site;
     }
 }

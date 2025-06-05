@@ -68,7 +68,6 @@ public class SiteUI {
     private void addNewSite() {
         System.out.println("\n=== Add New Site ===");
         
-        String id = getStringInput("Enter site ID: ");
         String name = getStringInput("Enter site name: ");
         String address = getStringInput("Enter address: ");
         String contactPhone = getStringInput("Enter contact phone: ");
@@ -101,7 +100,7 @@ public class SiteUI {
                 zone = "CENTER";
         }
         
-        Site site = facadeController.addSite(id, name, address, contactPhone, contactName, zone);
+        Site site = facadeController.addSite( name, address, contactPhone, contactName, zone);
         
         if (site != null) {
             System.out.println("Site added successfully!");
@@ -190,7 +189,6 @@ public class SiteUI {
      * Display site details
      */
     private void displaySiteDetails(Site site) {
-        System.out.println("ID: " + site.getId());
         System.out.println("Name: " + site.getName());
         System.out.println("Address: " + site.getAddress());
         System.out.println("Contact Phone: " + site.getContactPhone());

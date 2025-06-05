@@ -67,17 +67,7 @@ public class Truck {
     public double getAvailableCapacity(double cargoWeight) {
         return maxWeight - (emptyWeight + cargoWeight);
     }
-    //----------------- toString -------------------
-    @Override
-    public String toString() {
-        return "Truck{" +
-                "regNumber='" + regNumber + '\'' +
-                ", model='" + model + '\'' +
-                ", emptyWeight=" + emptyWeight +
-                ", maxWeight=" + maxWeight +
-                ", licenseType=" + licenseType +
-                '}';
-    }
+
     //----------------- equals -------------------
     @Override
     public boolean equals(Object o) {
