@@ -74,7 +74,7 @@ public class UserManagementUI {
      */
     private void displayMenu() {
         System.out.println("\n=== User Management ===");
-        System.out.println("1. Add New User");
+        // System.out.println("1. Add New User");
         System.out.println("2. View User");
         System.out.println("3. Update User");
         System.out.println("4. Deactivate User");

@@ -2,28 +2,27 @@ package transportDev.src.main.enums;
 
 public enum ShippingZone {
     // :)
-    NORTH("צפון"),
-    CENTER("מרכז"),
-    SOUTH("דרום"),
-    JERUSALEM("ירושלים");
+     NORTH("North"),
+    CENTER("Center"),
+    SOUTH("South"),
+    JERUSALEM("Jerusalem");
 
-    private final String hebrewName;
-    
-    ShippingZone(String hebrewName) {
-        this.hebrewName = hebrewName;
+    private final String displayName;
+
+    ShippingZone(String displayName) {
+        this.displayName = displayName;
     }
     
-    public static ShippingZone getByHebrewName(String hebrewName){
-        for (ShippingZone zone : ShippingZone.values()) {
-            if (zone.toString().equals(hebrewName)) {
-                return zone;
-            }
-        }
-        return null; // or throw an exception if preferred
+     public static ShippingZone getByName(String name) {
+        try {
+        return ShippingZone.valueOf(name.toUpperCase());
+    } catch (IllegalArgumentException e) {
+        return null;
+    }
     }
 
-    @Override
+   @Override
     public String toString() {
-        return hebrewName;
+        return displayName;
     }
 }

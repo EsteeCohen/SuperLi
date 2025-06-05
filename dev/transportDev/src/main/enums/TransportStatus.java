@@ -2,34 +2,24 @@ package transportDev.src.main.enums;
 
 public enum TransportStatus {
     // :)
-    PLANNING("בתכנון"),
-    ACTIVE("פעילה"),
-    COMPLETED("הושלמה"),
-    CANCELLED("בוטלה");
+    PLANNING("Planning"),
+    ACTIVE("Active"),
+    COMPLETED("Completed"),
+    CANCELLED("Cancelled");
 
-    private final String hebrewName;
+    private final String displayName;
 
-    /**
-     * Constructor for TransportStatus enum.
-     *
-     * @param hebrewName The Hebrew name of the transport status.
-     */
-    TransportStatus(String hebrewName) {
-        this.hebrewName = hebrewName;
+    TransportStatus(String displayName) {
+        this.displayName = displayName;
     }
 
-    /**
-     * Returns the Hebrew name of the transport status.
-     *
-     * @return The Hebrew name of the transport status.
-     */
-    public static TransportStatus getByHebrewName(String hebrewName){
+    public static TransportStatus getByName(String name) {
         for (TransportStatus status : TransportStatus.values()) {
-            if (status.toString().equals(hebrewName)) {
+            if (status.toString().equalsIgnoreCase(name)) {
                 return status;
             }
         }
-        return null; // or throw an exception if preferred
+        return null; // or throw exception
     }
     
     /**
@@ -55,10 +45,7 @@ public enum TransportStatus {
 
     @Override
     public String toString() {
-        return hebrewName;
+        return displayName;
     }
-
-
-
     
 }

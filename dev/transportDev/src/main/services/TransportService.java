@@ -1,10 +1,14 @@
 package transportDev.src.main.services;
 
+import java.sql.Driver;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import employeeDev.src.serviceLayer.DriverSL;
+import employeeDev.src.serviceLayer.Interfaces.DriverInfoInterface;
+import employeeDev.src.serviceLayer.Interfaces.SiteInfoInterface;
 import transportDev.src.main.entities.*;
 import transportDev.src.main.enums.ShippingZone;
 import transportDev.src.main.enums.TransportStatus;
@@ -13,13 +17,13 @@ public class TransportService {
     // :)
     private List<Transport> transports = new ArrayList<>();
     private TruckService truckService;
-    private DriverService driverService;
-    private SiteService siteService;
+    private DriverInfoInterface driverService;
+    private SiteInfoInterface siteService;
     private OrderService orderService;
 
 
     // Constructor
-    public TransportService(TruckService truckService, DriverService driverService, SiteService siteService){
+    public TransportService(TruckService truckService, DriverInfoInterface driverService, SiteInfoInterface siteService){
         this.truckService = truckService;
         this.driverService = driverService;
         this.siteService = siteService;
@@ -31,11 +35,11 @@ public class TransportService {
     // Methods
     public Transport createTransport(LocalDate date, LocalTime time, String truckId, String driverId, String sourceId, List<String> destinationIds){
         Truck truck = truckService.getTruckByRegNumber(truckId);
-        Driver driver = driverService.getDriverById(driverId);
-        Site source = siteService.getSiteById(sourceId);
+        DriverSL driver = driverService.getDriverById(driverId);
+        Site source = siteService.getSiteByName(sourceId);
         List<Site> destinations = new ArrayList<>();
         for (String destId : destinationIds) {
-            Site site = siteService.getSiteById(destId);
+            Site site = siteService.getSiteByName(destId);
             if (site != null) destinations.add(site);
         }
 
@@ -101,7 +105,7 @@ public class TransportService {
     }
     public boolean changeDriver(int transportId, String driverId){
         Transport t = getTransportById(transportId);
-        Driver driver = driverService.getDriverById(driverId);
+        DriverSL driver = driverService.getDriverById(driverId);
         
         if (t == null || driver == null) return false;
         
@@ -113,14 +117,14 @@ public class TransportService {
     }
     public boolean addDestination(int transportId, String siteId) {
         Transport transport = getTransportById(transportId);
-        Site site = siteService.getSiteById(siteId);
+        Site site = siteService.getSiteByName(siteId);
         
         if (transport == null || site == null) return false;
 
         List<Site> destinations = new ArrayList<>(transport.getDestinations());
         
         if (!destinations.isEmpty()) {
-            ShippingZone zone = destinations.getFirst().getShippingZone();
+            ShippingZone zone = transport.getSourceSite().getShippingZone();
             if (site.getShippingZone() != zone) return false;
         }
         
@@ -137,7 +141,7 @@ public class TransportService {
         if (transport == null) return false;
 
         List<Site> destinations = transport.getDestinations();
-        return destinations.removeIf(site -> site.getId().equals(siteId));
+        return destinations.removeIf(site -> site.getName().equals(siteId));
     }
 
     public boolean cancelTransport(int id){
@@ -174,11 +178,11 @@ public class TransportService {
     }
     
     public boolean isDriverAvailable(String driverId) {
-        Driver driver = driverService.getDriverById(driverId);
+        DriverSL driver = driverService.getDriverById(driverId);
         if (driver == null) return false;
         
         // Check if driver is marked as available
-        if (!driver.isAvailable()) return false;
+        if (!driver.isAvailableToDrive()) return false;
         
         // Check if driver is not assigned to any active transport
         for (Transport transport : transports) {

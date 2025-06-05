@@ -3,6 +3,8 @@ package transportDev.src.main.services;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+
+import employeeDev.src.serviceLayer.Interfaces.SiteInfoInterface;
 import transportDev.src.main.entities.*;
 import transportDev.src.main.enums.IncidentType;
 import transportDev.src.main.enums.OrderStatus;
@@ -10,12 +12,12 @@ import transportDev.src.main.enums.OrderStatus;
 public class OrderService {
     // :)
     private List<Order> orders;
-    private SiteService siteService;
+    private SiteInfoInterface siteService;
     private TransportService transportService;
     private IncidentService incidentService;
 
     // Constructor
-    public OrderService(SiteService siteService, TransportService transportService, IncidentService incidentService){
+    public OrderService(SiteInfoInterface siteService, TransportService transportService, IncidentService incidentService){
         this.siteService = siteService;
         this.transportService = transportService;
         this.incidentService = incidentService;
@@ -24,7 +26,7 @@ public class OrderService {
 
     // Methods
     public Order createOrder(LocalDate date, String siteId, List<Item> items){
-        Site site = siteService.getSiteById(siteId);
+        Site site = siteService.getSiteByName(siteId);
         if (site == null){
             throw new IllegalArgumentException("site not found");
         }

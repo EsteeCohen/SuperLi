@@ -1,19 +1,25 @@
 package transportDev.src.main.controllers;
 
+import java.sql.Driver;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import employeeDev.src.domainLayer.EmployeeDL;
+import employeeDev.src.serviceLayer.DriverSL;
+import employeeDev.src.serviceLayer.Interfaces.DriverInfoInterface;
+import employeeDev.src.serviceLayer.Interfaces.SiteInfoInterface;
 import transportDev.src.main.entities.*;
 import transportDev.src.main.enums.*;
 import transportDev.src.main.services.*;
 
 public class FacadeController {
     private final IncidentService incidentService;
-    private final DriverService driverService;
+    private final DriverInfoInterface driverService;
     private final UserService userService;
-    private final SiteService siteService;
+    private final SiteInfoInterface siteService;
     private final OrderService orderService;
     private final TruckService truckService;
     private final TransportService transportService;
@@ -22,9 +28,9 @@ public class FacadeController {
 
     public FacadeController(
             IncidentService incidentService,
-            DriverService driverService,
+            DriverInfoInterface driverService,
             UserService userService,
-            SiteService siteService,
+            SiteInfoInterface siteService,
             OrderService orderService,
             TruckService truckService,
             TransportService transportService,
@@ -87,38 +93,25 @@ public class FacadeController {
         return userService.getAllUsers();
     }
 
-    // Driver Management Methods
-    public Driver addDriver(String id, String name, String phone, String licenseType) {
-        try {
-            LicenseType license = LicenseType.valueOf(licenseType.toUpperCase());
-            return driverService.addDriver(id, name, phone, license);
-        } catch (IllegalArgumentException e) {
-            return null;
-        }
-    }
 
-    public Driver getDriverById(String id) {
+    public DriverSL getDriverById(String id) {
         return driverService.getDriverById(id);
     }
 
-    public List<Driver> getDriversByLicenseType(String licenseType) {
-        try {
-            LicenseType license = LicenseType.valueOf(licenseType.toUpperCase());
-            return driverService.getDriversByLicenseType(license);
-        } catch (IllegalArgumentException e) {
-            return null;
-        }
+    public List<DriverSL> getDriversByLicenseType(String licenseType) {
+        LicenseType license = LicenseType.fromString(licenseType);
+        return driverService.getDriversByLicenseType(license);
     }
+    
 
-    public List<Driver> getAllDrivers() {
+    public List<DriverSL> getAllDrivers() {
         return driverService.getAllDrivers();
     }
 
     // Site Management Methods
-    public Site addSite(String id, String name, String address, String contactPhone, String contactName, String zone) {
+    public Site addSite( String name, String address, String contactPhone, String contactName, String zone) {
         try {
-            ShippingZone shippingZone = ShippingZone.valueOf(zone);
-            return siteService.addSite(id, name, address, contactPhone, contactName, shippingZone);
+            return siteService.addSite( name, address, contactPhone, contactName, zone);
         } catch (IllegalArgumentException e) {
             return null;
         }
@@ -129,7 +122,7 @@ public class FacadeController {
     }
 
     public Site getSiteById(String id) {
-        return siteService.getSiteById(id);
+        return siteService.getSiteByName(id);
     }
 
     public List<Site> getAllSites() {
@@ -138,8 +131,7 @@ public class FacadeController {
 
     public List<Site> getSitesByZone(String zone) {
         try {
-            ShippingZone shippingZone = ShippingZone.valueOf(zone);
-            return siteService.getSitesByZone(shippingZone);
+            return siteService.getSitesByZone(zone);
         } catch (IllegalArgumentException e) {
             return null;
         }
@@ -311,13 +303,8 @@ public class FacadeController {
         return userService.updateUserPassword(user.getId(), newPassword);
     }
 
-    public List<Driver> getAvailableDriversWithLicense(String licenseType) {
-        try {
-            LicenseType license = LicenseType.valueOf(licenseType.toUpperCase());
-            return driverService.getAvailableDriversWithLicense(license, transportService);
-        } catch (IllegalArgumentException e) {
-            return new ArrayList<>();
-        }
+    public List<DriverSL> getAvailableDriversWithLicense(LocalDateTime time, Site site, LicenseType licenseType) {
+        return driverService.getAvailableDriversWithLicense(time, site, licenseType);
     }
     public boolean areThereArrivalsAtTheShift(LocalDateTime startTime, LocalDateTime endTime, Site site) {
         return transportScheduleService.areThereArrivalsAtTheShift(startTime, endTime, site);

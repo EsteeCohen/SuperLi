@@ -6,6 +6,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+import employeeDev.src.serviceLayer.DriverSL;
 import transportDev.src.main.enums.ShippingZone;
 import transportDev.src.main.enums.TransportStatus;
 
@@ -15,14 +16,14 @@ public class Transport {
     private LocalDate date;
     private LocalTime time;
     private Truck truck;
-    private Driver driver;
+    private DriverSL driver;
     private final Site sourceSite;
     private List<Site> destinations;
     private double currentWeight;
     private TransportStatus status;
 
     //----------------- Constructors -------------------
-    public Transport(LocalDate date, LocalTime time, Truck truck, Driver driver, Site sourceSite, List<Site> destinations) {
+    public Transport(LocalDate date, LocalTime time, Truck truck, DriverSL driver, Site sourceSite, List<Site> destinations) {
         this.id = idCounter++;
         this.status = TransportStatus.PLANNING;
         setDate(date);
@@ -50,7 +51,7 @@ public class Transport {
     public Truck getTruck(){
         return truck;
     }
-    public Driver getDriver(){
+    public DriverSL getDriver(){
         return driver;
     }
     public Site getSourceSite(){
@@ -85,8 +86,8 @@ public class Transport {
             throw new IllegalArgumentException("Truck cannot be null");
         }
         if(driver!=null) {
-            if (!driver.canDrive(truck)){
-                throw new IllegalArgumentException("Driver :" + driver.getName() + " that assign to this transport has no valid license");
+            if (!driver.canDrive(truck.getLicenseType())){
+                throw new IllegalArgumentException("Driver :" + driver.getFullName() + " that assign to this transport has no valid license");
             }
         }
         if (!canChangeTruck()){
@@ -99,26 +100,26 @@ public class Transport {
         this.truck.unavailable();
     }
 
-    public void setDriver(Driver driver){
+    public void setDriver(DriverSL driver){
         if (driver == null) {
             throw new IllegalArgumentException("Driver cannot be null");
         }
         if (truck != null) {
-            if (!driver.canDrive(truck)) {
-                throw new IllegalArgumentException("Driver :" + driver.getName() + " that assign to this transport has no valid license");
+            if (!driver.canDrive(truck.getLicenseType())) {
+                throw new IllegalArgumentException("Driver :" + driver.getFullName() + " that assign to this transport has no valid license");
             }
         }
         if (!canChangeDriver()){
             throw new IllegalArgumentException("Driver can't be changed after planning status");
         }
-        if(!driver.isAvailable()) {
-            throw new IllegalArgumentException("Driver " + driver.getName() + " is not available");
+        if(!driver.isAvailableToDrive()) {
+            throw new IllegalArgumentException("Driver " + driver.getFullName() + " is not available");
         }
         if (this.driver != null) {
-            this.driver.available();
+            this.driver.setAvailableToDrive(true);
         }
         this.driver = driver;
-        driver.unavailable();
+        driver.setAvailableToDrive(false);
 
     }
 
@@ -158,7 +159,7 @@ public class Transport {
         if (destinations == null || destinations.isEmpty()) {
             throw new IllegalArgumentException("there must be at least one destination");
         }
-        ShippingZone zone = destinations.getFirst().getShippingZone();
+        ShippingZone zone = sourceSite.getShippingZone();
         for(Site destination : destinations) {
             if (destination.getShippingZone() != zone) {
                 return false; // Different shipping zones
@@ -191,21 +192,7 @@ public class Transport {
         }
         return sb.toString();
     }
-    @Override
-    public String toString(){
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
-
-        return "מזהה הובלה: " + id + 
-               ", תאריך: " + (date != null ? date.format(dateFormatter) : "לא צוין") + 
-               ", שעה: " + (time != null ? time.format(timeFormatter) : "לא צוינה") + 
-               "\nמשאית: " + (truck != null ? truck.getRegNumber() + " (" + truck.getModel() + ")" : "לא צוינה") + 
-               "\nנהג: " + (driver != null ? driver.getName() + " (ת.ז: " + driver.getId() + ")" : "לא צוין") + 
-               "\nמקור: " + (sourceSite != null ? sourceSite.getName() : "לא צוין") + 
-               "\nיעדים: " + getDestinationsString() + 
-               "\nמשקל מטען: " + currentWeight + " ק\"ג" +
-               "\nסטטוס: " + status;
-    }    
+ 
     //----------------- equals -------------------
     @Override
     public boolean equals(Object o) {
