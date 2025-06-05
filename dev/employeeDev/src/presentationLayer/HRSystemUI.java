@@ -28,8 +28,7 @@ public class HRSystemUI {
 
     private final Scanner scanner;
 
-    public HRSystemUI() {
-        Factory factory = new Factory();
+    public HRSystemUI(Factory factory) {
         this.roleService = factory.getRoleService();
         this.shiftService = factory.getShiftService();
         this.employeeService = factory.getEmployeeService();
