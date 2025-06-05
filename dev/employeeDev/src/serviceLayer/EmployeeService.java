@@ -113,5 +113,9 @@ public class EmployeeService implements UserManagmentInteface {
     public List<LicenseType> getAllLicensesType() {
         return List.of(LicenseType.values());
     }
+
+    public boolean unassignRoleFromEmployee(String employeeId, String roleName) {
+        return employeeFacade.unassignRoleFromEmployee(employeeId, roleName);
+    }
 }
 
