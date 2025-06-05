@@ -27,12 +27,17 @@ public class SiteService implements SiteInfoInterface{
 
     @Override
     public Site addSite(String name, String address, String phoneNumber, String email, String zone) {
-        return siteFacade.addSite(name, address, phoneNumber, email, zone);
+        siteFacade.addSite(name, address, phoneNumber, email, zone);
+        return siteFacade.getSiteByName(name);
     }
 
     @Override
     public boolean deleteSite(String name) {
-        return siteFacade.deleteSite(name);
+        try {
+            return siteFacade.deleteSite(name);
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
     }
 
     @Override
