@@ -6,10 +6,10 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import transportDev.src.main.dtos.*;
+import transportDev.src.main.entities.DatabaseConnection;
 
 public class TransportDAO {
 
-    private final String DBPath = TransportDBConstants.DB_PATH;
     private final String transportTableName = TransportDBConstants.TRANSPORT_TABLE;
     private final String transportDestinationsTableName = TransportDBConstants.TRANSPORT_DESTINATIONS_TABLE;
     private final TruckDAO truckDAO;
@@ -23,7 +23,7 @@ public class TransportDAO {
     }
 
     public TransportDTO getTransportById(int id) {
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DBPath)) {
+        try (Connection conn = DatabaseConnection.getValidConnection()) {
             String query = "SELECT * FROM " + transportTableName + " WHERE id = ?";
             try (PreparedStatement statement = conn.prepareStatement(query)) {
                 statement.setInt(1, id);
@@ -55,7 +55,7 @@ public class TransportDAO {
 
     public List<TransportDTO> getAllTransports() {
         List<TransportDTO> transports = new ArrayList<>();
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DBPath)) {
+        try (Connection conn = DatabaseConnection.getValidConnection()) {
             String query = "SELECT * FROM " + transportTableName;
             try (PreparedStatement statement = conn.prepareStatement(query);
                  ResultSet rs = statement.executeQuery()) {
@@ -85,7 +85,7 @@ public class TransportDAO {
     }
 
     public void insertTransport(TransportDTO transport) {
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DBPath)) {
+        try (Connection conn = DatabaseConnection.getValidConnection()) {
             conn.setAutoCommit(false);
             
             String query = "INSERT INTO " + transportTableName + 
@@ -112,7 +112,7 @@ public class TransportDAO {
     }
 
     public void updateTransport(TransportDTO transport) {
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DBPath)) {
+        try (Connection conn = DatabaseConnection.getValidConnection()) {
             conn.setAutoCommit(false);
             
             String query = "UPDATE " + transportTableName + 
@@ -140,7 +140,7 @@ public class TransportDAO {
     }
 
     public void deleteTransport(int id) {
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DBPath)) {
+        try (Connection conn = DatabaseConnection.getValidConnection()) {
             conn.setAutoCommit(false);
             
             // Delete destinations first
@@ -160,7 +160,7 @@ public class TransportDAO {
 
     public List<TransportDTO> getTransportsByDate(LocalDate date) {
         List<TransportDTO> transports = new ArrayList<>();
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DBPath)) {
+        try (Connection conn = DatabaseConnection.getValidConnection()) {
             String query = "SELECT * FROM " + transportTableName + " WHERE date = ?";
             try (PreparedStatement statement = conn.prepareStatement(query)) {
                 statement.setString(1, date.toString());
@@ -192,7 +192,7 @@ public class TransportDAO {
 
     public List<TransportDTO> getTransportsByStatus(String status) {
         List<TransportDTO> transports = new ArrayList<>();
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DBPath)) {
+        try (Connection conn = DatabaseConnection.getValidConnection()) {
             String query = "SELECT * FROM " + transportTableName + " WHERE status = ?";
             try (PreparedStatement statement = conn.prepareStatement(query)) {
                 statement.setString(1, status);
@@ -224,14 +224,16 @@ public class TransportDAO {
 
     private List<SiteDTO> getDestinationsForTransport(int transportId) {
         List<SiteDTO> destinations = new ArrayList<>();
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DBPath)) {
+        try (Connection conn = DatabaseConnection.getValidConnection()) {
             String query = "SELECT site_name FROM " + transportDestinationsTableName + " WHERE transport_id = ?";
             try (PreparedStatement statement = conn.prepareStatement(query)) {
                 statement.setInt(1, transportId);
                 try (ResultSet rs = statement.executeQuery()) {
                     while (rs.next()) {
                         String siteName = rs.getString("site_name");
-                        SiteDTO site = siteDAO.getSiteByName(siteName);
+                        // Create new SiteDAO instance to avoid connection conflicts
+                        SiteDAO freshSiteDAO = new SiteDAO();
+                        SiteDTO site = freshSiteDAO.getSiteByName(siteName);
                         if (site != null) {
                             destinations.add(site);
                         }

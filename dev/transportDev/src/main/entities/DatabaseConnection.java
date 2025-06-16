@@ -7,14 +7,21 @@ import java.sql.SQLException;
 public class DatabaseConnection {
     private static DatabaseConnection instance;
     private static Connection connection;
-    private static final String DB_PATH = "supplyinventory.db";
+    private static final String DB_PATH = "db.db";
+
+    static {
+        try {
+            Class.forName("org.sqlite.JDBC");
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("SQLite JDBC driver not found", e);
+        }
+    }
 
     private DatabaseConnection() throws SQLException {
         try {
-            Class.forName("org.sqlite.JDBC");
             connection = DriverManager.getConnection("jdbc:sqlite:" + DB_PATH);
-        } catch (ClassNotFoundException e) {
-            throw new SQLException("SQLite JDBC driver not found", e);
+        } catch (SQLException e) {
+            throw new SQLException("Failed to connect to database", e);
         }
     }
 

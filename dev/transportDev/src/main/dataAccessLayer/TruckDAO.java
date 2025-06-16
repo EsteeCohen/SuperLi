@@ -4,15 +4,15 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import transportDev.src.main.dtos.TruckDTO;
+import transportDev.src.main.entities.DatabaseConnection;
 
 public class TruckDAO {
 
-    private final String DBPath = TransportDBConstants.DB_PATH;
     private final String truckTableName = TransportDBConstants.TRUCK_TABLE;
     private final String truckLicenseTypesTableName = TransportDBConstants.TRUCK_LICENSE_TYPES_TABLE;
 
     public TruckDTO getTruckByLicensePlate(String licensePlate) {
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DBPath)) {
+        try (Connection conn = DatabaseConnection.getValidConnection()) {
             String query = "SELECT * FROM " + truckTableName + " WHERE license_plate = ?";
             try (PreparedStatement statement = conn.prepareStatement(query)) {
                 statement.setString(1, licensePlate);
@@ -37,7 +37,7 @@ public class TruckDAO {
 
     public List<TruckDTO> getAllTrucks() {
         List<TruckDTO> trucks = new ArrayList<>();
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DBPath)) {
+        try (Connection conn = DatabaseConnection.getValidConnection()) {
             String query = "SELECT * FROM " + truckTableName;
             try (PreparedStatement statement = conn.prepareStatement(query);
                  ResultSet rs = statement.executeQuery()) {
@@ -60,7 +60,7 @@ public class TruckDAO {
     }
 
     public void insertTruck(TruckDTO truck) {
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DBPath)) {
+        try (Connection conn = DatabaseConnection.getValidConnection()) {
             conn.setAutoCommit(false);
             
             String query = "INSERT INTO " + truckTableName + 
@@ -84,7 +84,7 @@ public class TruckDAO {
     }
 
     public void updateTruck(TruckDTO truck) {
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DBPath)) {
+        try (Connection conn = DatabaseConnection.getValidConnection()) {
             conn.setAutoCommit(false);
             
             String query = "UPDATE " + truckTableName + 
@@ -109,7 +109,7 @@ public class TruckDAO {
     }
 
     public void deleteTruck(String licensePlate) {
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DBPath)) {
+        try (Connection conn = DatabaseConnection.getValidConnection()) {
             conn.setAutoCommit(false);
             
             // Delete license types first
@@ -129,7 +129,7 @@ public class TruckDAO {
 
     public List<TruckDTO> getAvailableTrucks() {
         List<TruckDTO> trucks = new ArrayList<>();
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DBPath)) {
+        try (Connection conn = DatabaseConnection.getValidConnection()) {
             String query = "SELECT * FROM " + truckTableName + " WHERE available = ?";
             try (PreparedStatement statement = conn.prepareStatement(query)) {
                 statement.setBoolean(1, true);
@@ -155,7 +155,7 @@ public class TruckDAO {
 
     private List<String> getLicenseTypesForTruck(String licensePlate) {
         List<String> licenseTypes = new ArrayList<>();
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DBPath)) {
+        try (Connection conn = DatabaseConnection.getValidConnection()) {
             String query = "SELECT license_type FROM " + truckLicenseTypesTableName + " WHERE truck_license_plate = ?";
             try (PreparedStatement statement = conn.prepareStatement(query)) {
                 statement.setString(1, licensePlate);

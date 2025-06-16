@@ -4,14 +4,14 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import transportDev.src.main.dtos.ItemDTO;
+import transportDev.src.main.entities.DatabaseConnection;
 
 public class ItemDAO {
 
-    private final String DBPath = TransportDBConstants.DB_PATH;
     private final String itemTableName = TransportDBConstants.ITEM_TABLE;
 
     public ItemDTO getItemById(int id) {
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DBPath)) {
+        try (Connection conn = DatabaseConnection.getValidConnection()) {
             String query = "SELECT * FROM " + itemTableName + " WHERE id = ?";
             try (PreparedStatement statement = conn.prepareStatement(query)) {
                 statement.setInt(1, id);
@@ -34,7 +34,7 @@ public class ItemDAO {
 
     public List<ItemDTO> getAllItems() {
         List<ItemDTO> items = new ArrayList<>();
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DBPath)) {
+        try (Connection conn = DatabaseConnection.getValidConnection()) {
             String query = "SELECT * FROM " + itemTableName;
             try (PreparedStatement statement = conn.prepareStatement(query);
                  ResultSet rs = statement.executeQuery()) {
@@ -55,7 +55,7 @@ public class ItemDAO {
     }
 
     public void insertItem(ItemDTO item) {
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DBPath)) {
+        try (Connection conn = DatabaseConnection.getValidConnection()) {
             String query = "INSERT INTO " + itemTableName + 
                           " (id, name, weight, quantity, description) VALUES (?, ?, ?, ?, ?)";
             try (PreparedStatement statement = conn.prepareStatement(query)) {
@@ -72,7 +72,7 @@ public class ItemDAO {
     }
 
     public void updateItem(ItemDTO item) {
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DBPath)) {
+        try (Connection conn = DatabaseConnection.getValidConnection()) {
             String query = "UPDATE " + itemTableName + 
                           " SET name = ?, weight = ?, quantity = ?, description = ? WHERE id = ?";
             try (PreparedStatement statement = conn.prepareStatement(query)) {
@@ -89,7 +89,7 @@ public class ItemDAO {
     }
 
     public void deleteItem(int id) {
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DBPath)) {
+        try (Connection conn = DatabaseConnection.getValidConnection()) {
             String query = "DELETE FROM " + itemTableName + " WHERE id = ?";
             try (PreparedStatement statement = conn.prepareStatement(query)) {
                 statement.setInt(1, id);
@@ -102,7 +102,7 @@ public class ItemDAO {
 
     public List<ItemDTO> getItemsByName(String name) {
         List<ItemDTO> items = new ArrayList<>();
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DBPath)) {
+        try (Connection conn = DatabaseConnection.getValidConnection()) {
             String query = "SELECT * FROM " + itemTableName + " WHERE name LIKE ?";
             try (PreparedStatement statement = conn.prepareStatement(query)) {
                 statement.setString(1, "%" + name + "%");
@@ -126,7 +126,7 @@ public class ItemDAO {
 
     public List<ItemDTO> getItemsByWeightRange(double minWeight, double maxWeight) {
         List<ItemDTO> items = new ArrayList<>();
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DBPath)) {
+        try (Connection conn = DatabaseConnection.getValidConnection()) {
             String query = "SELECT * FROM " + itemTableName + " WHERE weight BETWEEN ? AND ?";
             try (PreparedStatement statement = conn.prepareStatement(query)) {
                 statement.setDouble(1, minWeight);
@@ -150,7 +150,7 @@ public class ItemDAO {
     }
 
     public void updateItemQuantity(int id, int newQuantity) {
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DBPath)) {
+        try (Connection conn = DatabaseConnection.getValidConnection()) {
             String query = "UPDATE " + itemTableName + " SET quantity = ? WHERE id = ?";
             try (PreparedStatement statement = conn.prepareStatement(query)) {
                 statement.setInt(1, newQuantity);

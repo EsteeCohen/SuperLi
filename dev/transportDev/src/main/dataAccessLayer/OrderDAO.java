@@ -4,13 +4,11 @@ import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import transportDev.src.main.dtos.ItemDTO;
-import transportDev.src.main.dtos.OrderDTO;
-import transportDev.src.main.dtos.SiteDTO;
+import transportDev.src.main.dtos.*;
+import transportDev.src.main.entities.DatabaseConnection;
 
 public class OrderDAO {
 
-    private final String DBPath = TransportDBConstants.DB_PATH;
     private final String orderTableName = TransportDBConstants.ORDER_TABLE;
     private final String orderItemsTableName = TransportDBConstants.ORDER_ITEMS_TABLE;
     private final SiteDAO siteDAO;
@@ -22,7 +20,7 @@ public class OrderDAO {
     }
 
     public OrderDTO getOrderById(int id) {
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DBPath)) {
+        try (Connection conn = DatabaseConnection.getValidConnection()) {
             String query = "SELECT * FROM " + orderTableName + " WHERE id = ?";
             try (PreparedStatement statement = conn.prepareStatement(query)) {
                 statement.setInt(1, id);
@@ -38,7 +36,8 @@ public class OrderDAO {
                         SiteDTO destinationSite = siteDAO.getSiteByName(destinationSiteName);
                         List<ItemDTO> items = getItemsForOrder(id);
 
-                        return new OrderDTO(id, orderDate, status, sourceSite, destinationSite, items, totalWeight);
+                        return new OrderDTO(id, orderDate, status, sourceSite, destinationSite, 
+                                          items, totalWeight);
                     }
                 }
             }
@@ -50,7 +49,7 @@ public class OrderDAO {
 
     public List<OrderDTO> getAllOrders() {
         List<OrderDTO> orders = new ArrayList<>();
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DBPath)) {
+        try (Connection conn = DatabaseConnection.getValidConnection()) {
             String query = "SELECT * FROM " + orderTableName;
             try (PreparedStatement statement = conn.prepareStatement(query);
                  ResultSet rs = statement.executeQuery()) {
@@ -66,7 +65,8 @@ public class OrderDAO {
                     SiteDTO destinationSite = siteDAO.getSiteByName(destinationSiteName);
                     List<ItemDTO> items = getItemsForOrder(id);
 
-                    orders.add(new OrderDTO(id, orderDate, status, sourceSite, destinationSite, items, totalWeight));
+                    orders.add(new OrderDTO(id, orderDate, status, sourceSite, destinationSite, 
+                                          items, totalWeight));
                 }
             }
         } catch (SQLException e) {
@@ -76,7 +76,7 @@ public class OrderDAO {
     }
 
     public void insertOrder(OrderDTO order) {
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DBPath)) {
+        try (Connection conn = DatabaseConnection.getValidConnection()) {
             conn.setAutoCommit(false);
             
             String query = "INSERT INTO " + orderTableName + 
@@ -101,7 +101,7 @@ public class OrderDAO {
     }
 
     public void updateOrder(OrderDTO order) {
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DBPath)) {
+        try (Connection conn = DatabaseConnection.getValidConnection()) {
             conn.setAutoCommit(false);
             
             String query = "UPDATE " + orderTableName + 
@@ -127,7 +127,7 @@ public class OrderDAO {
     }
 
     public void deleteOrder(int id) {
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DBPath)) {
+        try (Connection conn = DatabaseConnection.getValidConnection()) {
             conn.setAutoCommit(false);
             
             // Delete items first
@@ -147,7 +147,7 @@ public class OrderDAO {
 
     public List<OrderDTO> getOrdersByStatus(String status) {
         List<OrderDTO> orders = new ArrayList<>();
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DBPath)) {
+        try (Connection conn = DatabaseConnection.getValidConnection()) {
             String query = "SELECT * FROM " + orderTableName + " WHERE status = ?";
             try (PreparedStatement statement = conn.prepareStatement(query)) {
                 statement.setString(1, status);
@@ -163,7 +163,8 @@ public class OrderDAO {
                         SiteDTO destinationSite = siteDAO.getSiteByName(destinationSiteName);
                         List<ItemDTO> items = getItemsForOrder(id);
 
-                        orders.add(new OrderDTO(id, orderDate, status, sourceSite, destinationSite, items, totalWeight));
+                        orders.add(new OrderDTO(id, orderDate, status, sourceSite, destinationSite, 
+                                              items, totalWeight));
                     }
                 }
             }
@@ -175,7 +176,7 @@ public class OrderDAO {
 
     public List<OrderDTO> getOrdersByDate(LocalDate date) {
         List<OrderDTO> orders = new ArrayList<>();
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DBPath)) {
+        try (Connection conn = DatabaseConnection.getValidConnection()) {
             String query = "SELECT * FROM " + orderTableName + " WHERE order_date = ?";
             try (PreparedStatement statement = conn.prepareStatement(query)) {
                 statement.setString(1, date.toString());
@@ -191,7 +192,8 @@ public class OrderDAO {
                         SiteDTO destinationSite = siteDAO.getSiteByName(destinationSiteName);
                         List<ItemDTO> items = getItemsForOrder(id);
 
-                        orders.add(new OrderDTO(id, date, status, sourceSite, destinationSite, items, totalWeight));
+                        orders.add(new OrderDTO(id, date, status, sourceSite, destinationSite, 
+                                              items, totalWeight));
                     }
                 }
             }
@@ -203,18 +205,15 @@ public class OrderDAO {
 
     private List<ItemDTO> getItemsForOrder(int orderId) {
         List<ItemDTO> items = new ArrayList<>();
-        try (Connection conn = DriverManager.getConnection("jdbc:sqlite:" + DBPath)) {
-            String query = "SELECT item_id, quantity FROM " + orderItemsTableName + " WHERE order_id = ?";
+        try (Connection conn = DatabaseConnection.getValidConnection()) {
+            String query = "SELECT item_id FROM " + orderItemsTableName + " WHERE order_id = ?";
             try (PreparedStatement statement = conn.prepareStatement(query)) {
                 statement.setInt(1, orderId);
                 try (ResultSet rs = statement.executeQuery()) {
                     while (rs.next()) {
                         int itemId = rs.getInt("item_id");
-                        int quantity = rs.getInt("quantity");
                         ItemDTO item = itemDAO.getItemById(itemId);
                         if (item != null) {
-                            // Update quantity to reflect the order quantity
-                            item.setQuantity(quantity);
                             items.add(item);
                         }
                     }
@@ -227,12 +226,11 @@ public class OrderDAO {
     }
 
     private void insertItemsForOrder(Connection conn, int orderId, List<ItemDTO> items) throws SQLException {
-        String query = "INSERT INTO " + orderItemsTableName + " (order_id, item_id, quantity) VALUES (?, ?, ?)";
+        String query = "INSERT INTO " + orderItemsTableName + " (order_id, item_id) VALUES (?, ?)";
         try (PreparedStatement statement = conn.prepareStatement(query)) {
             for (ItemDTO item : items) {
                 statement.setInt(1, orderId);
                 statement.setInt(2, item.getId());
-                statement.setInt(3, item.getQuantity());
                 statement.executeUpdate();
             }
         }
