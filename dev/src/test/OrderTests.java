@@ -101,7 +101,7 @@ public class OrderTests {
         boolean removed = orderService.removeOrderFromTruck(order.getId());
         assertTrue(removed);
         assertNull(order.getTransport());
-        assertEquals(OrderStatus.DONE, order.getStatus());
+        assertEquals(OrderStatus.CREATED, order.getStatus());
     }
 
     @Test
@@ -180,6 +180,44 @@ public class OrderTests {
         assertTrue(result.contains(o1));
         assertTrue(result.contains(o2));
     }
+    @Test
+    public void testAssignOrder_ExactCapacity() {
+        // Truck: empty 3000, max 12000 → cargo capacity = 9000. Order weight = 9000. Should succeed.
+        Transport t = transportService.createTransport(LocalDate.now(), LocalTime.now().plusHours(1), "T1", "D1", "SRC", List.of("SRC"));
+        Order order = orderService.createOrder(LocalDate.now(), "SRC", List.of(new Item(20, "MaxLoad", 1, 9000)));
+        boolean ok = orderService.assignTransportToOrder(order.getId(), t.getId());
+        assertTrue(ok);
+        assertEquals(OrderStatus.IN_PROGRESS, order.getStatus());
+    }
+
+    @Test
+    public void testAssignOrder_ZeroWeightItem() {
+        Transport t = transportService.createTransport(LocalDate.now(), LocalTime.now().plusHours(1), "T1", "D1", "SRC", List.of("SRC"));
+        Order order = orderService.createOrder(LocalDate.now(), "SRC", List.of(new Item(21, "Envelope", 1, 0)));
+        boolean ok = orderService.assignTransportToOrder(order.getId(), t.getId());
+        assertTrue(ok);
+        assertEquals(0.0, t.getCurrentWeight());
+    }
+
+    @Test
+    public void testAssignOrder_AlreadyAssigned() {
+        Transport t = transportService.createTransport(LocalDate.now(), LocalTime.now().plusHours(1), "T1", "D1", "SRC", List.of("SRC"));
+        Order order = orderService.createOrder(LocalDate.now(), "SRC", List.of(new Item(22, "Box", 1, 100)));
+        orderService.assignTransportToOrder(order.getId(), t.getId());
+        boolean second = orderService.assignTransportToOrder(order.getId(), t.getId());
+        assertFalse(second); // already assigned, should not double-assign
+    }
+
+    @Test
+    public void testAssignOrder_CancelledOrderCannotBeAssigned() {
+        Transport t = transportService.createTransport(LocalDate.now(), LocalTime.now().plusHours(1), "T1", "D1", "SRC", List.of("SRC"));
+        Order order = orderService.createOrder(LocalDate.now(), "SRC", List.of(new Item(23, "Box", 1, 100)));
+        orderService.cancelOrder(order.getId());
+        boolean ok = orderService.assignTransportToOrder(order.getId(), t.getId());
+        assertFalse(ok);
+        assertEquals(OrderStatus.CANCELLED, order.getStatus());
+    }
+
     @Test
     public void testCancelOrder_WhenNotAllowed() {
         Order o = orderService.createOrder(LocalDate.now(), "SRC", List.of(new Item(7, "Uncancelable", 1, 500)));

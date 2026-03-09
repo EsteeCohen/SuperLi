@@ -87,9 +87,9 @@ public class OrderService {
         Order order = getOrderById(orderId);
         Transport transport = transportService.getTransportById(transportId);
 
-        if (order == null || transport == null) {
-            return false;
-        }
+        if (order == null || transport == null) return false;
+        if (order.getStatus() == OrderStatus.CANCELLED) return false;
+        if (order.getTransport() != null) return false;
 
         double newWeight = order.OrderWeight() + transport.getCurrentWeight();
         if (newWeight > transport.getTruck().getMaxWeight()) {
