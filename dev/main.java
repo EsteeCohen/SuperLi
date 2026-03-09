@@ -17,6 +17,19 @@ public class main {
         TransportApp transportApp = new TransportApp(employeeFactory);
         employeeFactory.setTransportScheduleService(transportApp.getITransportScheduleService());
 
+        boolean isEmpty = employeeFactory.getSiteService().getAllSites().isEmpty()
+                       && transportApp.getTruckService().getAllTrucks().isEmpty();
+        if (isEmpty) {
+            System.out.println("=======================================================");
+            System.out.println("  First run detected: the database appears to be empty.");
+            System.out.println("  To get started:");
+            System.out.println("  1. Open the HR system and add sites and employees.");
+            System.out.println("  2. Open the Transport system and add trucks.");
+            System.out.println("  3. Assign driver roles to employees in the HR system.");
+            System.out.println("=======================================================");
+            System.out.println();
+        }
+
         System.out.println("=== please pick a system ===");
         System.out.println("1. Employee Management System");
         System.out.println("2. Transport Management System");

@@ -84,6 +84,10 @@ public class TransportApp {
         return transportScheduleService;
     }
 
+    public TruckService getTruckService() {
+        return truckService;
+    }
+
     public void startSystem(){
         mainUI.start();
     }
