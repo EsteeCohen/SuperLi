@@ -103,15 +103,15 @@ public class SiteDAO {
     public List<SiteDTO> getSitesByShippingZone(String shippingZone) {
         List<SiteDTO> sites = new ArrayList<>();
         try (Connection conn = DatabaseConnection.getValidConnection()) {
-            String query = "SELECT * FROM " + siteTableName + " WHERE shipping_zone = ?";
+            String query = "SELECT * FROM " + siteTableName + " WHERE ShippingZone = ?";
             try (PreparedStatement statement = conn.prepareStatement(query)) {
                 statement.setString(1, shippingZone);
                 try (ResultSet rs = statement.executeQuery()) {
                     while (rs.next()) {
-                        String name = rs.getString("name");
+                        String name = rs.getString("SiteName");
                         String address = rs.getString("address");
-                        String phoneNumber = rs.getString("phone_number");
-                        String contactPerson = rs.getString("contact_person");
+                        String phoneNumber = rs.getString("contactPhone");
+                        String contactPerson = rs.getString("contactName");
 
                         sites.add(new SiteDTO(name, address, phoneNumber, contactPerson, shippingZone));
                     }
