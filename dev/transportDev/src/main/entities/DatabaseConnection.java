@@ -5,7 +5,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DatabaseConnection {
-    private static final String DB_PATH = "db.db";
+    private static final String DB_PATH = "dev\\db.db";
 
     static {
         try {
