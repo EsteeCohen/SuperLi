@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import java.security.MessageDigest;
 import src.main.entities.User;
 import src.main.enums.UserRole;
 
@@ -20,6 +21,18 @@ public class UserService {
         initializeSystem(); // אתחול נתוני משתמשים לדוגמה
     }
     
+    private String hashPassword(String password) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            byte[] hash = md.digest(password.getBytes("UTF-8"));
+            StringBuilder hex = new StringBuilder();
+            for (byte b : hash) hex.append(String.format("%02x", b));
+            return hex.toString();
+        } catch (Exception e) {
+            return password;
+        }
+    }
+
     //הוספת משתמש חדש
     public boolean addUser(String id, String username, String password, String fullName, UserRole role) {
         // בדיקה שאין משתמש עם אותו שם משתמש
@@ -33,7 +46,7 @@ public class UserService {
         }
         
         // יצירת משתמש חדש והוספתו לרשימה
-        User newUser = new User(id, username, password, fullName, role);
+        User newUser = new User(id, username, hashPassword(password), fullName, role);
         users.add(newUser);
         
         return true;
@@ -56,7 +69,7 @@ public class UserService {
         // עדכון פרטי המשתמש
         user.setUsername(username);
         if (password != null && !password.isEmpty()) {
-            user.setPassword(password);
+            user.setPassword(hashPassword(password));
         }
         user.setFullName(fullName);
         user.setRole(role);
@@ -71,7 +84,7 @@ public class UserService {
             return false;
         }
         
-        user.setPassword(newPassword);
+        user.setPassword(hashPassword(newPassword));
         return true;
     }
     
@@ -103,7 +116,7 @@ public class UserService {
             return null;
         }
         
-        if (user.getPassword().equals(password)) {
+        if (user.getPassword().equals(hashPassword(password))) {
             return user;
         }
         

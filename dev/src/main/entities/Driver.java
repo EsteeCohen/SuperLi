@@ -55,7 +55,7 @@ public class Driver {
     }
     //----------------- methods -------------------
     public boolean canDrive(Truck truck){
-        return this.licenseType.ordinal() >= truck.getLicenseType().ordinal();
+        return this.isAvailable && this.licenseType.ordinal() >= truck.getLicenseType().ordinal();
     }
 
     //----------------- toString -------------------
