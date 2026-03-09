@@ -207,8 +207,8 @@ public class OrderService {
             if (order.getTransport() != null) {
                 order.getTransport().setCurrentWeight(order.getTransport().getCurrentWeight() - order.OrderWeight());
                 order.setTransport(null);
-                order.setStatus(OrderStatus.DONE);
-                
+                order.setStatus(OrderStatus.CREATED);
+
                 // Update order in database
                 OrderDTO orderDTO = OrderMapper.toDTO(order);
                 orderDAO.updateOrder(orderDTO);

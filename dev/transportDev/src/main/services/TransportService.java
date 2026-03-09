@@ -71,9 +71,14 @@ public class TransportService {
                 DriverSL driver = driverService.getDriverById(dto.getDriver().getId());
                 Site source = siteService.getSiteByName(dto.getSourceSite().getName());
                 
-                // For now, create empty destinations list - we'll load them separately
                 List<Site> destinations = new ArrayList<>();
-                
+                if (dto.getDestinations() != null) {
+                    for (transportDev.src.main.dtos.SiteDTO destDTO : dto.getDestinations()) {
+                        Site dest = siteService.getSiteByName(destDTO.getName());
+                        if (dest != null) destinations.add(dest);
+                    }
+                }
+
                 if (truck != null && driver != null && source != null) {
                     Transport transport = TransportMapper.fromDTO(dto, truck, driver, source, destinations);
                     transports.add(transport);
@@ -95,8 +100,13 @@ public class TransportService {
                 DriverSL driver = driverService.getDriverById(transportDTO.getDriver().getId());
                 Site source = siteService.getSiteByName(transportDTO.getSourceSite().getName());
                 
-                // For now, create empty destinations list
                 List<Site> destinations = new ArrayList<>();
+                if (transportDTO.getDestinations() != null) {
+                    for (transportDev.src.main.dtos.SiteDTO destDTO : transportDTO.getDestinations()) {
+                        Site dest = siteService.getSiteByName(destDTO.getName());
+                        if (dest != null) destinations.add(dest);
+                    }
+                }
                 
                 if (truck != null && driver != null && source != null) {
                     return TransportMapper.fromDTO(transportDTO, truck, driver, source, destinations);

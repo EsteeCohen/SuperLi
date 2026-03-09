@@ -92,7 +92,7 @@ public class Incident {
         sb.append("תיאור: ").append(description).append("\n");
         sb.append("הובלה מושפעת: ").append(affectedTransport.getId()).append("\n");
         sb.append("סטטוס: ").append(status).append("\n");
-        sb.append("פתרון: ").append(resolution.toString()).append("\n");
+        sb.append("פתרון: ").append(resolution != null ? resolution.toString() : "אין פתרון עדיין").append("\n");
 
         return sb.toString();
     }
