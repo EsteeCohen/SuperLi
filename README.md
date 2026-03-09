@@ -179,6 +179,20 @@ Tests use in-memory service instances (no database dependency).
 
 ---
 
+## Documentation
+
+The `docs/` folder contains:
+
+| File | Contents |
+|---|---|
+| `transport-manual-pdf.pdf` | Full user manual — all screens, workflows, and field descriptions |
+| `transit.drawio.pdf` | System architecture and data-flow diagram |
+| `דרישות ושאלות לקוח.pdf` | Original client requirements and Q&A (Hebrew) |
+
+A step-by-step testing guide with exact menu navigation and test data is in [`dev/TESTING_GUIDE.md`](dev/TESTING_GUIDE.md).
+
+---
+
 ## Running
 
 ```bash
@@ -192,6 +206,8 @@ java -cp out:lib/sqlite-jdbc.jar main.TransportApp
 # Or use the pre-built JAR
 java -jar release/transport.jar
 ```
+
+When prompted at startup, enter `Y` to load demo data (pre-seeded trucks, drivers, sites, and sample transports).
 
 ---
 
