@@ -62,22 +62,23 @@ public class TruckDAO {
     public void insertTruck(TruckDTO truck) {
         try (Connection conn = DatabaseConnection.getValidConnection()) {
             conn.setAutoCommit(false);
-            
-            String query = "INSERT INTO " + truckTableName + 
-                          " (license_plate, model, empty_weight, max_weight, available) VALUES (?, ?, ?, ?, ?)";
-            try (PreparedStatement statement = conn.prepareStatement(query)) {
-                statement.setString(1, truck.getLicensePlate());
-                statement.setString(2, truck.getModel());
-                statement.setDouble(3, truck.getEmptyWeight());
-                statement.setDouble(4, truck.getMaxWeight());
-                statement.setBoolean(5, truck.isAvailable());
-                statement.executeUpdate();
+            try {
+                String query = "INSERT INTO " + truckTableName +
+                              " (license_plate, model, empty_weight, max_weight, available) VALUES (?, ?, ?, ?, ?)";
+                try (PreparedStatement statement = conn.prepareStatement(query)) {
+                    statement.setString(1, truck.getLicensePlate());
+                    statement.setString(2, truck.getModel());
+                    statement.setDouble(3, truck.getEmptyWeight());
+                    statement.setDouble(4, truck.getMaxWeight());
+                    statement.setBoolean(5, truck.isAvailable());
+                    statement.executeUpdate();
+                }
+                insertLicenseTypesForTruck(conn, truck.getLicensePlate(), truck.getRequiredLicenseTypes());
+                conn.commit();
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
             }
-
-            // Insert license types
-            insertLicenseTypesForTruck(conn, truck.getLicensePlate(), truck.getRequiredLicenseTypes());
-            
-            conn.commit();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -86,23 +87,24 @@ public class TruckDAO {
     public void updateTruck(TruckDTO truck) {
         try (Connection conn = DatabaseConnection.getValidConnection()) {
             conn.setAutoCommit(false);
-            
-            String query = "UPDATE " + truckTableName + 
-                          " SET model = ?, empty_weight = ?, max_weight = ?, available = ? WHERE license_plate = ?";
-            try (PreparedStatement statement = conn.prepareStatement(query)) {
-                statement.setString(1, truck.getModel());
-                statement.setDouble(2, truck.getEmptyWeight());
-                statement.setDouble(3, truck.getMaxWeight());
-                statement.setBoolean(4, truck.isAvailable());
-                statement.setString(5, truck.getLicensePlate());
-                statement.executeUpdate();
+            try {
+                String query = "UPDATE " + truckTableName +
+                              " SET model = ?, empty_weight = ?, max_weight = ?, available = ? WHERE license_plate = ?";
+                try (PreparedStatement statement = conn.prepareStatement(query)) {
+                    statement.setString(1, truck.getModel());
+                    statement.setDouble(2, truck.getEmptyWeight());
+                    statement.setDouble(3, truck.getMaxWeight());
+                    statement.setBoolean(4, truck.isAvailable());
+                    statement.setString(5, truck.getLicensePlate());
+                    statement.executeUpdate();
+                }
+                deleteLicenseTypesForTruck(conn, truck.getLicensePlate());
+                insertLicenseTypesForTruck(conn, truck.getLicensePlate(), truck.getRequiredLicenseTypes());
+                conn.commit();
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
             }
-
-            // Update license types
-            deleteLicenseTypesForTruck(conn, truck.getLicensePlate());
-            insertLicenseTypesForTruck(conn, truck.getLicensePlate(), truck.getRequiredLicenseTypes());
-            
-            conn.commit();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -111,17 +113,18 @@ public class TruckDAO {
     public void deleteTruck(String licensePlate) {
         try (Connection conn = DatabaseConnection.getValidConnection()) {
             conn.setAutoCommit(false);
-            
-            // Delete license types first
-            deleteLicenseTypesForTruck(conn, licensePlate);
-            
-            String query = "DELETE FROM " + truckTableName + " WHERE license_plate = ?";
-            try (PreparedStatement statement = conn.prepareStatement(query)) {
-                statement.setString(1, licensePlate);
-                statement.executeUpdate();
+            try {
+                deleteLicenseTypesForTruck(conn, licensePlate);
+                String query = "DELETE FROM " + truckTableName + " WHERE license_plate = ?";
+                try (PreparedStatement statement = conn.prepareStatement(query)) {
+                    statement.setString(1, licensePlate);
+                    statement.executeUpdate();
+                }
+                conn.commit();
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
             }
-            
-            conn.commit();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -177,8 +180,9 @@ public class TruckDAO {
             for (String licenseType : licenseTypes) {
                 statement.setString(1, licensePlate);
                 statement.setString(2, licenseType);
-                statement.executeUpdate();
+                statement.addBatch();
             }
+            statement.executeBatch();
         }
     }
 

@@ -40,9 +40,10 @@ public class TransportDAO {
                         TruckDTO truck = truckDAO.getTruckByLicensePlate(truckLicensePlate);
                         DriverDTO driver = driverDAO.getDriverById(driverId);
                         SiteDTO sourceSite = siteDAO.getSiteByName(sourceSiteName);
+                        if (truck == null || driver == null || sourceSite == null) return null;
                         List<SiteDTO> destinations = getDestinationsForTransport(id);
 
-                        return new TransportDTO(id, date, time, truck, driver, sourceSite, 
+                        return new TransportDTO(id, date, time, truck, driver, sourceSite,
                                               destinations, currentWeight, status);
                     }
                 }
@@ -72,9 +73,10 @@ public class TransportDAO {
                     TruckDTO truck = truckDAO.getTruckByLicensePlate(truckLicensePlate);
                     DriverDTO driver = driverDAO.getDriverById(driverId);
                     SiteDTO sourceSite = siteDAO.getSiteByName(sourceSiteName);
+                    if (truck == null || driver == null || sourceSite == null) continue;
                     List<SiteDTO> destinations = getDestinationsForTransport(id);
 
-                    transports.add(new TransportDTO(id, date, time, truck, driver, sourceSite, 
+                    transports.add(new TransportDTO(id, date, time, truck, driver, sourceSite,
                                                   destinations, currentWeight, status));
                 }
             }
@@ -87,25 +89,26 @@ public class TransportDAO {
     public void insertTransport(TransportDTO transport) {
         try (Connection conn = DatabaseConnection.getValidConnection()) {
             conn.setAutoCommit(false);
-            
-            String query = "INSERT INTO " + transportTableName + 
-                          " (id, date, time, truck_license_plate, driver_id, source_site_name, current_weight, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-            try (PreparedStatement statement = conn.prepareStatement(query)) {
-                statement.setInt(1, transport.getId());
-                statement.setString(2, transport.getDate().toString());
-                statement.setString(3, transport.getTime().toString());
-                statement.setString(4, transport.getTruck().getLicensePlate());
-                statement.setString(5, transport.getDriver().getId());
-                statement.setString(6, transport.getSourceSite().getName());
-                statement.setDouble(7, transport.getCurrentWeight());
-                statement.setString(8, transport.getStatus());
-                statement.executeUpdate();
+            try {
+                String query = "INSERT INTO " + transportTableName +
+                              " (id, date, time, truck_license_plate, driver_id, source_site_name, current_weight, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                try (PreparedStatement statement = conn.prepareStatement(query)) {
+                    statement.setInt(1, transport.getId());
+                    statement.setString(2, transport.getDate().toString());
+                    statement.setString(3, transport.getTime().toString());
+                    statement.setString(4, transport.getTruck().getLicensePlate());
+                    statement.setString(5, transport.getDriver().getId());
+                    statement.setString(6, transport.getSourceSite().getName());
+                    statement.setDouble(7, transport.getCurrentWeight());
+                    statement.setString(8, transport.getStatus());
+                    statement.executeUpdate();
+                }
+                insertDestinationsForTransport(conn, transport.getId(), transport.getDestinations());
+                conn.commit();
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
             }
-
-            // Insert destinations
-            insertDestinationsForTransport(conn, transport.getId(), transport.getDestinations());
-            
-            conn.commit();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -114,26 +117,27 @@ public class TransportDAO {
     public void updateTransport(TransportDTO transport) {
         try (Connection conn = DatabaseConnection.getValidConnection()) {
             conn.setAutoCommit(false);
-            
-            String query = "UPDATE " + transportTableName + 
-                          " SET date = ?, time = ?, truck_license_plate = ?, driver_id = ?, source_site_name = ?, current_weight = ?, status = ? WHERE id = ?";
-            try (PreparedStatement statement = conn.prepareStatement(query)) {
-                statement.setString(1, transport.getDate().toString());
-                statement.setString(2, transport.getTime().toString());
-                statement.setString(3, transport.getTruck().getLicensePlate());
-                statement.setString(4, transport.getDriver().getId());
-                statement.setString(5, transport.getSourceSite().getName());
-                statement.setDouble(6, transport.getCurrentWeight());
-                statement.setString(7, transport.getStatus());
-                statement.setInt(8, transport.getId());
-                statement.executeUpdate();
+            try {
+                String query = "UPDATE " + transportTableName +
+                              " SET date = ?, time = ?, truck_license_plate = ?, driver_id = ?, source_site_name = ?, current_weight = ?, status = ? WHERE id = ?";
+                try (PreparedStatement statement = conn.prepareStatement(query)) {
+                    statement.setString(1, transport.getDate().toString());
+                    statement.setString(2, transport.getTime().toString());
+                    statement.setString(3, transport.getTruck().getLicensePlate());
+                    statement.setString(4, transport.getDriver().getId());
+                    statement.setString(5, transport.getSourceSite().getName());
+                    statement.setDouble(6, transport.getCurrentWeight());
+                    statement.setString(7, transport.getStatus());
+                    statement.setInt(8, transport.getId());
+                    statement.executeUpdate();
+                }
+                deleteDestinationsForTransport(conn, transport.getId());
+                insertDestinationsForTransport(conn, transport.getId(), transport.getDestinations());
+                conn.commit();
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
             }
-
-            // Update destinations
-            deleteDestinationsForTransport(conn, transport.getId());
-            insertDestinationsForTransport(conn, transport.getId(), transport.getDestinations());
-            
-            conn.commit();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -142,17 +146,18 @@ public class TransportDAO {
     public void deleteTransport(int id) {
         try (Connection conn = DatabaseConnection.getValidConnection()) {
             conn.setAutoCommit(false);
-            
-            // Delete destinations first
-            deleteDestinationsForTransport(conn, id);
-            
-            String query = "DELETE FROM " + transportTableName + " WHERE id = ?";
-            try (PreparedStatement statement = conn.prepareStatement(query)) {
-                statement.setInt(1, id);
-                statement.executeUpdate();
+            try {
+                deleteDestinationsForTransport(conn, id);
+                String query = "DELETE FROM " + transportTableName + " WHERE id = ?";
+                try (PreparedStatement statement = conn.prepareStatement(query)) {
+                    statement.setInt(1, id);
+                    statement.executeUpdate();
+                }
+                conn.commit();
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
             }
-            
-            conn.commit();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -177,9 +182,10 @@ public class TransportDAO {
                         TruckDTO truck = truckDAO.getTruckByLicensePlate(truckLicensePlate);
                         DriverDTO driver = driverDAO.getDriverById(driverId);
                         SiteDTO sourceSite = siteDAO.getSiteByName(sourceSiteName);
+                        if (truck == null || driver == null || sourceSite == null) continue;
                         List<SiteDTO> destinations = getDestinationsForTransport(id);
 
-                        transports.add(new TransportDTO(id, date, time, truck, driver, sourceSite, 
+                        transports.add(new TransportDTO(id, date, time, truck, driver, sourceSite,
                                                       destinations, currentWeight, status));
                     }
                 }
@@ -209,9 +215,10 @@ public class TransportDAO {
                         TruckDTO truck = truckDAO.getTruckByLicensePlate(truckLicensePlate);
                         DriverDTO driver = driverDAO.getDriverById(driverId);
                         SiteDTO sourceSite = siteDAO.getSiteByName(sourceSiteName);
+                        if (truck == null || driver == null || sourceSite == null) continue;
                         List<SiteDTO> destinations = getDestinationsForTransport(id);
 
-                        transports.add(new TransportDTO(id, date, time, truck, driver, sourceSite, 
+                        transports.add(new TransportDTO(id, date, time, truck, driver, sourceSite,
                                                       destinations, currentWeight, status));
                     }
                 }
@@ -231,9 +238,7 @@ public class TransportDAO {
                 try (ResultSet rs = statement.executeQuery()) {
                     while (rs.next()) {
                         String siteName = rs.getString("site_name");
-                        // Create new SiteDAO instance to avoid connection conflicts
-                        SiteDAO freshSiteDAO = new SiteDAO();
-                        SiteDTO site = freshSiteDAO.getSiteByName(siteName);
+                        SiteDTO site = siteDAO.getSiteByName(siteName);
                         if (site != null) {
                             destinations.add(site);
                         }
@@ -252,8 +257,9 @@ public class TransportDAO {
             for (SiteDTO destination : destinations) {
                 statement.setInt(1, transportId);
                 statement.setString(2, destination.getName());
-                statement.executeUpdate();
+                statement.addBatch();
             }
+            statement.executeBatch();
         }
     }
 

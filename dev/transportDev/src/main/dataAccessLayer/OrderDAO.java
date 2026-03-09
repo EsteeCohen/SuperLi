@@ -34,9 +34,10 @@ public class OrderDAO {
 
                         SiteDTO sourceSite = siteDAO.getSiteByName(sourceSiteName);
                         SiteDTO destinationSite = siteDAO.getSiteByName(destinationSiteName);
+                        if (sourceSite == null || destinationSite == null) return null;
                         List<ItemDTO> items = getItemsForOrder(id);
 
-                        return new OrderDTO(id, orderDate, status, sourceSite, destinationSite, 
+                        return new OrderDTO(id, orderDate, status, sourceSite, destinationSite,
                                           items, totalWeight);
                     }
                 }
@@ -63,9 +64,10 @@ public class OrderDAO {
 
                     SiteDTO sourceSite = siteDAO.getSiteByName(sourceSiteName);
                     SiteDTO destinationSite = siteDAO.getSiteByName(destinationSiteName);
+                    if (sourceSite == null || destinationSite == null) continue;
                     List<ItemDTO> items = getItemsForOrder(id);
 
-                    orders.add(new OrderDTO(id, orderDate, status, sourceSite, destinationSite, 
+                    orders.add(new OrderDTO(id, orderDate, status, sourceSite, destinationSite,
                                           items, totalWeight));
                 }
             }
@@ -78,23 +80,24 @@ public class OrderDAO {
     public void insertOrder(OrderDTO order) {
         try (Connection conn = DatabaseConnection.getValidConnection()) {
             conn.setAutoCommit(false);
-            
-            String query = "INSERT INTO " + orderTableName + 
-                          " (id, order_date, status, source_site_name, destination_site_name, total_weight) VALUES (?, ?, ?, ?, ?, ?)";
-            try (PreparedStatement statement = conn.prepareStatement(query)) {
-                statement.setInt(1, order.getId());
-                statement.setString(2, order.getOrderDate().toString());
-                statement.setString(3, order.getStatus());
-                statement.setString(4, order.getSourceSite().getName());
-                statement.setString(5, order.getDestinationSite().getName());
-                statement.setDouble(6, order.getTotalWeight());
-                statement.executeUpdate();
+            try {
+                String query = "INSERT INTO " + orderTableName +
+                              " (id, order_date, status, source_site_name, destination_site_name, total_weight) VALUES (?, ?, ?, ?, ?, ?)";
+                try (PreparedStatement statement = conn.prepareStatement(query)) {
+                    statement.setInt(1, order.getId());
+                    statement.setString(2, order.getOrderDate().toString());
+                    statement.setString(3, order.getStatus());
+                    statement.setString(4, order.getSourceSite().getName());
+                    statement.setString(5, order.getDestinationSite().getName());
+                    statement.setDouble(6, order.getTotalWeight());
+                    statement.executeUpdate();
+                }
+                insertItemsForOrder(conn, order.getId(), order.getItems());
+                conn.commit();
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
             }
-
-            // Insert items
-            insertItemsForOrder(conn, order.getId(), order.getItems());
-            
-            conn.commit();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -103,24 +106,25 @@ public class OrderDAO {
     public void updateOrder(OrderDTO order) {
         try (Connection conn = DatabaseConnection.getValidConnection()) {
             conn.setAutoCommit(false);
-            
-            String query = "UPDATE " + orderTableName + 
-                          " SET order_date = ?, status = ?, source_site_name = ?, destination_site_name = ?, total_weight = ? WHERE id = ?";
-            try (PreparedStatement statement = conn.prepareStatement(query)) {
-                statement.setString(1, order.getOrderDate().toString());
-                statement.setString(2, order.getStatus());
-                statement.setString(3, order.getSourceSite().getName());
-                statement.setString(4, order.getDestinationSite().getName());
-                statement.setDouble(5, order.getTotalWeight());
-                statement.setInt(6, order.getId());
-                statement.executeUpdate();
+            try {
+                String query = "UPDATE " + orderTableName +
+                              " SET order_date = ?, status = ?, source_site_name = ?, destination_site_name = ?, total_weight = ? WHERE id = ?";
+                try (PreparedStatement statement = conn.prepareStatement(query)) {
+                    statement.setString(1, order.getOrderDate().toString());
+                    statement.setString(2, order.getStatus());
+                    statement.setString(3, order.getSourceSite().getName());
+                    statement.setString(4, order.getDestinationSite().getName());
+                    statement.setDouble(5, order.getTotalWeight());
+                    statement.setInt(6, order.getId());
+                    statement.executeUpdate();
+                }
+                deleteItemsForOrder(conn, order.getId());
+                insertItemsForOrder(conn, order.getId(), order.getItems());
+                conn.commit();
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
             }
-
-            // Update items
-            deleteItemsForOrder(conn, order.getId());
-            insertItemsForOrder(conn, order.getId(), order.getItems());
-            
-            conn.commit();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -129,17 +133,18 @@ public class OrderDAO {
     public void deleteOrder(int id) {
         try (Connection conn = DatabaseConnection.getValidConnection()) {
             conn.setAutoCommit(false);
-            
-            // Delete items first
-            deleteItemsForOrder(conn, id);
-            
-            String query = "DELETE FROM " + orderTableName + " WHERE id = ?";
-            try (PreparedStatement statement = conn.prepareStatement(query)) {
-                statement.setInt(1, id);
-                statement.executeUpdate();
+            try {
+                deleteItemsForOrder(conn, id);
+                String query = "DELETE FROM " + orderTableName + " WHERE id = ?";
+                try (PreparedStatement statement = conn.prepareStatement(query)) {
+                    statement.setInt(1, id);
+                    statement.executeUpdate();
+                }
+                conn.commit();
+            } catch (SQLException e) {
+                conn.rollback();
+                throw e;
             }
-            
-            conn.commit();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -161,9 +166,10 @@ public class OrderDAO {
 
                         SiteDTO sourceSite = siteDAO.getSiteByName(sourceSiteName);
                         SiteDTO destinationSite = siteDAO.getSiteByName(destinationSiteName);
+                        if (sourceSite == null || destinationSite == null) continue;
                         List<ItemDTO> items = getItemsForOrder(id);
 
-                        orders.add(new OrderDTO(id, orderDate, status, sourceSite, destinationSite, 
+                        orders.add(new OrderDTO(id, orderDate, status, sourceSite, destinationSite,
                                               items, totalWeight));
                     }
                 }
@@ -190,9 +196,10 @@ public class OrderDAO {
 
                         SiteDTO sourceSite = siteDAO.getSiteByName(sourceSiteName);
                         SiteDTO destinationSite = siteDAO.getSiteByName(destinationSiteName);
+                        if (sourceSite == null || destinationSite == null) continue;
                         List<ItemDTO> items = getItemsForOrder(id);
 
-                        orders.add(new OrderDTO(id, date, status, sourceSite, destinationSite, 
+                        orders.add(new OrderDTO(id, date, status, sourceSite, destinationSite,
                                               items, totalWeight));
                     }
                 }
@@ -231,8 +238,9 @@ public class OrderDAO {
             for (ItemDTO item : items) {
                 statement.setInt(1, orderId);
                 statement.setInt(2, item.getId());
-                statement.executeUpdate();
+                statement.addBatch();
             }
+            statement.executeBatch();
         }
     }
 
